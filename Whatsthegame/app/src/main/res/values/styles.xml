@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="fonteEstilizada">
+        <item name="android:fontFamily">@font/HachiMaruPop-Regular</item>
+    </style>
+    <style name="fonteEstilizadaBold">
+        <item name="android:fontFamily">@font/MochiyPopPOne-Regular</item>
+    </style>
+    <style name="fonteBase">
+        <item name="android:fontFamily">@font/Poppins-Medium</item>
+    </style>
+
+
+</resources>
