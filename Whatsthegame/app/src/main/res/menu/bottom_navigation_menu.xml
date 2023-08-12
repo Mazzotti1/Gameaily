@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/minigamesNavbar"
+        android:enabled="true"
+        android:icon="@drawable/gamecontrollerthin"
+        android:iconTintMode="@color/white"
+        android:title=""
+        />
+
+    <item
+        android:id="@+id/rankNavbar"
+        android:enabled="true"
+        android:icon="@drawable/trophythin"
+        android:iconTintMode="@color/white"
+        android:title=""
+        />
+
+    <item
+        android:id="@+id/adNavbar"
+        android:enabled="true"
+        android:icon="@drawable/heartthin"
+        android:iconTintMode="@color/white"
+        android:title="" />
+
+</menu>

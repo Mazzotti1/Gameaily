@@ -2,14 +2,31 @@
 <resources>
 
     <style name="fonteEstilizada">
-        <item name="android:fontFamily">@font/HachiMaruPop-Regular</item>
+        <item name="android:fontFamily">@font/hachimarupop_regular</item>
     </style>
     <style name="fonteEstilizadaBold">
-        <item name="android:fontFamily">@font/MochiyPopPOne-Regular</item>
+        <item name="android:fontFamily">@font/mochiypoppone_regular</item>
     </style>
     <style name="fonteBase">
-        <item name="android:fontFamily">@font/Poppins-Medium</item>
+        <item name="android:fontFamily">@font/poppins_medium</item>
     </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+    </style>
+
+    <style name="AppTheme.WhatsTheGameActivity" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/appBar</item>
+        <item name="android:fontFamily">@font/mochiypoppone_regular</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorControlNormal">@color/black</item>
+    </style>
+
+    <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="android:queryBackground">@drawable/search_view_bg</item>
+        <item name="android:textColorHint">@android:color/black</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
 
 
 </resources>
