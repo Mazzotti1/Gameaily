@@ -3,7 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/minigamesNavbar">
+    app:startDestination="@id/whatsTheGame">
+    <fragment
+        android:id="@+id/whatsTheGame"
+        android:name="com.whatsthegame.fragments.whatsTheGameFragment"
+        android:label="fragment_whats_the_game"
+        tools:layout="@layout/fragment_whats_the_game" />
+    <fragment
+        android:id="@+id/adNavbar"
+        android:name="com.whatsthegame.fragments.adFragment"
+        android:label="fragment_ad"
+        tools:layout="@layout/fragment_ad" />
     <fragment
         android:id="@+id/minigamesNavbar"
         android:name="com.whatsthegame.fragments.minigamesFragment"
@@ -14,9 +24,4 @@
         android:name="com.whatsthegame.fragments.rankFragment"
         android:label="fragment_rank"
         tools:layout="@layout/fragment_rank" />
-    <fragment
-        android:id="@+id/adNavbar"
-        android:name="com.whatsthegame.fragments.adFragment"
-        android:label="fragment_ad"
-        tools:layout="@layout/fragment_ad" />
 </navigation>

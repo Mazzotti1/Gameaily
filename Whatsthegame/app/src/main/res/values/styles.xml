@@ -26,6 +26,12 @@
         <item name="android:textColorHint">@android:color/black</item>
         <item name="android:textSize">12sp</item>
     </style>
+    <style name="NavbarIconStyle">
+        <item name="android:width">48dp</item>
+        <item name="android:height">48dp</item>
+        <item name="android:tint">@color/black</item>
+    </style>
+
 
 
 
