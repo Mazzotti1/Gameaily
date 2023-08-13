@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme.WhatsTheGameActivity" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/appBar</item>
+        <item name="android:fontFamily">@font/mochiypoppone_regular</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorControlNormal">@color/black</item>
+    </style>
+</resources>

@@ -18,6 +18,14 @@
         <item name="colorPrimary">@color/appBar</item>
         <item name="android:fontFamily">@font/mochiypoppone_regular</item>
         <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:color">@color/black</item>
+        <item name="android:colorControlNormal">@color/black</item>
+    </style>
+
+    <style name="AppTheme.RankActivity" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/appBar</item>
+        <item name="android:fontFamily">@font/mochiypoppone_regular</item>
+        <item name="android:textColorPrimary">@color/black</item>
         <item name="android:colorControlNormal">@color/black</item>
     </style>
 
