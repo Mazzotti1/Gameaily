@@ -1,15 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.minigamesFragment">
+    tools:context=".fragments.minigamesFragment"
+    android:background="@color/background">
 
-    <!-- TODO: Update blank fragment layout -->
+    <Button
+        android:id="@+id/anagramSolverButton"
+        android:layout_width="199dp"
+        android:layout_height="90dp"
+        android:backgroundTint="@color/destaques"
+        android:fontFamily="@font/mochiypoppone_regular"
+        android:text="Anagramas solver"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.109"
+        tools:ignore="MissingConstraints" />
+
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment"
-        android:background="@color/secundaria"/>
+        android:id="@+id/anagramSolverText"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Os jogadores recebem um anagrama (um embaralhamento de letras) e têm que descobrir a palavra original por tempo. Sem limites para jogar."
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.292" />
 
-</FrameLayout>
+    <Button
+        android:id="@+id/tipButton"
+        android:layout_width="199dp"
+        android:layout_height="90dp"
+        android:backgroundTint="@color/destaques"
+        android:fontFamily="@font/mochiypoppone_regular"
+        android:text="Pistas"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.569"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Os jogadores recebem pistas enigmáticas que levam a uma palavra específica. Eles precisam decifrar as pistas e adivinhar a palavra correta. Quanto mais complexa a pista, mais pontos ganham."
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.82" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

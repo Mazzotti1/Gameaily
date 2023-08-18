@@ -11,7 +11,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WhatsTheGame"
         tools:targetApi="31" >
-
+        <activity
+            android:name=".activitys.SettingsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_settings" />
         <activity
             android:name=".activitys.MainActivity"
             android:exported="true"

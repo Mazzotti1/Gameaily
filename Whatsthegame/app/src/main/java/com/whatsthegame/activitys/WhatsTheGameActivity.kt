@@ -1,9 +1,11 @@
 package com.whatsthegame.activitys
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
 
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -21,11 +23,11 @@ class WhatsTheGameActivity : AppCompatActivity() {
         return true
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val navController = findNavController(R.id.fragment)
+
         when (item.itemId) {
             R.id.icon_bet -> {
-                return true
-            }
-            R.id.icon_gear -> {
+                navController.navigate(R.id.rouletteFragment)
                 return true
             }
             else -> return super.onOptionsItemSelected(item)

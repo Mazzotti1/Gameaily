@@ -53,7 +53,7 @@
         tools:ignore="MissingConstraints"
         android:src="@drawable/trophythin"
         app:tint="@color/black"
-        android:background="@drawable/rounded_button_home"/>
+        android:background="@drawable/rounded_buttons_home"/>
 
     <ImageButton
         android:id="@+id/homeButtonMiniGames"
@@ -68,7 +68,7 @@
         tools:ignore="MissingConstraints"
         android:src="@drawable/gamecontrollerthin"
         app:tint="@color/black"
-        android:background="@drawable/rounded_button_home"/>
+        android:background="@drawable/rounded_buttons_home"/>
 
     <ImageButton
         android:id="@+id/homeButtonSettings"
@@ -83,7 +83,7 @@
         tools:ignore="MissingConstraints"
         android:src="@drawable/gearthin"
         app:tint="@color/black"
-        android:background="@drawable/rounded_button_home"/>
+        android:background="@drawable/rounded_buttons_home"/>
 
     <TextView
         android:layout_width="wrap_content"

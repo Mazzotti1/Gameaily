@@ -3,14 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/icon_bet"
-        android:title="Icon 1"
+        android:title="Roleta"
         android:icon="@drawable/bet"
         android:orderInCategory="100"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/icon_gear"
-        android:title="Icon 2"
+        android:title="Configurações"
         android:icon="@drawable/gearthin"
         android:orderInCategory="101"
         app:showAsAction="always"

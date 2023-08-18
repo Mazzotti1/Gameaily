@@ -7,21 +7,30 @@
     <fragment
         android:id="@+id/whatsTheGame"
         android:name="com.whatsthegame.fragments.whatsTheGameFragment"
-        android:label="fragment_whats_the_game"
+        android:label="What's the Game"
         tools:layout="@layout/fragment_whats_the_game" />
+
     <fragment
         android:id="@+id/adNavbar"
         android:name="com.whatsthegame.fragments.adFragment"
-        android:label="fragment_ad"
+        android:label="Advertisement"
         tools:layout="@layout/fragment_ad" />
+
     <fragment
         android:id="@+id/minigamesNavbar"
         android:name="com.whatsthegame.fragments.minigamesFragment"
-        android:label="fragment_minigames"
+        android:label="Mini Games"
         tools:layout="@layout/fragment_minigames" />
+
     <fragment
         android:id="@+id/rankNavbar"
         android:name="com.whatsthegame.fragments.rankFragment"
-        android:label="fragment_rank"
+        android:label="Rankings"
         tools:layout="@layout/fragment_rank" />
+    <fragment
+        android:id="@+id/rouletteFragment"
+        android:name="com.whatsthegame.appBarFragments.rouletteFragment"
+        android:label="fragment_roulette"
+        tools:layout="@layout/fragment_roulette" />
+
 </navigation>
