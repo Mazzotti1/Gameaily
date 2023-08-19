@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_rank"
+    app:startDestination="@id/rankNavbar">
+
+   <fragment
+       android:id="@+id/rankNavbar"
+       android:name="com.whatsthegame.fragments.rankFragment"
+       android:label="Rankings"
+       tools:layout="@layout/fragment_rank" />
+    <fragment
+        android:id="@+id/whatsTheGame"
+        android:name="com.whatsthegame.fragments.whatsTheGameFragment"
+        android:label="What's the Game"
+        tools:layout="@layout/fragment_whats_the_game" />
+    <fragment
+        android:id="@+id/adNavbar"
+        android:name="com.whatsthegame.fragments.adFragment"
+        android:label="Advertisement"
+        tools:layout="@layout/fragment_ad" />
+    <fragment
+        android:id="@+id/minigamesNavbar"
+        android:name="com.whatsthegame.fragments.minigamesFragment"
+        android:label="Mini Games"
+        tools:layout="@layout/fragment_minigames" />
+    <fragment
+        android:id="@+id/rouletteFragment"
+        android:name="com.whatsthegame.appBarFragments.rouletteFragment"
+        android:label="fragment_roulette"
+        tools:layout="@layout/fragment_roulette" />
+ <fragment
+     android:id="@+id/settingsFragment"
+     android:name="com.whatsthegame.appBarFragments.SettingsFragment"
+     android:label="SettingsFragment"
+     tools:layout="@layout/fragment_settings">
+  <action
+      android:id="@+id/action_settingsFragment_to_aboutFragment"
+      app:destination="@id/aboutFragment"
+      app:popUpTo="@id/settingsFragment" />
+  <action
+      android:id="@+id/action_settingsFragment_to_faqFragment"
+      app:destination="@id/faqFragment"
+      app:popUpTo="@id/settingsFragment" />
+ </fragment>
+ <fragment
+     android:id="@+id/aboutFragment"
+     android:name="com.whatsthegame.appBarFragments.settingsFragments.aboutFragment"
+     android:label="fragment_about"
+     tools:layout="@layout/fragment_about" />
+ <fragment
+     android:id="@+id/faqFragment"
+     android:name="com.whatsthegame.appBarFragments.settingsFragments.faqFragment"
+     android:label="fragment_faq"
+     tools:layout="@layout/fragment_faq" />
+
+
+</navigation>

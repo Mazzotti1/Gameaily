@@ -1,13 +1,12 @@
-package com.whatsthegame.fragments
+package com.whatsthegame.appBarFragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import androidx.core.content.ContextCompat
+import android.widget.Button
+import androidx.navigation.fragment.findNavController
 import com.whatsthegame.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -17,10 +16,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [whatsTheGameFragment.newInstance] factory method to
+ * Use the [SettingsFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class whatsTheGameFragment : Fragment() {
+class SettingsFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -37,34 +36,24 @@ class whatsTheGameFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_whats_the_game, container, false)
+        // Inflate the layout for this fragment
+        val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
-        // Your existing code to add heart icons
-        val iconList = listOf(
-            R.drawable.heartthin,
-            R.drawable.heartthin,
-            R.drawable.heartthin,
-            R.drawable.heartthin,
-            R.drawable.heartthin
-        )
-        val iconContainer = rootView.findViewById<LinearLayout>(R.id.hearts)
-        val iconSize = resources.getDimensionPixelSize(R.dimen.icon_size)
-        for (iconResId in iconList) {
-            val imageView = ImageView(requireContext()) // Use requireContext() instead of 'this'
-            imageView.setImageResource(iconResId)
-            imageView.layoutParams = LinearLayout.LayoutParams(
-                resources.getDimensionPixelSize(R.dimen.icon_size),
-                resources.getDimensionPixelSize(R.dimen.icon_size)
-            )
-            imageView.setColorFilter(ContextCompat.getColor(requireContext(), R.color.destaques))
+        val faqButton = view.findViewById<Button>(R.id.faq)
+        val aboutButton = view.findViewById<Button>(R.id.about)
 
-            iconContainer.addView(imageView)
+        faqButton.setOnClickListener {
+            findNavController().navigate(R.id.action_settingsFragment_to_faqFragment)
         }
 
-        return rootView
+        aboutButton.setOnClickListener {
+            findNavController().navigate(R.id.action_settingsFragment_to_aboutFragment)
+        }
 
-
+        return view
     }
+
+
 
     companion object {
         /**
@@ -73,12 +62,12 @@ class whatsTheGameFragment : Fragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment whatsTheGameFragment.
+         * @return A new instance of fragment SettingsFragment.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            whatsTheGameFragment().apply {
+            SettingsFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)
