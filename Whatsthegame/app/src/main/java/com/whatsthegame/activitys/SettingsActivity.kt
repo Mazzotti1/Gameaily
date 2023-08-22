@@ -41,12 +41,7 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        setUpBottomNavigation()
 
     }
-    private fun setUpBottomNavigation(){
-        val navView : BottomNavigationView = findViewById(R.id.bottom_navigation)
-        val navController = findNavController(R.id.fragmentSettings)
-        navView.setupWithNavController(navController)
-    }
+
 }

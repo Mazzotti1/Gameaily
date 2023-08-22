@@ -13,6 +13,7 @@
     <color name="background">#353535</color>
     <color name="backgroundButton">#EFEFEF</color>
     <color name="appBar">#CCCCCC</color>
+    <color name="win">#84EBB3</color>
 
 </resources>
 

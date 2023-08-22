@@ -5,9 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.findNavController
 import com.whatsthegame.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -33,11 +35,24 @@ class whatsTheGameFragment : Fragment() {
         }
     }
 
+    private val token = false
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_whats_the_game, container, false)
+
+        val sendButton = rootView.findViewById<Button>(R.id.sendButton)
+        sendButton.setOnClickListener {
+            if (token){
+                findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
+            }else{
+                findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
+            }
+
+        }
+
+
 
         // Your existing code to add heart icons
         val iconList = listOf(
