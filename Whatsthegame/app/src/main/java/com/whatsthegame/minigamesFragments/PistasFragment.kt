@@ -1,12 +1,13 @@
-package com.whatsthegame.fragments
+package com.whatsthegame.minigamesFragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import androidx.navigation.fragment.findNavController
+import android.widget.ImageView
+import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import com.whatsthegame.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -16,10 +17,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [minigamesFragment.newInstance] factory method to
+ * Use the [PistasFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class minigamesFragment : Fragment() {
+class PistasFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -37,20 +38,29 @@ class minigamesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_minigames, container, false)
+        val view = inflater.inflate(R.layout.fragment_pistas, container, false)
+        val iconList = listOf(
+            R.drawable.heartthin,
+            R.drawable.heartthin,
+            R.drawable.heartthin,
+        )
+        val iconContainer = view.findViewById<LinearLayout>(R.id.hearts)
+        val iconSize = resources.getDimensionPixelSize(R.dimen.icon_size)
+        for (iconResId in iconList) {
+            val imageView = ImageView(requireContext())
+            imageView.setImageResource(iconResId)
+            imageView.layoutParams = LinearLayout.LayoutParams(
+                resources.getDimensionPixelSize(R.dimen.icon_size),
+                resources.getDimensionPixelSize(R.dimen.icon_size)
+            )
+            imageView.setColorFilter(ContextCompat.getColor(requireContext(), R.color.destaques))
 
-        val anagramSolverButton = view.findViewById<Button>(R.id.anagramSolverButton)
-        anagramSolverButton.setOnClickListener {
-                findNavController().navigate(R.id.action_minigamesNavbar_to_anagramaSolverFragment)
-        }
-        val pistasSolverButton = view.findViewById<Button>(R.id.pistasButton)
-        pistasSolverButton.setOnClickListener {
-            findNavController().navigate(R.id.action_minigamesNavbar_to_pistasFragment)
+            iconContainer.addView(imageView)
         }
 
         return view
-    }
 
+    }
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -58,12 +68,12 @@ class minigamesFragment : Fragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment minigamesFragment.
+         * @return A new instance of fragment PistasFragment.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            minigamesFragment().apply {
+            PistasFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

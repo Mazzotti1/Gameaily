@@ -26,9 +26,6 @@
             android:label="Mini Games"
             android:parentActivityName=".activitys.MainActivity"
             android:theme="@style/AppTheme.WhatsTheGameActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activitys.MainActivity" />
         </activity>
         <activity
             android:name=".activitys.RankActivity"

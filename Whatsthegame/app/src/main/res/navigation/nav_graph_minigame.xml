@@ -9,7 +9,14 @@
         android:id="@+id/minigamesNavbar"
         android:name="com.whatsthegame.fragments.minigamesFragment"
         android:label="Mini Games"
-        tools:layout="@layout/fragment_minigames" />
+        tools:layout="@layout/fragment_minigames" >
+        <action
+            android:id="@+id/action_minigamesNavbar_to_anagramaSolverFragment"
+            app:destination="@id/anagramaSolverFragment2" />
+        <action
+            android:id="@+id/action_minigamesNavbar_to_pistasFragment"
+            app:destination="@id/pistasFragment2" />
+    </fragment>
     <fragment
         android:id="@+id/whatsTheGame"
         android:name="com.whatsthegame.fragments.whatsTheGameFragment"
@@ -56,5 +63,15 @@
         android:name="com.whatsthegame.appBarFragments.settingsFragments.faqFragment"
         android:label="fragment_faq"
         tools:layout="@layout/fragment_faq" />
+    <fragment
+        android:id="@+id/anagramaSolverFragment2"
+        android:name="com.whatsthegame.minigamesFragments.AnagramaSolverFragment"
+        android:label="fragment_anagrama_solver"
+        tools:layout="@layout/fragment_anagrama_solver" />
+    <fragment
+        android:id="@+id/pistasFragment2"
+        android:name="com.whatsthegame.minigamesFragments.PistasFragment"
+        android:label="fragment_pistas"
+        tools:layout="@layout/fragment_pistas" />
 
 </navigation>

@@ -25,12 +25,14 @@ class RankActivity : AppCompatActivity() {
         val navController = findNavController(R.id.fragmentRank)
 
         when (item.itemId) {
-            R.id.icon_bet -> {
-                navController.navigate(R.id.rouletteFragment)
+            android.R.id.home -> {
+                if (!navController.popBackStack()) {
+                    finish()
+                }
                 return true
             }
-            R.id.icon_gear -> {
-                navController.navigate(R.id.settingsFragment)
+            R.id.icon_bet -> {
+                navController.navigate(R.id.rouletteFragment)
                 return true
             }
             R.id.icon_gear -> {

@@ -26,24 +26,32 @@ class WhatsTheGameActivity : AppCompatActivity() {
         val navController = findNavController(R.id.fragment)
 
 
-        return when (item.itemId) {
+        when (item.itemId) {
+            android.R.id.home -> {
+                if (!navController.popBackStack()) {
+                    finish()
+                }
+                return true
+            }
             R.id.icon_bet -> {
                 navController.navigate(R.id.rouletteFragment)
-                true
+                return true
             }
             R.id.icon_gear -> {
                 navController.navigate(R.id.settingsFragment)
-                true
+                return true
             }
-
-            else -> super.onOptionsItemSelected(item)
+            else -> return super.onOptionsItemSelected(item)
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_whats_the_game)
-
-
+        setUpBottomNavigation()
     }
-
+    private fun setUpBottomNavigation(){
+        val navView : BottomNavigationView = findViewById(R.id.bottom_navigation)
+        val navController = findNavController(R.id.fragment)
+        navView.setupWithNavController(navController)
+    }
 }

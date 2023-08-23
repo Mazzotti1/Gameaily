@@ -26,6 +26,12 @@ class SettingsActivity : AppCompatActivity() {
         val navController = findNavController(R.id.fragmentSettings)
 
         when (item.itemId) {
+            android.R.id.home -> {
+                if (!navController.popBackStack()) {
+                    finish()
+                }
+                return true
+            }
             R.id.icon_bet -> {
                 navController.navigate(R.id.rouletteFragment)
                 return true
@@ -37,7 +43,6 @@ class SettingsActivity : AppCompatActivity() {
             else -> return super.onOptionsItemSelected(item)
         }
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
