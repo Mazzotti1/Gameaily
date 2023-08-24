@@ -1,22 +1,14 @@
-package com.whatsTheGame.Server.Entity
+package com.musclemate.server.entity.form
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import jakarta.persistence.*
+import jakarta.persistence.Column
 import lombok.AllArgsConstructor
 import lombok.Data
 import lombok.NoArgsConstructor
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "users")
-@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
-class Users {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null
-
+class UserForm {
     @Column(unique = true)
     var name: String? = null
 
@@ -30,4 +22,5 @@ class Users {
     var division: String? = null
 
     var points: Int? = null
+
 }
