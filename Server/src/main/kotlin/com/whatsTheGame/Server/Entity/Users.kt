@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor
 @JsonIgnoreProperties("hibernateLazyInitializer", "handler")
 class Users {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
@@ -30,4 +31,10 @@ class Users {
     var division: String? = null
 
     var points: Int? = null
+
+    var token: String? = null
+
+    fun token(token: String?) {
+        this.token = token.toString()
+    }
 }

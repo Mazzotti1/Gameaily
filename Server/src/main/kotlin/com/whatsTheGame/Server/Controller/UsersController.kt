@@ -3,8 +3,12 @@ package com.whatsTheGame.Server.Controller
 import com.musclemate.server.entity.form.UserForm
 import com.whatsTheGame.Server.DTOS.UsersDTO
 import com.whatsTheGame.Server.Entity.Users
+import com.whatsTheGame.Server.IncorrectException.RegistroIncorretoException
 import com.whatsTheGame.Server.Services.Impl.UserServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.security.core.AuthenticationException
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -25,8 +29,26 @@ class UsersController {
         return usersDTOList
     }
     @PostMapping("/register")
-    fun create(@RequestBody form: UserForm?): Users? {
-        return service!!.create(form!!)
+    fun create(@RequestBody form: UserForm?): ResponseEntity<out Any> {
+        try {
+            val user = service!!.create(form!!)
+            return ResponseEntity(user, HttpStatus.CREATED)
+        }catch (ex: RegistroIncorretoException){
+            val errorMessage = ex.message ?: "Ocorreu um erro durante a criação do usuário."
+            return ResponseEntity(mapOf("error" to errorMessage), HttpStatus.BAD_REQUEST)
+        }
+    }
+
+    @PostMapping("/login")
+    @Throws(AuthenticationException::class)
+    fun login(@RequestBody form: UserForm): ResponseEntity<out Any> {
+        try {
+            val users: Users? = service?.login(form.email, form.password)
+            return ResponseEntity.ok().body(users?.token)
+        }catch (ex: RegistroIncorretoException){
+        val errorMessage = ex.message ?: "Ocorreu um erro durante a criação do usuário."
+        return ResponseEntity(mapOf("error" to errorMessage), HttpStatus.BAD_REQUEST)
+     }
     }
 
 }

@@ -25,9 +25,9 @@ class WebSecurityConfiguration {
         http {
             //addFilterBefore<UsernamePasswordAuthenticationFilter>(JwtAuthenticationFilter())
             authorizeRequests {
-                authorize("/users", permitAll)
                 authorize("/users/register", permitAll)
-                authorize(anyRequest, authenticated)
+                authorize("/users/login", permitAll)
+                authorize(anyRequest, permitAll)
             }
             csrf { disable() }
             authorizeRequests {  }
