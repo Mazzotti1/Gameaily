@@ -1,5 +1,7 @@
 package com.whatsTheGame.Server.Security
 
+import JwtAuthenticationFilter
+import io.github.cdimascio.dotenv.dotenv
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -9,12 +11,15 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @Configuration
 @EnableWebSecurity
-class WebSecurityConfiguration {
+class WebSecurityConfiguration{
 
-
+    val dotenv = dotenv()
+    val routeA = dotenv["ROUTE_A"]!!
+    val routeB = dotenv["ROUTE_B"]!!
     @Bean
     fun encoder(): PasswordEncoder? {
         return BCryptPasswordEncoder()
@@ -23,17 +28,17 @@ class WebSecurityConfiguration {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http {
-            //addFilterBefore<UsernamePasswordAuthenticationFilter>(JwtAuthenticationFilter())
             authorizeRequests {
-                authorize("/users/register", permitAll)
-                authorize("/users/login", permitAll)
-                authorize(anyRequest, permitAll)
+                authorize(routeA, permitAll)
+                authorize(routeB, permitAll)
+                authorize(anyRequest, authenticated)
             }
-            csrf { disable() }
-            authorizeRequests {  }
-            sessionManagement { SessionCreationPolicy.STATELESS }
             cors {  }
-            headers {  }
+            headers { frameOptions { disable() } }
+            csrf { disable() }
+            sessionManagement {SessionCreationPolicy.STATELESS}
+            authorizeRequests {  }
+            addFilterBefore<UsernamePasswordAuthenticationFilter>(JwtAuthenticationFilter(JwtToken()))
             formLogin {disable()}
             httpBasic {}
         }

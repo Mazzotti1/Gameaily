@@ -1,48 +1,49 @@
-import com.whatsTheGame.Server.Repository.UserRepository
-import io.jsonwebtoken.Claims
+
+import com.whatsTheGame.Server.Security.JwtToken
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.Keys
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.filter.OncePerRequestFilter
 
+class JwtAuthenticationFilter(private val jwtToken: JwtToken) : OncePerRequestFilter() {
 
-class JwtAuthenticationFilter : UsernamePasswordAuthenticationFilter() {
-
-    private val userRepository: UserRepository = TODO()
-    fun doFilterInternal(
-        request: HttpServletRequest,
-        response: HttpServletResponse,
-        chain: FilterChain
+    override fun doFilterInternal(
+         request: HttpServletRequest,
+         response: HttpServletResponse,
+         chain: FilterChain
     ) {
         val token = extractTokenFromRequest(request)
 
         if (token != null) {
-            // Valide e decodifique o token JWT aqui (use a biblioteca jjwt)
-            // Verifique se o token é válido e não expirou, etc.
-            val claims = Jwts.parser()
-                .setSigningKey("asdasdas")
-                .parseClaimsJws(token)
-                .body as Claims
+            try {
+                val claims = Jwts
+                    .parserBuilder()
+                    .setSigningKey(Keys.hmacShaKeyFor(jwtToken.secretKey.toByteArray()))
+                    .build()
+                    .parseClaimsJws(token)
+                    .body
 
-            // Extraia o userId das reivindicações
-            val userId = claims["userId"] as String
+                val userId = claims.id
 
-            // Crie um objeto de autenticação com o userId
-            val authentication: Authentication = UsernamePasswordAuthenticationToken(userId, null)
+                val authentication: Authentication = UsernamePasswordAuthenticationToken(userId, null, null)
+                SecurityContextHolder.getContext().authentication = authentication
+            } catch (ex: Exception) {
 
-            // Defina a autenticação no contexto de segurança
-            SecurityContextHolder.getContext().authentication = authentication
+            }
         }
+
         chain.doFilter(request, response)
     }
-    private fun extractTokenFromRequest(request: HttpServletRequest): String? {
-        val authorizationHeader = request.getHeader("Authorization")
-        return authorizationHeader?.replace("Bearer ", "")
 
+    private fun extractTokenFromRequest(request: HttpServletRequest): String? {
+        val header = request.getHeader("Authorization")
+        return if (header != null && header.startsWith("Bearer ")) {
+            header.substring(7)
+        } else null
     }
 }
-

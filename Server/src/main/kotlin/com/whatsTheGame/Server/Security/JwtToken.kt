@@ -1,14 +1,19 @@
 package com.whatsTheGame.Server.Security
 
+import io.github.cdimascio.dotenv.dotenv
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class JwtToken {
+class JwtToken{
 
+    val dotenv = dotenv()
+    val secretKey = dotenv["JWT_SECRET"]!!
+
+    private val userDetailsService: UserDetailsService? = null
     fun generateToken(
         id: Long?,
         name: String?,
@@ -21,7 +26,7 @@ class JwtToken {
         val now = Date()
         val expiryDate = Date(now.time + 3600000)
 
-        val key = Keys.secretKeyFor(SignatureAlgorithm.HS512)
+        val key = Keys.hmacShaKeyFor(secretKey.toByteArray())
 
         return Jwts.builder()
             .setSubject(id.toString())
@@ -39,3 +44,4 @@ class JwtToken {
     }
 
 }
+
