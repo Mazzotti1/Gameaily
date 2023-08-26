@@ -20,6 +20,7 @@ class WebSecurityConfiguration{
     val dotenv = dotenv()
     val routeA = dotenv["ROUTE_A"]!!
     val routeB = dotenv["ROUTE_B"]!!
+    val routeC = dotenv["ROUTE_C"]!!
     @Bean
     fun encoder(): PasswordEncoder? {
         return BCryptPasswordEncoder()
@@ -31,6 +32,7 @@ class WebSecurityConfiguration{
             authorizeRequests {
                 authorize(routeA, permitAll)
                 authorize(routeB, permitAll)
+                authorize(routeC, permitAll)
                 authorize(anyRequest, authenticated)
             }
             cors {  }

@@ -9,38 +9,22 @@ import lombok.NoArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "games")
 @JsonIgnoreProperties("hibernateLazyInitializer", "handler")
-class Users {
-
+class Games {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 
     @Column(unique = true)
-    var name: String? = null
+    var gameName: String? = null
 
     @Column(unique = true)
-    var email: String? = null
+    var gameImage: String? = null
 
-    var password: String? = null
+    var difficulty: String? = null
 
-    var rank: String? = null
+    var tips: String? = null
 
-    var division: String? = null
-
-    var points: Int? = null
-
-    var token: String? = null
-
-    var lifesWtg: Int = 5
-
-    var lifesAnagrams: Int = 3
-
-    var lifePistas: Int = 3
-
-    fun token(token: String?) {
-        this.token = token.toString()
-    }
 }
