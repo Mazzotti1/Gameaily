@@ -12,6 +12,7 @@ class JwtToken{
 
     val dotenv = dotenv()
     val secretKey = dotenv["JWT_SECRET"]!!
+    val tokenExpiry : String? = dotenv["TOKEN_EXPIRY"]
 
     private val userDetailsService: UserDetailsService? = null
     fun generateToken(
@@ -24,7 +25,7 @@ class JwtToken{
 
     ): String? {
         val now = Date()
-        val expiryDate = Date(now.time + 3600000)
+        val expiryDate = Date(now.time + tokenExpiry!!.toInt())
 
         val key = Keys.hmacShaKeyFor(secretKey.toByteArray())
 
