@@ -4,8 +4,10 @@ import com.whatsTheGame.Server.DTOS.GamesDTO
 import com.whatsTheGame.Server.Entity.Games
 import com.whatsTheGame.Server.Services.Impl.GamesServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 
 @RestController
@@ -36,14 +38,17 @@ class GamesController {
     data class GuessRequest(val gameName: String)
     data class GuessResponse(val message: String)
     @PostMapping("/guess")
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun guessDiaryGame(@RequestBody request: GuessRequest): ResponseEntity<GuessResponse> {
         val isCorrect = gamesService!!.guessTheGame(request.gameName)
-        val responseMessage = if (isCorrect) {
-            "Resposta certa!"
+        if (isCorrect) {
+            val responseMessage = "Resposta certa!"
+            val response = GuessResponse(responseMessage)
+            return ResponseEntity.ok(response)
         } else {
-            "Jogo errado!"
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Jogo errado!")
+
         }
-        val response = GuessResponse(responseMessage) 
-        return ResponseEntity.ok(response)
     }
+
 }

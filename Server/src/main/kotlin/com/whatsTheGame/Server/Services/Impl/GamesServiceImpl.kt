@@ -1,6 +1,7 @@
 package com.whatsTheGame.Server.Services.Impl
 
 import com.whatsTheGame.Server.Entity.Games
+import com.whatsTheGame.Server.IncorrectException.RespostaIncorretaException
 import com.whatsTheGame.Server.Repository.GamesRepository
 import com.whatsTheGame.Server.Services.IGamesService
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,6 +33,7 @@ class GamesServiceImpl @Autowired constructor(
         return gameOfTheDay
     }
 
+    @Throws(RespostaIncorretaException::class)
     override fun guessTheGame(gameName: String?): Boolean {
         if (gameOfTheDay == null) {
             return false
@@ -41,6 +43,7 @@ class GamesServiceImpl @Autowired constructor(
 
 
 }
+
 
 
 
