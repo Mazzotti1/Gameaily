@@ -31,8 +31,8 @@ class GamesController {
         return gamesDTOList
     }
     @GetMapping("/diary")
-    fun getDiaryGame(gameName: String?): Games? {
-        return gamesService!!.getDiaryGame(gameName)
+    fun getDiaryGame(): Games? {
+        return gamesService!!.getDiaryGame()
     }
 
     data class GuessRequest(val gameName: String)

@@ -12,4 +12,5 @@ interface IUsersService {
     @Throws(AuthenticationException::class)
     fun login(email: String?, password: String?): Users?
 
+    fun deleteAccount(userId: Long): Boolean
 }

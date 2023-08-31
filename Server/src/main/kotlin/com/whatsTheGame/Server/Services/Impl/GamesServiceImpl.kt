@@ -20,7 +20,7 @@ class GamesServiceImpl @Autowired constructor(
 
     private var gameOfTheDay: Games? = null
 
-    override fun getDiaryGame(gameName: String?): Games? {
+    override fun getDiaryGame(): Games? {
         val allGames = gamesRepository!!.findAll()
 
         val calendar = Calendar.getInstance()
@@ -40,6 +40,7 @@ class GamesServiceImpl @Autowired constructor(
         }
         return gameName == gameOfTheDay?.gameName
     }
+
 
 
 }

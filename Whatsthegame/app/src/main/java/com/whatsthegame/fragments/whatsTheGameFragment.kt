@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
+import com.whatsthegame.Api.ApiManager
 import com.whatsthegame.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -27,6 +28,8 @@ class whatsTheGameFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+
+    val apiManager = ApiManager()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -51,9 +54,6 @@ class whatsTheGameFragment : Fragment() {
             }
 
         }
-
-
-
         // Your existing code to add heart icons
         val iconList = listOf(
             R.drawable.heartthin,
@@ -75,12 +75,19 @@ class whatsTheGameFragment : Fragment() {
 
             iconContainer.addView(imageView)
         }
-
         return rootView
-
-
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Chama a função para buscar os dados assim que o Fragmento é criado
+        apiManager.fetchDiaryGame { result ->
+            // Aqui você pode lidar com o resultado da chamada à API
+            // Por exemplo, atualizar a interface do usuário com os dados retornados
+            // Certifique-se de executar qualquer operação na UI thread se necessário
+        }
+    }
     companion object {
         /**
          * Use this factory method to create a new instance of

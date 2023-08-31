@@ -48,7 +48,17 @@ class UsersController {
         }catch (ex: RegistroIncorretoException){
         val errorMessage = ex.message ?: "Ocorreu um erro durante a criação do usuário."
         return ResponseEntity(mapOf("error" to errorMessage), HttpStatus.BAD_REQUEST)
-     }
+      }
+    }
+
+    @DeleteMapping("/{userId}")
+    fun deleteAccount(@PathVariable userId: Long): ResponseEntity<String> {
+        val deleted = service!!.deleteAccount(userId)
+        return if (deleted) {
+            ResponseEntity.ok("Conta excluída com sucesso.")
+        } else {
+            ResponseEntity.notFound().build()
+        }
     }
 
 }

@@ -70,6 +70,14 @@ class UserServiceImpl @Autowired constructor(
         return users
     }
 
+    override fun deleteAccount(id: Long): Boolean {
+        val id = userRepository.findById(id)
+        if (id.isPresent) {
+            userRepository.delete(id.get())
+            return true
+        }
+        return false
+    }
 
 }
 

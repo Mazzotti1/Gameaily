@@ -6,7 +6,7 @@ interface IGamesService {
 
     fun getAll(gameName: String?): List<Games?>?
 
-    fun getDiaryGame(gameName: String?): Games?
+    fun getDiaryGame(): Games?
 
     fun guessTheGame(gameName: String?): Boolean
 
