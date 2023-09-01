@@ -20,8 +20,7 @@ class Games {
     @Column(unique = true)
     var gameName: String? = null
 
-    @Column(unique = true)
-    var gameImage: String? = null
+    var gameImage: String? = ""
 
     var difficulty: String? = null
 

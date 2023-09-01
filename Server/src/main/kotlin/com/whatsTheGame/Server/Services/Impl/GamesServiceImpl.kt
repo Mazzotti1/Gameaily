@@ -1,5 +1,6 @@
 package com.whatsTheGame.Server.Services.Impl
 
+import com.whatsTheGame.Server.Entity.Forms.GamesForm
 import com.whatsTheGame.Server.Entity.Games
 import com.whatsTheGame.Server.IncorrectException.RespostaIncorretaException
 import com.whatsTheGame.Server.Repository.GamesRepository
@@ -41,7 +42,22 @@ class GamesServiceImpl @Autowired constructor(
         return gameName == gameOfTheDay?.gameName
     }
 
+    override fun setNewGames(forms: List<GamesForm>?): List<Games> {
+        val savedGames = mutableListOf<Games>()
 
+        forms?.forEach { form ->
+            val games = Games()
+            games.gameName = form.gameName
+            games.gameImage = form.gameImage
+            games.difficulty = form.difficulty
+            games.tips = form.tips
+
+            val savedGame = gamesRepository.save(games)
+            savedGames.add(savedGame)
+        }
+
+        return savedGames
+    }
 
 }
 

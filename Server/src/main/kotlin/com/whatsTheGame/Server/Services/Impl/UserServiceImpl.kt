@@ -1,6 +1,6 @@
 package com.whatsTheGame.Server.Services.Impl
 
-import com.musclemate.server.entity.form.UserForm
+import com.whatsTheGame.Server.Entity.Forms.UserForm
 import com.whatsTheGame.Server.Entity.Users
 import com.whatsTheGame.Server.IncorrectException.RegistroIncorretoException
 import com.whatsTheGame.Server.Repository.UserRepository
@@ -65,6 +65,7 @@ class UserServiceImpl @Autowired constructor(
             users.rank,
             users.division,
             users.points,
+            users.role,
         )
         users.token(token)
         return users

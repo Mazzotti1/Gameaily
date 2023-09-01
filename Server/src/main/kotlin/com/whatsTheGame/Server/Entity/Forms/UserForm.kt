@@ -1,4 +1,4 @@
-package com.musclemate.server.entity.form
+package com.whatsTheGame.Server.Entity.Forms
 
 import jakarta.persistence.Column
 import lombok.AllArgsConstructor

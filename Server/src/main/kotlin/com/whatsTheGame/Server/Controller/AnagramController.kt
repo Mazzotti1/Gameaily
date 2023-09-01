@@ -1,6 +1,8 @@
 package com.whatsTheGame.Server.Controller
 
 import com.whatsTheGame.Server.Entity.Anagrams
+import com.whatsTheGame.Server.Entity.Forms.AnagramForm
+import com.whatsTheGame.Server.IncorrectException.RegistroIncorretoException
 import com.whatsTheGame.Server.Services.Impl.AnagramServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -38,6 +40,17 @@ class AnagramController {
         } else {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Resposta errada!")
 
+        }
+    }
+
+    @PostMapping("/setNew")
+    fun setNewGames(@RequestBody form: List<AnagramForm>?): ResponseEntity<out Any> {
+        try {
+            val newGames = anagramService!!.setNewAnagrams(form!!)
+            return ResponseEntity(newGames, HttpStatus.CREATED)
+        }catch (ex: RegistroIncorretoException){
+            val errorMessage = ex.message ?: "Ocorreu um erro durante a criação dos novos jogos"
+            return ResponseEntity(mapOf("error" to errorMessage), HttpStatus.BAD_REQUEST)
         }
     }
 }

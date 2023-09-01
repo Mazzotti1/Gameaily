@@ -1,6 +1,6 @@
 package com.whatsTheGame.Server.Controller
 
-import com.musclemate.server.entity.form.UserForm
+import com.whatsTheGame.Server.Entity.Forms.UserForm
 import com.whatsTheGame.Server.DTOS.UsersDTO
 import com.whatsTheGame.Server.Entity.Users
 import com.whatsTheGame.Server.IncorrectException.RegistroIncorretoException

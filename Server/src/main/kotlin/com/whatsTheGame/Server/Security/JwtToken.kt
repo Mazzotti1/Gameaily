@@ -22,6 +22,7 @@ class JwtToken{
         rank: String?,
         division: String?,
         points: Int?,
+        role: String,
 
     ): String? {
         val now = Date()
@@ -37,6 +38,7 @@ class JwtToken{
             .claim("rank", rank)
             .claim("division", division)
             .claim("points", points)
+            .claim("role", role)
             .setIssuedAt(now)
             .setExpiration(expiryDate)
             .signWith(key)

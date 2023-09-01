@@ -1,6 +1,8 @@
 package com.whatsTheGame.Server.Controller
 
 import com.whatsTheGame.Server.Entity.Enigma
+import com.whatsTheGame.Server.Entity.Forms.EnigmaForm
+import com.whatsTheGame.Server.IncorrectException.RegistroIncorretoException
 import com.whatsTheGame.Server.Services.Impl.EnigmaServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -38,6 +40,17 @@ class EnigmaController {
         } else {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Resposta errada!")
 
+        }
+    }
+
+    @PostMapping("/setNew")
+    fun setNewEnigmas(@RequestBody form: List<EnigmaForm>?): ResponseEntity<out Any> {
+        try {
+            val newGames = enigmaService!!.setNewEnigmas(form!!)
+            return ResponseEntity(newGames, HttpStatus.CREATED)
+        }catch (ex: RegistroIncorretoException){
+            val errorMessage = ex.message ?: "Ocorreu um erro durante a criação dos novos jogos"
+            return ResponseEntity(mapOf("error" to errorMessage), HttpStatus.BAD_REQUEST)
         }
     }
 }

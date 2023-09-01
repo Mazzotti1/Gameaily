@@ -29,7 +29,9 @@ class WebSecurityConfiguration{
     val routeJ = dotenv["ROUTE_J"]!!
     val routeK = dotenv["ROUTE_K"]!!
     val routeL = dotenv["ROUTE_L"]!!
-
+    val routeAdminA = dotenv["ROUTE_ADMIN_A"]!!
+    val routeAdminB = dotenv["ROUTE_ADMIN_B"]!!
+    val routeAdminC = dotenv["ROUTE_ADMIN_C"]!!
     @Bean
     fun encoder(): PasswordEncoder? {
         return BCryptPasswordEncoder()
@@ -50,6 +52,9 @@ class WebSecurityConfiguration{
                 authorize(routeJ, permitAll)
                 authorize(routeK, permitAll)
                 authorize(routeL, permitAll)
+                authorize(routeAdminA, permitAll)
+                authorize(routeAdminB, permitAll)
+                authorize(routeAdminC, permitAll)
 
                 authorize(anyRequest, authenticated)
             }

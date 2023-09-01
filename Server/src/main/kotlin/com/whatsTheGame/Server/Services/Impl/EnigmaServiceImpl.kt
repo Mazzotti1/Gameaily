@@ -1,6 +1,7 @@
 package com.whatsTheGame.Server.Services.Impl
 
 import com.whatsTheGame.Server.Entity.Enigma
+import com.whatsTheGame.Server.Entity.Forms.EnigmaForm
 import com.whatsTheGame.Server.IncorrectException.RespostaIncorretaException
 import com.whatsTheGame.Server.Repository.EnigmaRepository
 import com.whatsTheGame.Server.Services.IEnigmaService
@@ -10,11 +11,11 @@ import kotlin.random.Random
 
 @Service
 class EnigmaServiceImpl  @Autowired constructor(
-    private val pistasRepository: EnigmaRepository,
+    private val enigmaRepository: EnigmaRepository,
 ) : IEnigmaService {
 
     override fun getAll(enigmaName: String?): List<Enigma?>? {
-        return pistasRepository!!.findAll()
+        return enigmaRepository!!.findAll()
     }
 
     private var enigma: Enigma? = null
@@ -23,7 +24,7 @@ class EnigmaServiceImpl  @Autowired constructor(
     private val maxConsecutiveIncorrectAttempts = 3
     override fun getEnigma(enigmaName: String?): Enigma? {
         if (unguessedAnagrams.isEmpty()) {
-            unguessedAnagrams.addAll(pistasRepository!!.findAll())
+            unguessedAnagrams.addAll(enigmaRepository!!.findAll())
         }
 
         val random = Random.Default
@@ -54,6 +55,23 @@ class EnigmaServiceImpl  @Autowired constructor(
             }
         }
         return isCorrect
+    }
+
+    override fun setNewEnigmas(forms: List<EnigmaForm>?): List<Enigma> {
+        val savedEnigma = mutableListOf<Enigma>()
+
+        forms?.forEach { form ->
+            val enigma = Enigma()
+            enigma.enigmaName = form.enigmaName
+            enigma.answer = form.answer
+            enigma.difficulty = form.difficulty
+            enigma.tips = form.tips
+
+            val savedGame = enigmaRepository.save(enigma)
+            savedEnigma.add(savedGame)
+        }
+
+        return savedEnigma
     }
 
 

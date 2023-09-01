@@ -1,6 +1,7 @@
 package com.whatsTheGame.Server.Services
 
 import com.whatsTheGame.Server.Entity.Anagrams
+import com.whatsTheGame.Server.Entity.Forms.AnagramForm
 
 interface IAnagramService {
 
@@ -9,4 +10,6 @@ interface IAnagramService {
     fun getAnagram(wordName: String?): Anagrams?
 
     fun guessTheAnagram(answer: String?): Boolean
+
+    fun setNewAnagrams(forms: List<AnagramForm>?): List<Anagrams>
 }

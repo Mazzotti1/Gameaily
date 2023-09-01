@@ -1,6 +1,7 @@
 package com.whatsTheGame.Server.Services.Impl
 
 import com.whatsTheGame.Server.Entity.Anagrams
+import com.whatsTheGame.Server.Entity.Forms.AnagramForm
 import com.whatsTheGame.Server.IncorrectException.RespostaIncorretaException
 import com.whatsTheGame.Server.Repository.AnagramsRepository
 import com.whatsTheGame.Server.Services.IAnagramService
@@ -58,5 +59,21 @@ class AnagramServiceImpl  @Autowired constructor(
         return isCorrect
     }
 
+    override fun setNewAnagrams(forms: List<AnagramForm>?): List<Anagrams> {
+        val savedAnagrams = mutableListOf<Anagrams>()
+
+        forms?.forEach { form ->
+            val anagrams = Anagrams()
+            anagrams.wordName = form.wordName
+            anagrams.answer = form.answer
+            anagrams.difficulty = form.difficulty
+            anagrams.tips = form.tips
+
+            val savedGame = anagramsRepository.save(anagrams)
+            savedAnagrams.add(savedGame)
+        }
+
+        return savedAnagrams
+    }
 
 }

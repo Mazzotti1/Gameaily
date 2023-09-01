@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import com.whatsthegame.Api.ApiManager
@@ -81,11 +82,30 @@ class whatsTheGameFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Chama a função para buscar os dados assim que o Fragmento é criado
-        apiManager.fetchDiaryGame { result ->
-            // Aqui você pode lidar com o resultado da chamada à API
-            // Por exemplo, atualizar a interface do usuário com os dados retornados
-            // Certifique-se de executar qualquer operação na UI thread se necessário
+        val textViewDifficulty = view.findViewById<TextView>(R.id.difficulty)
+
+        apiManager.fetchDiaryGame { games ->
+            if (games != null) {
+                val gameTip = games.tips
+                val gameImage = games.gameImage
+                val gameName = games.gameName
+                val gameDifficulty = games.difficulty
+
+                val colorResId = when (gameDifficulty) {
+                    "Fácil" -> R.color.win
+                    "Médio" -> R.color.secundaria
+                    "Difícil" -> R.color.destaques
+                    else -> android.R.color.white
+                }
+
+                activity?.runOnUiThread {
+                    textViewDifficulty.text = "$gameDifficulty"
+                    textViewDifficulty.setTextColor(ContextCompat.getColor(requireContext(), colorResId))
+                }
+
+            } else {
+                // Trate o caso de erro ou falha de alguma forma
+            }
         }
     }
     companion object {

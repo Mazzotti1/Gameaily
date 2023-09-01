@@ -1,6 +1,6 @@
 package com.whatsTheGame.Server.Services
 
-import com.musclemate.server.entity.form.UserForm
+import com.whatsTheGame.Server.Entity.Forms.UserForm
 import com.whatsTheGame.Server.Entity.Users
 import javax.naming.AuthenticationException
 

@@ -40,6 +40,8 @@ class Users {
 
     var lifePistas: Int = 3
 
+    var role : String = "USER"
+
     fun token(token: String?) {
         this.token = token.toString()
     }
