@@ -23,7 +23,7 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.042" />
+        app:layout_constraintVertical_bias="0.041" />
 
     <TextView
         android:id="@+id/difficulty"
@@ -39,7 +39,7 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.077" />
+        app:layout_constraintVertical_bias="0.076" />
 
     <View
         android:id="@+id/view"
@@ -87,6 +87,7 @@
         app:layout_constraintVertical_bias="0.762"
         tools:ignore="MissingConstraints" />
 
+
     <Button
         android:id="@+id/sendButton"
         android:layout_width="80dp"
@@ -131,6 +132,6 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.88"></LinearLayout>
+        app:layout_constraintVertical_bias="0.891" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

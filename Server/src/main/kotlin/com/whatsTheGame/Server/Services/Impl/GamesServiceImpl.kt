@@ -15,7 +15,7 @@ class GamesServiceImpl @Autowired constructor(
     private val gamesRepository: GamesRepository,
 ) : IGamesService {
 
-    override fun getAll(gameName: String?): List<Games?>? {
+    override fun getAll(): List<Games?>? {
         return gamesRepository!!.findAll()
     }
 

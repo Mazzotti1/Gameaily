@@ -52,9 +52,10 @@ class WebSecurityConfiguration{
                 authorize(routeJ, permitAll)
                 authorize(routeK, permitAll)
                 authorize(routeL, permitAll)
-                authorize(routeAdminA, permitAll)
-                authorize(routeAdminB, permitAll)
-                authorize(routeAdminC, permitAll)
+
+                authorize(routeAdminA, authenticated)
+                authorize(routeAdminB, authenticated)
+                authorize(routeAdminC, authenticated)
 
                 authorize(anyRequest, authenticated)
             }
@@ -67,6 +68,7 @@ class WebSecurityConfiguration{
             formLogin {disable()}
             httpBasic {}
         }
+
         return http.build()
     }
 }

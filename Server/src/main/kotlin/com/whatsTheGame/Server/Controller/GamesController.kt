@@ -23,8 +23,8 @@ class GamesController {
     private var lastGameIndex: Int = 0
 
     @GetMapping
-    fun getAll(@RequestParam(value = "gameName", required = false) gameName: String?): List<GamesDTO?>? {
-        val games = gamesService!!.getAll(gameName)
+    fun getAll(): List<GamesDTO?>? {
+        val games = gamesService!!.getAll()
         val gamesDTOList = games?.map { game ->
             GamesDTO(
                 gameName = game?.gameName

@@ -10,9 +10,13 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.whatsthegame.Api.ApiManager
+import com.whatsthegame.Api.ViewModel.GameViewModel
 import com.whatsthegame.R
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -29,8 +33,6 @@ class whatsTheGameFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
-
-    val apiManager = ApiManager()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -48,9 +50,9 @@ class whatsTheGameFragment : Fragment() {
 
         val sendButton = rootView.findViewById<Button>(R.id.sendButton)
         sendButton.setOnClickListener {
-            if (token){
+            if (token) {
                 findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
-            }else{
+            } else {
                 findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
             }
 
@@ -79,17 +81,19 @@ class whatsTheGameFragment : Fragment() {
         return rootView
     }
 
+    private lateinit var viewModel: GameViewModel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
 
         val textViewDifficulty = view.findViewById<TextView>(R.id.difficulty)
 
-        apiManager.fetchDiaryGame { games ->
-            if (games != null) {
-                val gameTip = games.tips
-                val gameImage = games.gameImage
-                val gameName = games.gameName
-                val gameDifficulty = games.difficulty
+        viewModel.game.observe(viewLifecycleOwner, Observer { game ->
+            if (game != null){
+                val gameName = game.gameName
+                val gameImage = game.gameImage
+                val gameTip = game.tips
+                val gameDifficulty = game.difficulty
 
                 val colorResId = when (gameDifficulty) {
                     "Fácil" -> R.color.win
@@ -97,17 +101,19 @@ class whatsTheGameFragment : Fragment() {
                     "Difícil" -> R.color.destaques
                     else -> android.R.color.white
                 }
-
                 activity?.runOnUiThread {
                     textViewDifficulty.text = "$gameDifficulty"
                     textViewDifficulty.setTextColor(ContextCompat.getColor(requireContext(), colorResId))
                 }
-
-            } else {
-                // Trate o caso de erro ou falha de alguma forma
             }
+        })
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.fetchDiaryGame()
         }
     }
+
+
     companion object {
         /**
          * Use this factory method to create a new instance of
