@@ -50,6 +50,7 @@
         </activity>
         <activity
             android:name=".activitys.WhatsTheGameActivity"
+            android:windowSoftInputMode="adjustResize"
             android:label="What&apos;s the game?"
             android:parentActivityName=".activitys.MainActivity"
             android:theme="@style/AppTheme.WhatsTheGameActivity">

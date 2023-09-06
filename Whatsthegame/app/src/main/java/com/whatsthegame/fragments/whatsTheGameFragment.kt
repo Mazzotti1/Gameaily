@@ -1,13 +1,13 @@
 package com.whatsthegame.fragments
 
-import android.app.AlertDialog
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.*
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +16,7 @@ import com.whatsthegame.Api.ViewModel.AllGamesViewModel
 import com.whatsthegame.Api.ViewModel.GameViewModel
 import com.whatsthegame.R
 import kotlinx.coroutines.launch
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -39,41 +40,37 @@ class whatsTheGameFragment : Fragment() {
             param2 = it.getString(ARG_PARAM2)
         }
     }
-    private lateinit var allGamesViewModel: AllGamesViewModel
     private val token = false
+    private val gameNameList = mutableListOf<String>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_whats_the_game, container, false)
 
-        val searchView = view?.findViewById<SearchView>(R.id.searchView)
-        allGamesViewModel = ViewModelProvider(this).get(AllGamesViewModel::class.java)
+        val searchView = rootView.findViewById<SearchView>(R.id.searchView)
+        val gameNameTextView = rootView.findViewById<TextView>(R.id.gameNameTextView)
 
-        allGamesViewModel.fetchDiaryGame()
-
-        val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_dropdown_item_1line)
-
-        allGamesViewModel.game.observe(viewLifecycleOwner) { gameList ->
-            adapter.clear()
-            gameList?.forEach { game ->
-                game?.let {
-                    adapter.add(game.gameName)
-                }
-            }
-        }
-
-        searchView?.setOnSuggestionListener(object : SearchView.OnSuggestionListener {
-            override fun onSuggestionSelect(position: Int): Boolean {
-                // Lidar com a seleção da sugestão aqui, se necessário
+        // Configurar o ouvinte de texto para a SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // Não é necessário fazer nada aqui, pois você quer atualizar em tempo real.
                 return true
             }
 
-            override fun onSuggestionClick(position: Int): Boolean {
-                // Lidar com o clique na sugestão aqui, se necessário
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // Filtrar a lista com base no texto digitado
+                val filteredList = gameNameList.filter { gameName ->
+                    gameName.contains(newText.orEmpty(), ignoreCase = true)
+                }
+
+                // Atualizar o texto do TextView com os resultados filtrados
+                gameNameTextView.text = filteredList.joinToString("\n")
+                gameNameTextView.setBackgroundResource(R.drawable.search_view_bg);
                 return true
             }
         })
+
 
         val sendButton = rootView.findViewById<Button>(R.id.sendButton)
         sendButton.setOnClickListener {
@@ -84,7 +81,6 @@ class whatsTheGameFragment : Fragment() {
             }
 
         }
-        // Your existing code to add heart icons
         val iconList = listOf(
             R.drawable.heartthin,
             R.drawable.heartthin,
@@ -108,14 +104,16 @@ class whatsTheGameFragment : Fragment() {
         return rootView
     }
 
-    private lateinit var viewModel: GameViewModel
+    private lateinit var diaryGameViewModel: GameViewModel
+    private lateinit var allGamesViewModel: AllGamesViewModel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
+
+        diaryGameViewModel = ViewModelProvider(this).get(GameViewModel::class.java)
 
         val textViewDifficulty = view.findViewById<TextView>(R.id.difficulty)
 
-        viewModel.game.observe(viewLifecycleOwner, Observer { game ->
+        diaryGameViewModel.game.observe(viewLifecycleOwner, Observer { game ->
             if (game != null){
                 val gameName = game.gameName
                 val gameImage = game.gameImage
@@ -135,8 +133,21 @@ class whatsTheGameFragment : Fragment() {
             }
         })
 
+        allGamesViewModel = ViewModelProvider(this).get(AllGamesViewModel::class.java)
+        allGamesViewModel.games.observe(viewLifecycleOwner, Observer { games ->
+            if (games != null) {
+                for (game in games) {
+                    val gameList = game?.gameName
+                    if (gameList != null) {
+                        gameNameList.add(gameList)
+                    }
+                }
+            }
+        })
+
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.fetchDiaryGame()
+            diaryGameViewModel.fetchDiaryGame()
+            allGamesViewModel.fetchAllGames()
         }
     }
 

@@ -16,9 +16,10 @@ class AllGamesRepository {
                 apiService.getAllNameGame()
             }
         } catch (e: HttpException) {
-            // Handle HTTP exceptions here
+            println(e)
             emptyList()
         } catch (e: Throwable) {
+            println(e)
             emptyList()
         }
     }

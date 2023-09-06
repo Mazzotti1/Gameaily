@@ -10,6 +10,6 @@ interface ApiService {
     @GET("/games/diary")
     suspend fun getDiaryGame(): DiaryGames
     @GET("/games")
-    fun getAllNameGame(): List<AllGames>
+    suspend fun getAllNameGame(): List<AllGames>
 
 }

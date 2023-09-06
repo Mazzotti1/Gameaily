@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     tools:context=".fragments.whatsTheGameFragment"
-    tools:layout_editor_absoluteX="0dp"
-    tools:layout_editor_absoluteY="43dp">
+>
 
     <TextView
         android:id="@+id/difficultyTitle"
@@ -23,7 +22,7 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.041" />
+        app:layout_constraintVertical_bias="0.022" />
 
     <TextView
         android:id="@+id/difficulty"
@@ -39,7 +38,8 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.076" />
+        app:layout_constraintVertical_bias="0.058" />
+
 
     <View
         android:id="@+id/view"
@@ -65,11 +65,12 @@
         android:textSize="13sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.081"
+        app:layout_constraintHorizontal_bias="0.101"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.767"
+        app:layout_constraintVertical_bias="0.797"
         tools:ignore="MissingConstraints" />
+
 
     <SearchView
         android:id="@+id/searchView"
@@ -81,12 +82,29 @@
         android:theme="@style/SearchViewStyle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.469"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.762"
+        app:layout_constraintVertical_bias="0.79"
         tools:ignore="MissingConstraints" />
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        tools:ignore="MissingConstraints">
+
+        <TextView
+            android:id="@+id/gameNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:fontFamily="@font/poppins_medium"
+            android:layout_marginTop="16dp"
+            android:padding="8dp"
+            android:textAlignment="center"
+            tools:ignore="MissingConstraints" />
+    </ScrollView>
 
     <Button
         android:id="@+id/sendButton"
@@ -100,10 +118,10 @@
         android:textSize="11sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.978"
+        app:layout_constraintHorizontal_bias="0.987"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.763"
+        app:layout_constraintVertical_bias="0.789"
         tools:ignore="MissingConstraints" />
 
     <TextView
@@ -120,7 +138,7 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.841" />
+        app:layout_constraintVertical_bias="0.886" />
 
     <LinearLayout
         android:id="@+id/hearts"
@@ -132,6 +150,10 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.891" />
+        app:layout_constraintVertical_bias="0.941" />
+
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

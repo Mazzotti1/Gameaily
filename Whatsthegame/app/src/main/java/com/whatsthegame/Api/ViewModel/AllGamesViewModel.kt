@@ -12,12 +12,12 @@ import kotlinx.coroutines.launch
 
 class AllGamesViewModel : ViewModel() {
     private val repository = AllGamesRepository()
-    val game = MutableLiveData<List<AllGames?>>()
+    val games = MutableLiveData<List<AllGames>>()
 
-    fun fetchDiaryGame() {
+    fun fetchAllGames() {
         viewModelScope.launch(Dispatchers.IO) {
             val gameData = repository.getAllNameGame()
-            game.postValue(gameData)
+            games.postValue(gameData)
         }
     }
 }
