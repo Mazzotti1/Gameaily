@@ -1,0 +1,29 @@
+<!-- res/layout/custom_toast_layout.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:background="@drawable/search_view_bg">
+
+    <ImageView
+        android:id="@+id/toast_icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/gearthin"
+        android:gravity="center_vertical"/>
+
+    <TextView
+        android:id="@+id/empty_submit_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins_medium"
+        android:textColor="@color/black"
+        android:text="Selecione um jogo antes de enviar!"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="3dp"/>
+
+</LinearLayout>

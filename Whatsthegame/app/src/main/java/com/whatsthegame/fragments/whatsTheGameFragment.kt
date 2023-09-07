@@ -15,8 +15,8 @@ import com.whatsthegame.Api.ViewModel.GameViewModel
 import com.whatsthegame.R
 import kotlinx.coroutines.launch
 import android.content.Context
-
-
+import android.widget.Toast.LENGTH_LONG
+import com.whatsthegame.Api.ViewModel.GuessDiaryGameViewModel
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -44,7 +44,7 @@ class whatsTheGameFragment : Fragment() {
     private val token = false
     private val gameNameList = mutableListOf<String>()
     private var gameTip: String? = null
-
+    private var gameName: String? = null
     @SuppressLint("ClickableViewAccessibility", "MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,15 +55,13 @@ class whatsTheGameFragment : Fragment() {
         val searchView = rootView.findViewById<SearchView>(R.id.searchView)
         val gameNameListView = rootView.findViewById<ListView>(R.id.gameNameListView)
 
-        // Configurar o ouvinte de texto para a SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                // Não é necessário fazer nada aqui, pois você quer atualizar em tempo real.
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Filtrar a lista com base no texto digitado
+
                 val filteredList = gameNameList.filter { gameName ->
                     gameName.contains(newText.orEmpty(), ignoreCase = true)
                 }
@@ -93,9 +91,6 @@ class whatsTheGameFragment : Fragment() {
         rootView.setOnTouchListener { _, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     searchView.clearFocus()
-                   // val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-                   // val savedString = sharedPreferences.getString("choosedGame", "")
-                   // println(savedString)
                 }
                 false
             }
@@ -122,35 +117,97 @@ class whatsTheGameFragment : Fragment() {
         }
 
 
-        val sendButton = rootView.findViewById<Button>(R.id.sendButton)
-        sendButton.setOnClickListener {
-            if (token) {
-                findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
-            } else {
-                findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
-            }
-
-        }
-        val iconList = listOf(
-            R.drawable.heartthin,
-            R.drawable.heartthin,
-            R.drawable.heartthin,
-            R.drawable.heartthin,
-            R.drawable.heartthin
+        val alternativeIcons = listOf(
+                R.drawable.heartbreakthin,
+                R.drawable.heartbreakthin,
+                R.drawable.heartbreakthin,
+                R.drawable.heartbreakthin,
+                R.drawable.heartbreakthin
         )
         val iconContainer = rootView.findViewById<LinearLayout>(R.id.hearts)
-        val iconSize = resources.getDimensionPixelSize(R.dimen.icon_size)
-        for (iconResId in iconList) {
-            val imageView = ImageView(requireContext()) // Use requireContext() instead of 'this'
-            imageView.setImageResource(iconResId)
-            imageView.layoutParams = LinearLayout.LayoutParams(
-                resources.getDimensionPixelSize(R.dimen.icon_size),
-                resources.getDimensionPixelSize(R.dimen.icon_size)
-            )
-            imageView.setColorFilter(ContextCompat.getColor(requireContext(), R.color.destaques))
+        var currentIconIndex = alternativeIcons.size - 1
 
-            iconContainer.addView(imageView)
+        val lifesCounter = rootView.findViewById<TextView>(R.id.textViewLifes)
+        var remainingLives = 5
+        
+        val sendButton = rootView.findViewById<Button>(R.id.sendButton)
+        sendButton.setOnClickListener {
+
+            val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+            val choosedGame = sharedPreferences.getString("choosedGame", "")
+
+            val guessDiaryGameViewModel = ViewModelProvider(this).get(GuessDiaryGameViewModel::class.java)
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                if (!choosedGame.isNullOrEmpty()) {
+                    guessDiaryGameViewModel.guessDiaryGame(choosedGame)
+
+                    if(choosedGame != gameName){
+
+                        val imageViewToChange = iconContainer.getChildAt(currentIconIndex) as ImageView
+
+                        imageViewToChange.setImageResource(alternativeIcons[currentIconIndex])
+                        currentIconIndex = (currentIconIndex - 1 + alternativeIcons.size) % alternativeIcons.size
+
+                        remainingLives--
+                        lifesCounter.text = "$remainingLives vidas restantes"
+
+                        val inflater = layoutInflater
+                        val layout = inflater.inflate(R.layout.submit_layout, null)
+                        val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                        toastText.text = "Jogo errado!"
+                        val toast = Toast(requireContext())
+                        toast.duration = Toast.LENGTH_SHORT
+                        toast.view = layout
+                        toast.show()
+
+                        val searchView = rootView.findViewById<SearchView>(R.id.searchView)
+                        searchView.setQuery("", false)
+
+                    }else if (!token){
+                        findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
+                    }else{
+                        findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
+                    }
+
+                    val editor = sharedPreferences.edit()
+                    editor.putString("choosedGame", null)
+                    editor.apply()
+
+                } else {
+                    val inflater = layoutInflater
+                    val layout = inflater.inflate(R.layout.empty_submit_layout, null)
+                    val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                    toastText.text = "Selecione um jogo antes de enviar!"
+                    val toast = Toast(requireContext())
+                    toast.duration = Toast.LENGTH_LONG
+                    toast.view = layout
+                    toast.show()
+                }
+            }
         }
+
+
+        val alternativeIconsA = listOf(
+                R.drawable.heartthin,
+                R.drawable.heartthin,
+                R.drawable.heartthin,
+                R.drawable.heartthin,
+                R.drawable.heartthin
+        )
+
+        val iconContainerA = rootView.findViewById<LinearLayout>(R.id.hearts)
+        val iconSize = resources.getDimensionPixelSize(R.dimen.icon_size)
+
+        for (iconResId in alternativeIconsA) {
+            val imageView = ImageView(requireContext())
+            imageView.setImageResource(iconResId)
+            imageView.layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+            imageView.setColorFilter(ContextCompat.getColor(requireContext(), R.color.destaques))
+            iconContainerA.addView(imageView)
+        }
+
+
         return rootView
     }
 
@@ -165,7 +222,7 @@ class whatsTheGameFragment : Fragment() {
 
         diaryGameViewModel.game.observe(viewLifecycleOwner, Observer { game ->
             if (game != null){
-                val gameName = game.gameName
+                gameName = game.gameName
                 val gameImage = game.gameImage
                 gameTip = game.tips
                 val gameDifficulty = game.difficulty
