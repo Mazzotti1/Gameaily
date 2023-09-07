@@ -1,10 +1,8 @@
 package com.whatsthegame.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -16,6 +14,9 @@ import com.whatsthegame.Api.ViewModel.AllGamesViewModel
 import com.whatsthegame.Api.ViewModel.GameViewModel
 import com.whatsthegame.R
 import kotlinx.coroutines.launch
+import android.content.Context
+
+
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -42,6 +43,9 @@ class whatsTheGameFragment : Fragment() {
     }
     private val token = false
     private val gameNameList = mutableListOf<String>()
+    private var gameTip: String? = null
+
+    @SuppressLint("ClickableViewAccessibility", "MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -49,7 +53,7 @@ class whatsTheGameFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.fragment_whats_the_game, container, false)
 
         val searchView = rootView.findViewById<SearchView>(R.id.searchView)
-        val gameNameTextView = rootView.findViewById<TextView>(R.id.gameNameTextView)
+        val gameNameListView = rootView.findViewById<ListView>(R.id.gameNameListView)
 
         // Configurar o ouvinte de texto para a SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -64,12 +68,58 @@ class whatsTheGameFragment : Fragment() {
                     gameName.contains(newText.orEmpty(), ignoreCase = true)
                 }
 
-                // Atualizar o texto do TextView com os resultados filtrados
-                gameNameTextView.text = filteredList.joinToString("\n")
-                gameNameTextView.setBackgroundResource(R.drawable.search_view_bg);
+                //gameNameTextView.text = filteredList.joinToString("\n")
+                val gameNameListView = rootView.findViewById<ListView>(R.id.gameNameListView)
+                val adapter = ArrayAdapter<String>(requireContext(),  R.layout.list_item_custom, filteredList)
+                gameNameListView.adapter = adapter
+
+                gameNameListView.setOnItemClickListener { parent, view, position, id ->
+                    val clickedGameName = filteredList[position]
+
+                    val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+                    val editor = sharedPreferences.edit()
+                    editor.putString("choosedGame", clickedGameName)
+                    editor.apply()
+
+                    searchView.setQuery(clickedGameName, false)
+                    searchView.clearFocus()
+                }
+                gameNameListView.setBackgroundResource(R.drawable.search_view_bg);
                 return true
             }
         })
+
+
+        rootView.setOnTouchListener { _, event ->
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    searchView.clearFocus()
+                   // val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+                   // val savedString = sharedPreferences.getString("choosedGame", "")
+                   // println(savedString)
+                }
+                false
+            }
+
+            searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) {
+                    gameNameListView.visibility = View.GONE
+                } else {
+                    gameNameListView.visibility = View.VISIBLE
+                }
+            }
+
+        val tipButton = rootView.findViewById<Button>(R.id.tipButton)
+        tipButton.setOnClickListener {
+            val inflater = layoutInflater
+            val layout = inflater.inflate(R.layout.custom_toast_layout, null)
+            val toastText = layout.findViewById<TextView>(R.id.toast_text)
+            toastText.text = gameTip
+
+            val toast = Toast(requireContext())
+            toast.duration = Toast.LENGTH_LONG
+            toast.view = layout
+            toast.show()
+        }
 
 
         val sendButton = rootView.findViewById<Button>(R.id.sendButton)
@@ -117,7 +167,7 @@ class whatsTheGameFragment : Fragment() {
             if (game != null){
                 val gameName = game.gameName
                 val gameImage = game.gameImage
-                val gameTip = game.tips
+                gameTip = game.tips
                 val gameDifficulty = game.difficulty
 
                 val colorResId = when (gameDifficulty) {
