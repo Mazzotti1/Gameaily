@@ -18,6 +18,9 @@
             android:id="@+id/action_whatsTheGame_to_rightAnswerLoggedFragment"
             app:destination="@id/rightAnswerLoggedFragment"
             app:popUpTo="@id/whatsTheGame" />
+        <action
+            android:id="@+id/action_whatsTheGame_to_rankNavbar"
+            app:destination="@id/rankNavbar" />
     </fragment>
 
     <fragment

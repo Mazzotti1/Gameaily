@@ -129,63 +129,96 @@ class whatsTheGameFragment : Fragment() {
 
         val lifesCounter = rootView.findViewById<TextView>(R.id.textViewLifes)
         var remainingLives = 5
-        
+
+
+
+        val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+
+        val lifesTimestamp = sharedPreferences.getLong("lifesTimestamp", 0)
+        val currentTimeMillis = System.currentTimeMillis()
+
+
+        if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
+            remainingLives = sharedPreferences.getInt("remainingLives", 5)
+
+            lifesCounter.text = "$remainingLives vidas restantes"
+        }
         val sendButton = rootView.findViewById<Button>(R.id.sendButton)
         sendButton.setOnClickListener {
-
             val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
             val choosedGame = sharedPreferences.getString("choosedGame", "")
 
             val guessDiaryGameViewModel = ViewModelProvider(this).get(GuessDiaryGameViewModel::class.java)
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                if (!choosedGame.isNullOrEmpty()) {
-                    guessDiaryGameViewModel.guessDiaryGame(choosedGame)
+            if (remainingLives > 0) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    if (!choosedGame.isNullOrEmpty()) {
+                        guessDiaryGameViewModel.guessDiaryGame(choosedGame)
 
-                    if(choosedGame != gameName){
+                        if (choosedGame != gameName) {
 
-                        val imageViewToChange = iconContainer.getChildAt(currentIconIndex) as ImageView
+                            val imageViewToChange = iconContainer.getChildAt(currentIconIndex) as ImageView
 
-                        imageViewToChange.setImageResource(alternativeIcons[currentIconIndex])
-                        currentIconIndex = (currentIconIndex - 1 + alternativeIcons.size) % alternativeIcons.size
+                            imageViewToChange.setImageResource(alternativeIcons[currentIconIndex])
+                            currentIconIndex = (currentIconIndex - 1 + alternativeIcons.size) % alternativeIcons.size
 
-                        remainingLives--
-                        lifesCounter.text = "$remainingLives vidas restantes"
+                            remainingLives--
+                            lifesCounter.text = "$remainingLives vidas restantes"
 
+                            if (remainingLives <= 0) {
+                                // Navegar para a tela "GameOverFragment" quando as vidas chegarem a zero
+                                findNavController().navigate(R.id.action_whatsTheGame_to_rankNavbar)
+                            } else {
+
+                                val inflater = layoutInflater
+                                val layout = inflater.inflate(R.layout.submit_layout, null)
+                                val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                                toastText.text = "Jogo errado!"
+                                val toast = Toast(requireContext())
+                                toast.duration = Toast.LENGTH_SHORT
+                                toast.view = layout
+                                toast.show()
+
+
+                                val searchView = rootView.findViewById<SearchView>(R.id.searchView)
+                                searchView.setQuery("", false)
+                            }
+                        } else if (!token) {
+                            findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
+                        } else {
+                            findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
+                        }
+
+                        val editor = sharedPreferences.edit()
+                        editor.putString("choosedGame", null)
+                        editor.putInt("remainingLives", remainingLives)
+                        editor.putLong("lifesTimestamp", currentTimeMillis)
+                        editor.apply()
+
+                    } else {
                         val inflater = layoutInflater
-                        val layout = inflater.inflate(R.layout.submit_layout, null)
+                        val layout = inflater.inflate(R.layout.empty_submit_layout, null)
                         val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
-                        toastText.text = "Jogo errado!"
+                        toastText.text = "Selecione um jogo antes de enviar!"
                         val toast = Toast(requireContext())
-                        toast.duration = Toast.LENGTH_SHORT
+                        toast.duration = Toast.LENGTH_LONG
                         toast.view = layout
                         toast.show()
-
-                        val searchView = rootView.findViewById<SearchView>(R.id.searchView)
-                        searchView.setQuery("", false)
-
-                    }else if (!token){
-                        findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
-                    }else{
-                        findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
                     }
-
-                    val editor = sharedPreferences.edit()
-                    editor.putString("choosedGame", null)
-                    editor.apply()
-
-                } else {
-                    val inflater = layoutInflater
-                    val layout = inflater.inflate(R.layout.empty_submit_layout, null)
-                    val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
-                    toastText.text = "Selecione um jogo antes de enviar!"
-                    val toast = Toast(requireContext())
-                    toast.duration = Toast.LENGTH_LONG
-                    toast.view = layout
-                    toast.show()
                 }
+            } else {
+
+                val inflater = layoutInflater
+                val layout = inflater.inflate(R.layout.empty_submit_layout, null)
+                val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                toastText.text = "Você não tem vidas restantes!"
+                val toast = Toast(requireContext())
+                toast.duration = Toast.LENGTH_LONG
+                toast.view = layout
+                toast.show()
             }
         }
+
 
 
         val alternativeIconsA = listOf(
