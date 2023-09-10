@@ -1,7 +1,7 @@
 package com.whatsTheGame.Server.Controller
 
-import com.whatsTheGame.Server.Entity.Forms.UserForm
 import com.whatsTheGame.Server.DTOS.UsersDTO
+import com.whatsTheGame.Server.Entity.Forms.UserForm
 import com.whatsTheGame.Server.Entity.Users
 import com.whatsTheGame.Server.IncorrectException.RegistroIncorretoException
 import com.whatsTheGame.Server.Services.Impl.UserServiceImpl
@@ -33,11 +33,12 @@ class UsersController {
         try {
             val user = service!!.create(form!!)
             return ResponseEntity(user, HttpStatus.CREATED)
-        }catch (ex: RegistroIncorretoException){
+        } catch (ex: RegistroIncorretoException) {
             val errorMessage = ex.message ?: "Ocorreu um erro durante a criação do usuário."
-            return ResponseEntity(mapOf("error" to errorMessage), HttpStatus.BAD_REQUEST)
+            return ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST)
         }
     }
+
 
     @PostMapping("/login")
     @Throws(AuthenticationException::class)

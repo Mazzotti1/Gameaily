@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -62,8 +64,20 @@ class RegisterFragment : Fragment() {
             val name = capitalizeWords(editTextName.text.toString())
             val password = editTextSenha.text.toString()
 
+            registerViewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+                val inflater = layoutInflater
+                val layout = inflater.inflate(R.layout.submit_layout, null)
+                val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                toastText.text = errorMessage
+                val toast = Toast(requireContext())
+                toast.duration = Toast.LENGTH_SHORT
+                toast.view = layout
+                toast.show()
+            }
+
             viewLifecycleOwner.lifecycleScope.launch {
                 registerViewModel.registerUser(name,email,password)
+
             }
         }
 
