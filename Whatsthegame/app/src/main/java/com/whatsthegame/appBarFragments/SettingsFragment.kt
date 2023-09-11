@@ -1,5 +1,6 @@
 package com.whatsthegame.appBarFragments
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -42,6 +43,7 @@ class SettingsFragment : Fragment() {
 
         val faqButton = view.findViewById<Button>(R.id.faq)
         val aboutButton = view.findViewById<Button>(R.id.about)
+        val logoutButton = view.findViewById<Button>(R.id.logout)
 
         faqButton.setOnClickListener {
             findNavController().navigate(R.id.action_settingsFragment_to_faqFragment)
@@ -49,6 +51,15 @@ class SettingsFragment : Fragment() {
 
         aboutButton.setOnClickListener {
             findNavController().navigate(R.id.action_settingsFragment_to_aboutFragment)
+        }
+
+        logoutButton.setOnClickListener {
+            val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+
+            editor.remove("tokenJwt")
+            editor.apply()
+            findNavController().navigate(R.id.action_settingsFragment_to_whatsTheGame)
         }
 
         return view

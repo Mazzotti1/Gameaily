@@ -1,9 +1,6 @@
 package com.whatsthegame.Api.Services
 
-import com.whatsthegame.models.AllGames
-import com.whatsthegame.models.DiaryGames
-import com.whatsthegame.models.GuessDiaryGame
-import com.whatsthegame.models.Register
+import com.whatsthegame.models.*
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
@@ -21,4 +18,7 @@ interface ApiService {
 
     @POST("/users/register")
     suspend fun registerUser(@Body request: Register): ResponseBody
+
+    @POST("/users/login")
+    suspend fun loginUser(@Body request: Login): ResponseBody
 }

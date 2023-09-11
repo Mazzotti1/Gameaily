@@ -41,7 +41,7 @@ class whatsTheGameFragment : Fragment() {
             param2 = it.getString(ARG_PARAM2)
         }
     }
-    private val token = false
+
     private val gameNameList = mutableListOf<String>()
     private var gameTip: String? = null
     private var gameName: String? = null
@@ -143,6 +143,8 @@ class whatsTheGameFragment : Fragment() {
 
             lifesCounter.text = "$remainingLives vidas restantes"
         }
+
+        val token = sharedPreferences.getString("tokenJwt", null)
         val sendButton = rootView.findViewById<Button>(R.id.sendButton)
         sendButton.setOnClickListener {
             val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
@@ -183,10 +185,10 @@ class whatsTheGameFragment : Fragment() {
                                 val searchView = rootView.findViewById<SearchView>(R.id.searchView)
                                 searchView.setQuery("", false)
                             }
-                        } else if (!token) {
-                            findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
-                        } else {
+                        } else if (token != null) {
                             findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
+                        } else {
+                            findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
                         }
 
                         val editor = sharedPreferences.edit()

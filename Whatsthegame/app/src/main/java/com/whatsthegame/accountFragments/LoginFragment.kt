@@ -1,12 +1,20 @@
 package com.whatsthegame.accountFragments
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import androidx.core.content.ContentProviderCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.whatsthegame.Api.ViewModel.LoginViewModel
 import com.whatsthegame.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -23,9 +31,10 @@ class LoginFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
+    private lateinit var loginViewModel: LoginViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -43,7 +52,58 @@ class LoginFragment : Fragment() {
         registerButton.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
+
+        val editTextEmail = view.findViewById<EditText>(R.id.editTextEmail)
+        val editTextSenha = view.findViewById<EditText>(R.id.editTextSenha)
+
+        val submitLoginButton = view.findViewById<Button>(R.id.submitLoginButton)
+        submitLoginButton.setOnClickListener {
+            val email = capitalizeWords(editTextEmail.text.toString())
+            val password = editTextSenha.text.toString()
+
+            loginViewModel.loginUser(email, password)
+        }
+        loginViewModel.loginStatus.observe(viewLifecycleOwner) { loginStatus ->
+            val inflater = layoutInflater
+            val layout = inflater.inflate(R.layout.submit_layout, null)
+            val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+            toastText.text = loginStatus
+            val toast = Toast(requireContext())
+            toast.duration = Toast.LENGTH_SHORT
+            toast.view = layout
+            toast.show()
+
+            if (loginStatus == "Logado com sucesso!" ) {
+                findNavController().navigate(R.id.action_loginFragment_to_rankNavbar)
+
+                val token = loginViewModel.getToken()
+                val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.putString("tokenJwt", token)
+                editor.apply()
+
+            }
+
+        }
+
+        view.setOnClickListener {
+            hideKeyboard()
+        }
         return view
+    }
+
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val currentFocusView = requireActivity().currentFocus
+        if (currentFocusView != null) {
+            imm.hideSoftInputFromWindow(currentFocusView.windowToken, 0)
+        }
+    }
+
+    fun capitalizeWords(input: String): String {
+        val words = input.split(" ")
+        val capitalizedWords = words.map { it.capitalize() }
+        return capitalizedWords.joinToString(" ")
     }
 
     companion object {

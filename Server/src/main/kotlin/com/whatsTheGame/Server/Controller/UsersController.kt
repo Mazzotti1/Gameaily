@@ -46,10 +46,10 @@ class UsersController {
         try {
             val users: Users? = service?.login(form.email, form.password)
             return ResponseEntity.ok().body(users?.token)
-        }catch (ex: RegistroIncorretoException){
-        val errorMessage = ex.message ?: "Ocorreu um erro durante a criação do usuário."
-        return ResponseEntity(mapOf("error" to errorMessage), HttpStatus.BAD_REQUEST)
-      }
+        } catch (ex: RegistroIncorretoException) {
+            val errorMessage = ex.message ?: "Ocorreu um erro durante a criação do usuário."
+            return ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST)
+        }
     }
 
     @DeleteMapping("/{userId}")

@@ -1,10 +1,14 @@
 package com.whatsthegame.accountFragments
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -31,14 +35,16 @@ class RegisterFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
+    private lateinit var registerViewModel: RegisterViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        registerViewModel = ViewModelProvider(this).get(RegisterViewModel::class.java)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,30 +64,40 @@ class RegisterFragment : Fragment() {
 
         val submitButtonRegister = view.findViewById<Button>(R.id.submitRegisterButton)
         submitButtonRegister.setOnClickListener {
-            val registerViewModel = ViewModelProvider(this).get(RegisterViewModel::class.java)
-
             val email = capitalizeWords(editTextEmail.text.toString())
             val name = capitalizeWords(editTextName.text.toString())
             val password = editTextSenha.text.toString()
 
-            registerViewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+            registerViewModel.registerUser(name, email, password)
+        }
+            registerViewModel.registerStatus.observe(viewLifecycleOwner) { registerStatus ->
                 val inflater = layoutInflater
                 val layout = inflater.inflate(R.layout.submit_layout, null)
                 val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
-                toastText.text = errorMessage
+                toastText.text = registerStatus
                 val toast = Toast(requireContext())
                 toast.duration = Toast.LENGTH_SHORT
                 toast.view = layout
                 toast.show()
+
+                if (registerStatus == "Conta criada com sucesso!") {
+                    // Navegue para outro fragmento
+                    findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
+                }
             }
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                registerViewModel.registerUser(name,email,password)
-
-            }
+        view.setOnClickListener {
+            hideKeyboard()
         }
-
  return view
+    }
+
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val currentFocusView = requireActivity().currentFocus
+        if (currentFocusView != null) {
+            imm.hideSoftInputFromWindow(currentFocusView.windowToken, 0)
+        }
     }
 
     fun capitalizeWords(input: String): String {

@@ -18,7 +18,7 @@ class RegisterRepository {
             withContext(Dispatchers.IO) {
                 apiService.registerUser(request)
             }
-            ""
+            "Conta criada com sucesso!"
 
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()

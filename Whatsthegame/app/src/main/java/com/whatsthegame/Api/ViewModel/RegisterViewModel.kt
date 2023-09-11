@@ -10,13 +10,14 @@ import kotlinx.coroutines.launch
 
 class RegisterViewModel : ViewModel() {
     private val repository = RegisterRepository()
-    val errorMessage = MutableLiveData<String>()
+    val registerStatus = MutableLiveData<String>()
+
 
     fun registerUser(name: String, email: String, password: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val error = repository.registerUser(Register(name, email, password))
-            if (error.isNotEmpty()) {
-                errorMessage.postValue(error)
+            val status = repository.registerUser(Register(name, email, password))
+            if (status.isNotEmpty()) {
+                registerStatus.postValue(status)
             }
         }
     }
