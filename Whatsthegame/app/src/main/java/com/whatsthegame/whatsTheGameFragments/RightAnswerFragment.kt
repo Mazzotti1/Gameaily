@@ -1,15 +1,34 @@
 package com.whatsthegame.whatsTheGameFragments
 
+
+import android.app.Activity.RESULT_OK
+
+import android.content.ContentValues.TAG
+import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
+
+
 import com.whatsthegame.R
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,8 +44,17 @@ class RightAnswerFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
+    private lateinit var googleSignInClient: GoogleSignInClient
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("904878821368-q1n94navrfjb25pns9ba1mv23jr9ce0a.apps.googleusercontent.com")
+            .requestEmail()
+            .build()
+
+        googleSignInClient = GoogleSignIn.getClient(requireActivity(), googleSignInOptions)
+
+
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
@@ -46,13 +74,19 @@ class RightAnswerFragment : Fragment() {
 
         val registerButton = view.findViewById<Button>(R.id.registerButton)
         registerButton.setOnClickListener {
-                findNavController().navigate(R.id.action_rightAnswerFragment_to_registerFragment)
+            findNavController().navigate(R.id.action_rightAnswerFragment_to_registerFragment)
         }
 
         val loginButton = view.findViewById<Button>(R.id.loginButton)
         loginButton.setOnClickListener {
-                findNavController().navigate(R.id.action_rightAnswerFragment_to_loginFragment)
+            findNavController().navigate(R.id.action_rightAnswerFragment_to_loginFragment)
         }
+
+        val googleButton = view.findViewById<ImageButton>(R.id.googleButton)
+        googleButton.setOnClickListener {
+            signIn()
+        }
+
 
 
         countDownTimer = object : CountDownTimer(86400000, 1000) {
@@ -64,7 +98,8 @@ class RightAnswerFragment : Fragment() {
 
                 timerTextView = view.findViewById(R.id.timerTextView)
 
-                timerTextView.text = String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
+                timerTextView.text =
+                    String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
             }
 
             override fun onFinish() {
@@ -75,6 +110,34 @@ class RightAnswerFragment : Fragment() {
 
         return view
     }
+
+    private fun signIn() {
+        val intent = googleSignInClient.signInIntent
+        openActivity.launch(intent)
+
+    }
+
+    var openActivity = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+            val intent = result.data
+            val task = GoogleSignIn.getSignedInAccountFromIntent(intent)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                if (account != null) {
+                    val email = account.email
+                    println("Conta google: $account")
+                    println("Conta email: $email")
+                } else {
+                    println("Conta Google nula")
+                }
+            } catch (exception: ApiException) {
+                println("Erro aqui: $exception")
+            }
+        }
+
+
+
 
     override fun onResume() {
         super.onResume()
@@ -87,6 +150,7 @@ class RightAnswerFragment : Fragment() {
         // Parar o timer quando a tela não estiver visível para economizar recursos
         countDownTimer.cancel()
     }
+
 
     companion object {
         /**

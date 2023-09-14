@@ -4,6 +4,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import io.github.cdimascio.dotenv.dotenv
 
+import okhttp3.OkHttpClient
+
+
 object RetrofitService {
 
 

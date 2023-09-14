@@ -1,5 +1,6 @@
 package com.whatsthegame.appBarFragments
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,7 +8,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.auth0.jwt.JWT
+import com.auth0.jwt.interfaces.DecodedJWT
+import com.whatsthegame.Api.ViewModel.DeleteUserViewModel
+
 import com.whatsthegame.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -24,9 +32,10 @@ class SettingsFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
+    private lateinit var deleteUserViewModel: DeleteUserViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        deleteUserViewModel = ViewModelProvider(this).get(DeleteUserViewModel::class.java)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -44,7 +53,7 @@ class SettingsFragment : Fragment() {
         val faqButton = view.findViewById<Button>(R.id.faq)
         val aboutButton = view.findViewById<Button>(R.id.about)
         val logoutButton = view.findViewById<Button>(R.id.logout)
-
+        val deleteUserButton = view.findViewById<Button>(R.id.deleteAccount)
         faqButton.setOnClickListener {
             findNavController().navigate(R.id.action_settingsFragment_to_faqFragment)
         }
@@ -55,11 +64,82 @@ class SettingsFragment : Fragment() {
 
         logoutButton.setOnClickListener {
             val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-            val editor = sharedPreferences.edit()
+            val authToken = sharedPreferences.getString("tokenJwt", "")
 
-            editor.remove("tokenJwt")
-            editor.apply()
-            findNavController().navigate(R.id.action_settingsFragment_to_whatsTheGame)
+            if (!authToken.isNullOrEmpty()) {
+                try {
+                    val alertDialogBuilder = AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
+                    alertDialogBuilder.setTitle("Confirmação")
+                    alertDialogBuilder.setMessage("Tem certeza que deseja sair da sua conta?")
+
+                    alertDialogBuilder.setPositiveButton("Sim") { _, _ ->
+                        val editor = sharedPreferences.edit()
+                        editor.remove("tokenJwt")
+                        editor.apply()
+                        findNavController().navigate(R.id.action_settingsFragment_to_whatsTheGame)
+                    }
+
+                    alertDialogBuilder.setNegativeButton("Cancelar") { _, _ ->
+                    }
+                    alertDialogBuilder.show()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            } else {
+                val inflater = layoutInflater
+                val layout = inflater.inflate(R.layout.submit_layout, null)
+                val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                toastText.text = "Não há nenhuma conta logada nesse momento."
+                val toast = Toast(requireContext())
+                toast.duration = Toast.LENGTH_SHORT
+                toast.view = layout
+                toast.show()
+            }
+        }
+
+        deleteUserButton.setOnClickListener {
+            val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+            val authToken = sharedPreferences.getString("tokenJwt", "")
+
+            if (!authToken.isNullOrEmpty()) {
+                try {
+                    val decodedJWT: DecodedJWT = JWT.decode(authToken)
+
+                    val userId = decodedJWT.subject
+
+                    val alertDialogBuilder = AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
+                    alertDialogBuilder.setTitle("Confirmação")
+                    alertDialogBuilder.setMessage("Tem certeza que deseja excluir sua conta? Essa ação é irreversível.")
+
+                    alertDialogBuilder.setPositiveButton("Sim") { _, _ ->
+                        // O usuário confirmou, então você pode prosseguir com a exclusão da conta.
+                        deleteUserViewModel.deleteUser(userId.toLong())
+                        val editor = sharedPreferences.edit()
+                        editor.remove("tokenJwt")
+                        editor.apply()
+                        findNavController().navigate(R.id.action_settingsFragment_to_whatsTheGame)
+                    }
+
+                    alertDialogBuilder.setNegativeButton("Cancelar") { _, _ ->
+                        // O usuário cancelou, você pode não fazer nada ou mostrar uma mensagem, se desejar.
+                    }
+
+                    alertDialogBuilder.show()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            } else {
+                val inflater = layoutInflater
+                val layout = inflater.inflate(R.layout.submit_layout, null)
+                val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                toastText.text = "Não há nenhuma conta logada nesse momento."
+                val toast = Toast(requireContext())
+                toast.duration = Toast.LENGTH_SHORT
+                toast.view = layout
+                toast.show()
+            }
+
+
         }
 
         return view
