@@ -80,6 +80,60 @@ class UserServiceImpl @Autowired constructor(
         return false
     }
 
+    override fun sendPoints(userId: Long, pointsToAdd: Int): Boolean {
+        val userOptional = userRepository.findById(userId)
+        if (userOptional.isPresent) {
+            val user = userOptional.get()
+            val currentPoints = user.points ?: 0
+
+            val updatedPoints = currentPoints + pointsToAdd
+
+            val newRank = calculateRank(updatedPoints)
+            val newDivision = calculateDivision(updatedPoints)
+
+            user.points = updatedPoints
+            user.rank = newRank
+            user.division = newDivision
+
+            userRepository.save(user)
+            return true
+        }
+        return false
+    }
+
+    fun calculateRank(points: Int): String {
+        return when{
+            points in 0..499 -> "Bronze"
+            points in 500..949 -> "Prata"
+            points in 950..1399 -> "Ouro"
+            points in 1400..1849 -> "Platina"
+            points in 1850..2150 -> "Diamante"
+            points >= 2150 -> "Diamante"
+            else -> "Sem Rank"
+        }
+    }
+
+    fun calculateDivision(points: Int): String {
+        return when {
+            points in 0..199 -> "Divisão III"
+            points in 200..349 -> "Divisão II"
+            points in 350..499 -> "Divisão I"
+            points in 500..649 -> "Divisão III"
+            points in 650..799 -> "Divisão II"
+            points in 800..949 -> "Divisão I"
+            points in 950..1099 -> "Divisão III"
+            points in 1100..1249 -> "Divisão II"
+            points in 1250..1399 -> "Divisão I"
+            points in 1400..1549 -> "Divisão III"
+            points in 1550..1699 -> "Divisão II"
+            points in 1700..1849 -> "Divisão I"
+            points in 1850..1999 -> "Divisão III"
+            points in 2000..2149 -> "Divisão II"
+            points >= 2150 -> "Division I"
+            else -> "Sem Divisão"
+        }
+    }
+
 }
 
 

@@ -62,4 +62,14 @@ class UsersController {
         }
     }
 
+    @PostMapping("/sendPoints/{userId}/{points}")
+    fun sendPoints(@PathVariable userId: Long, @PathVariable points: Int): ResponseEntity<String> {
+        val success = service!!.sendPoints(userId, points)
+        return if (success) {
+            ResponseEntity.ok("Pontuação atualizada com sucesso.")
+        } else {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado.")
+        }
+    }
+
 }

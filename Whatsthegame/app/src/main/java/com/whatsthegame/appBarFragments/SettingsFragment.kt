@@ -121,7 +121,7 @@ class SettingsFragment : Fragment() {
                     }
 
                     alertDialogBuilder.setNegativeButton("Cancelar") { _, _ ->
-                        // O usuário cancelou, você pode não fazer nada ou mostrar uma mensagem, se desejar.
+
                     }
 
                     alertDialogBuilder.show()

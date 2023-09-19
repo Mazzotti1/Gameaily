@@ -14,7 +14,10 @@ import android.widget.Toast
 import androidx.core.content.ContentProviderCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.auth0.jwt.JWT
+import com.auth0.jwt.interfaces.DecodedJWT
 import com.whatsthegame.Api.ViewModel.LoginViewModel
+import com.whatsthegame.Api.ViewModel.SendPointsViewModel
 import com.whatsthegame.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -32,8 +35,10 @@ class LoginFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var loginViewModel: LoginViewModel
+    private lateinit var sendPointsViewModel: SendPointsViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sendPointsViewModel = ViewModelProvider(this).get(SendPointsViewModel::class.java)
         loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
@@ -74,14 +79,26 @@ class LoginFragment : Fragment() {
             toast.show()
 
             if (loginStatus == "Logado com sucesso!" ) {
-                findNavController().navigate(R.id.action_loginFragment_to_rankNavbar)
 
-                val token = loginViewModel.getToken()
                 val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+                val token = loginViewModel.getToken()
                 val editor = sharedPreferences.edit()
                 editor.putString("tokenJwt", token)
                 editor.apply()
 
+                val authToken = sharedPreferences.getString("tokenJwt", "")
+                val points = sharedPreferences.getInt("points", 0)
+                try {
+                    val decodedJWT: DecodedJWT = JWT.decode(authToken)
+                    val userId = decodedJWT.subject
+
+                    sendPointsViewModel.sendPoints(userId.toLong(), points)
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                editor.remove("points")
+                findNavController().navigate(R.id.action_loginFragment_to_rankNavbar)
             }
 
         }
@@ -91,6 +108,8 @@ class LoginFragment : Fragment() {
         }
         return view
     }
+
+
 
     private fun hideKeyboard() {
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

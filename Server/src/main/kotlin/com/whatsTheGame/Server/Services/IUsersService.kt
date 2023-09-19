@@ -13,4 +13,6 @@ interface IUsersService {
     fun login(email: String?, password: String?): Users?
 
     fun deleteAccount(userId: Long): Boolean
+
+    fun sendPoints(userId: Long, points: Int): Boolean
 }

@@ -1,6 +1,7 @@
 package com.whatsthegame.fragments
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
 import android.widget.*
@@ -10,13 +11,14 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.whatsthegame.Api.ViewModel.AllGamesViewModel
-import com.whatsthegame.Api.ViewModel.GameViewModel
 import com.whatsthegame.R
 import kotlinx.coroutines.launch
 import android.content.Context
-import android.widget.Toast.LENGTH_LONG
-import com.whatsthegame.Api.ViewModel.GuessDiaryGameViewModel
+import android.content.SharedPreferences
+import android.os.CountDownTimer
+import com.auth0.jwt.JWT
+import com.auth0.jwt.interfaces.DecodedJWT
+import com.whatsthegame.Api.ViewModel.*
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -33,9 +35,10 @@ class whatsTheGameFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
+    private lateinit var sendPointsViewModel: SendPointsViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sendPointsViewModel = ViewModelProvider(this).get(SendPointsViewModel::class.java)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -45,12 +48,19 @@ class whatsTheGameFragment : Fragment() {
     private val gameNameList = mutableListOf<String>()
     private var gameTip: String? = null
     private var gameName: String? = null
-    @SuppressLint("ClickableViewAccessibility", "MissingInflatedId")
+    private var gameTipUsed = false
+
+    private var timer: CountDownTimer? = null
+    private var timeElapsedInMs: Long = 0
+    private var timePassedInMin = timeElapsedInMs / 60000
+    @SuppressLint("ClickableViewAccessibility", "MissingInflatedId", "SuspiciousIndentation")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_whats_the_game, container, false)
+
+        startTimer()
 
         val searchView = rootView.findViewById<SearchView>(R.id.searchView)
         val gameNameListView = rootView.findViewById<ListView>(R.id.gameNameListView)
@@ -103,6 +113,7 @@ class whatsTheGameFragment : Fragment() {
                 }
             }
 
+
         val tipButton = rootView.findViewById<Button>(R.id.tipButton)
         tipButton.setOnClickListener {
             val inflater = layoutInflater
@@ -114,35 +125,25 @@ class whatsTheGameFragment : Fragment() {
             toast.duration = Toast.LENGTH_LONG
             toast.view = layout
             toast.show()
+
+            gameTipUsed = true
         }
 
 
-        val alternativeIcons = listOf(
-                R.drawable.heartbreakthin,
-                R.drawable.heartbreakthin,
-                R.drawable.heartbreakthin,
-                R.drawable.heartbreakthin,
-                R.drawable.heartbreakthin
-        )
-        val iconContainer = rootView.findViewById<LinearLayout>(R.id.hearts)
-        var currentIconIndex = alternativeIcons.size - 1
+
 
         val lifesCounter = rootView.findViewById<TextView>(R.id.textViewLifes)
         var remainingLives = 5
-
-
-
         val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-
         val lifesTimestamp = sharedPreferences.getLong("lifesTimestamp", 0)
         val currentTimeMillis = System.currentTimeMillis()
 
 
-        if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
+        /*if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
             remainingLives = sharedPreferences.getInt("remainingLives", 5)
 
             lifesCounter.text = "$remainingLives vidas restantes"
-        }
+        }*/
 
         val token = sharedPreferences.getString("tokenJwt", null)
         val sendButton = rootView.findViewById<Button>(R.id.sendButton)
@@ -158,11 +159,6 @@ class whatsTheGameFragment : Fragment() {
                         guessDiaryGameViewModel.guessDiaryGame(choosedGame)
 
                         if (choosedGame != gameName) {
-
-                            val imageViewToChange = iconContainer.getChildAt(currentIconIndex) as ImageView
-
-                            imageViewToChange.setImageResource(alternativeIcons[currentIconIndex])
-                            currentIconIndex = (currentIconIndex - 1 + alternativeIcons.size) % alternativeIcons.size
 
                             remainingLives--
                             lifesCounter.text = "$remainingLives vidas restantes"
@@ -186,9 +182,35 @@ class whatsTheGameFragment : Fragment() {
                                 searchView.setQuery("", false)
                             }
                         } else if (token != null) {
-                            findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
+                            //enviar direto pontos pro server
+                            points = calculateTipsPoints(gameTipUsed)
+                            points = calculateMinutesPoints(timePassedInMin)
+                            points = calculateLivesPoints(remainingLives)
+
+                            val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+                            val authToken = sharedPreferences.getString("tokenJwt", "")
+                            try {
+                                val decodedJWT: DecodedJWT = JWT.decode(authToken)
+                                val userId = decodedJWT.subject
+
+                                    sendPointsViewModel.sendPoints(userId.toLong(), points)
+                                    findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
+
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+
                         } else {
                             findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
+                            points = calculateTipsPoints(gameTipUsed)
+                            points = calculateMinutesPoints(timePassedInMin)
+                            points = calculateLivesPoints(remainingLives)
+
+                            val sharedPreferences: SharedPreferences = context!!.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+                            val editor: SharedPreferences.Editor = sharedPreferences.edit()
+                            editor.putInt("points", points)
+                            editor.apply()
+
                         }
 
                         val editor = sharedPreferences.edit()
@@ -246,6 +268,33 @@ class whatsTheGameFragment : Fragment() {
         return rootView
     }
 
+    private var points = 70
+    private fun calculateTipsPoints (userUsedHint: Boolean) : Int{
+        if (userUsedHint) {
+            points -= 10
+        }
+        return points
+    }
+    private fun calculateMinutesPoints (timeInMinutes: Long) : Int{
+        if (timeInMinutes > 30) {
+            points -= 20
+        }
+        return points
+    }
+    private fun calculateLivesPoints (remainingLives: Int) : Int{
+        when (remainingLives) {
+            1 -> points -= 30
+            2 -> points -= 25
+            3 -> points -= 15
+            4 -> points -= 10
+            5 -> points -= 0
+        }
+        return points
+    }
+
+
+
+
     private lateinit var diaryGameViewModel: GameViewModel
     private lateinit var allGamesViewModel: AllGamesViewModel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -293,6 +342,23 @@ class whatsTheGameFragment : Fragment() {
         }
     }
 
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        timer?.cancel()
+    }
+
+    private fun startTimer() {
+        timer = object : CountDownTimer(Long.MAX_VALUE, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeElapsedInMs += 1000
+            }
+
+            override fun onFinish() {
+
+            }
+        }.start()
+    }
 
     companion object {
         /**

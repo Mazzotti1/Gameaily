@@ -24,4 +24,7 @@ interface ApiService {
     @DELETE("/users/{userId}")
     suspend fun deleteUser(@Path("userId") userId: Long): ResponseBody
 
+    @POST("/users/sendPoints/{userId}/{points}")
+    suspend fun sendPoints(@Path("userId") userId: Long, @Path("points") points: Int): ResponseBody
+
 }

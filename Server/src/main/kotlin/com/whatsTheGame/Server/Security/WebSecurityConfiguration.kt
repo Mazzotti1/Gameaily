@@ -52,6 +52,7 @@ class WebSecurityConfiguration{
                 authorize(routeJ, permitAll)
                 authorize(routeK, permitAll)
                 authorize(routeL, permitAll)
+                authorize("/users/sendPoints/{userId}/{points}", permitAll)
                 authorize("/users/{userId}", permitAll)
                 authorize(routeAdminA, authenticated)
                 authorize(routeAdminB, authenticated)

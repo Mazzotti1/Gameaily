@@ -46,6 +46,7 @@ class WhatsTheGameActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_whats_the_game)
         setUpBottomNavigation()
     }
