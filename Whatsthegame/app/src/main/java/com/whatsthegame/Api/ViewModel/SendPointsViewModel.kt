@@ -9,13 +9,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class SendPointsViewModel : ViewModel() {
-    private val repository = SendPointsRepository()
+class SendPointsViewModel: ViewModel() {
+    private var token = ""
+    private val repository = SendPointsRepository(token)
     private val sendPointsStatus = MutableLiveData<String>()
 
-
-    fun sendPoints(userId: Long, points: Int) {
+    fun sendPoints(userId: Long, points: Int, authToken:String) {
         viewModelScope.launch(Dispatchers.IO) {
+            token = authToken
             val status = repository.sendPoints(userId, points)
             if (status.isNotEmpty()) {
                 sendPointsStatus.postValue(status)

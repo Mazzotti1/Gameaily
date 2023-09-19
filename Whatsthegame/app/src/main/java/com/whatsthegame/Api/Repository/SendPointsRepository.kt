@@ -6,12 +6,11 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
 
-class SendPointsRepository {
-    private val apiService = RetrofitService.create()
+class SendPointsRepository (private val authToken: String) {
 
-    suspend fun sendPoints(userId: Long, points: Int ): String {
+    private val apiService = RetrofitService.create(authToken)
+    suspend fun sendPoints(userId: Long, points: Int): String {
         return try {
-
             withContext(Dispatchers.IO) {
                 apiService.sendPoints(userId, points)
             }

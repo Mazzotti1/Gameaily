@@ -92,7 +92,9 @@ class LoginFragment : Fragment() {
                     val decodedJWT: DecodedJWT = JWT.decode(authToken)
                     val userId = decodedJWT.subject
 
-                    sendPointsViewModel.sendPoints(userId.toLong(), points)
+                    if (authToken != null) {
+                        sendPointsViewModel.sendPoints(userId.toLong(), points, authToken)
+                    }
 
                 } catch (e: Exception) {
                     e.printStackTrace()

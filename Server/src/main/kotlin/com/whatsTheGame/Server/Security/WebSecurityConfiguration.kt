@@ -29,6 +29,8 @@ class WebSecurityConfiguration{
     val routeJ = dotenv["ROUTE_J"]!!
     val routeK = dotenv["ROUTE_K"]!!
     val routeL = dotenv["ROUTE_L"]!!
+    val routeM = dotenv["ROUTE_M"]!!
+    val routeN = dotenv["ROUTE_N"]!!
     val routeAdminA = dotenv["ROUTE_ADMIN_A"]!!
     val routeAdminB = dotenv["ROUTE_ADMIN_B"]!!
     val routeAdminC = dotenv["ROUTE_ADMIN_C"]!!
@@ -52,8 +54,9 @@ class WebSecurityConfiguration{
                 authorize(routeJ, permitAll)
                 authorize(routeK, permitAll)
                 authorize(routeL, permitAll)
-                authorize("/users/sendPoints/{userId}/{points}", permitAll)
-                authorize("/users/{userId}", permitAll)
+
+                authorize(routeM, authenticated)
+                authorize(routeN, authenticated)
                 authorize(routeAdminA, authenticated)
                 authorize(routeAdminB, authenticated)
                 authorize(routeAdminC, authenticated)

@@ -1,10 +1,7 @@
 package com.whatsthegame.Api.Repository
 
-import android.content.Context
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.whatsthegame.Api.RetrofitService
 import com.whatsthegame.models.Login
-import com.whatsthegame.models.Register
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException

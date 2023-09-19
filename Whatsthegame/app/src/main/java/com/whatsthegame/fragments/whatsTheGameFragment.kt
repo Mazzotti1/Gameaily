@@ -193,7 +193,11 @@ class whatsTheGameFragment : Fragment() {
                                 val decodedJWT: DecodedJWT = JWT.decode(authToken)
                                 val userId = decodedJWT.subject
 
-                                    sendPointsViewModel.sendPoints(userId.toLong(), points)
+
+                                if (authToken != null) {
+                                    sendPointsViewModel.sendPoints(userId.toLong(), points, authToken)
+                                }
+
                                     findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
 
                             } catch (e: Exception) {
