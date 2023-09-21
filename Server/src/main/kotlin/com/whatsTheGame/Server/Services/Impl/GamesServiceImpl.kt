@@ -21,18 +21,38 @@ class GamesServiceImpl @Autowired constructor(
 
     private var gameOfTheDay: Games? = null
 
-    override fun getDiaryGame(): Games? {
+    override fun getDiaryGame(): Pair<Games?, String> {
         val allGames = gamesRepository!!.findAll()
 
         val calendar = Calendar.getInstance()
-        val dayOfYear = calendar.get(Calendar.DAY_OF_YEAR)
+        val currentMillis = calendar.timeInMillis
 
-        val random = Random(dayOfYear)
+        // Define a data para o próximo dia
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        calendar.add(Calendar.DAY_OF_YEAR, 1)
+        val nextDayMillis = calendar.timeInMillis
 
+        // Calcula o tempo restante em milissegundos
+        val millisUntilNextDay = nextDayMillis - currentMillis
+
+        // Converte o tempo restante em horas, minutos e segundos
+        val hoursUntilNextDay = millisUntilNextDay / (60 * 60 * 1000)
+        val minutesUntilNextDay = (millisUntilNextDay % (60 * 60 * 1000)) / (60 * 1000)
+        val secondsUntilNextDay = (millisUntilNextDay % (60 * 1000)) / 1000
+
+        val random = Random(nextDayMillis)
         val randomIndex = random.nextInt(allGames.size)
-        gameOfTheDay = allGames[randomIndex]
-        return gameOfTheDay
+        val gameOfTheDay = allGames[randomIndex]
+
+        val timer = String.format("%02d:%02d:%02d", hoursUntilNextDay, minutesUntilNextDay, secondsUntilNextDay)
+
+        return Pair(gameOfTheDay, timer)
     }
+
+
 
     @Throws(RespostaIncorretaException::class)
     override fun guessTheGame(gameName: String?): Boolean {

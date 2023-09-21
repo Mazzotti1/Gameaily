@@ -57,6 +57,7 @@ class whatsTheGameFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
+
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_whats_the_game, container, false)
 
@@ -164,8 +165,8 @@ class whatsTheGameFragment : Fragment() {
                             lifesCounter.text = "$remainingLives vidas restantes"
 
                             if (remainingLives <= 0) {
-                                // Navegar para a tela "GameOverFragment" quando as vidas chegarem a zero
-                                findNavController().navigate(R.id.action_whatsTheGame_to_rankNavbar)
+
+                                findNavController().navigate(R.id.action_whatsTheGame_to_gameOverFragment)
                             } else {
 
                                 val inflater = layoutInflater
@@ -189,15 +190,15 @@ class whatsTheGameFragment : Fragment() {
 
                             val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
                             val authToken = sharedPreferences.getString("tokenJwt", "")
+
                             try {
                                 val decodedJWT: DecodedJWT = JWT.decode(authToken)
                                 val userId = decodedJWT.subject
 
 
                                 if (authToken != null) {
-                                    sendPointsViewModel.sendPoints(userId.toLong(), points, authToken)
+                                    sendPointsViewModel.sendPoints(userId.toLong(), points)
                                 }
-
                                     findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
 
                             } catch (e: Exception) {
@@ -299,22 +300,23 @@ class whatsTheGameFragment : Fragment() {
 
 
 
-    private lateinit var diaryGameViewModel: GameViewModel
+    private lateinit var diaryGameViewModel: DiaryGameViewModel
     private lateinit var allGamesViewModel: AllGamesViewModel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        diaryGameViewModel = ViewModelProvider(this).get(GameViewModel::class.java)
+        diaryGameViewModel = ViewModelProvider(this).get(DiaryGameViewModel::class.java)
 
         val textViewDifficulty = view.findViewById<TextView>(R.id.difficulty)
 
         diaryGameViewModel.game.observe(viewLifecycleOwner, Observer { game ->
             if (game != null){
-                gameName = game.gameName
-                val gameImage = game.gameImage
-                gameTip = game.tips
-                val gameDifficulty = game.difficulty
-
+                gameName = game.first.gameName
+                val gameImage = game.first.gameImage
+                gameTip = game.first.tips
+                val gameDifficulty = game.first.difficulty
+                val timer = game.second
+                println("TIMER: $timer")
                 val colorResId = when (gameDifficulty) {
                     "Fácil" -> R.color.win
                     "Médio" -> R.color.secundaria

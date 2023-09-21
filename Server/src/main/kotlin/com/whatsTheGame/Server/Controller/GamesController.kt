@@ -33,7 +33,7 @@ class GamesController {
         return gamesDTOList
     }
     @GetMapping("/diary")
-    fun getDiaryGame(): Games? {
+    fun getDiaryGame(): Pair<Games?, String> {
         return gamesService!!.getDiaryGame()
     }
 

@@ -21,6 +21,9 @@
         <action
             android:id="@+id/action_whatsTheGame_to_rankNavbar"
             app:destination="@id/rankNavbar" />
+        <action
+            android:id="@+id/action_whatsTheGame_to_gameOverFragment"
+            app:destination="@id/gameOverFragment" />
     </fragment>
 
     <fragment
@@ -107,6 +110,9 @@
         <action
             android:id="@+id/action_loginFragment_to_rankNavbar"
             app:destination="@id/rankNavbar" />
+        <action
+            android:id="@+id/action_loginFragment_to_posLoginFragment"
+            app:destination="@id/posLoginFragment" />
     </fragment>
     <fragment
         android:id="@+id/registerFragment"
@@ -127,5 +133,23 @@
         android:name="com.whatsthegame.minigamesFragments.PistasFragment"
         android:label="fragment_pistas"
         tools:layout="@layout/fragment_pistas" />
+    <fragment
+        android:id="@+id/posLoginFragment"
+        android:name="com.whatsthegame.accountFragments.PosLoginFragment"
+        android:label="fragment_pos_login"
+        tools:layout="@layout/fragment_pos_login" >
+        <action
+            android:id="@+id/action_posLoginFragment_to_rankNavbar"
+            app:destination="@id/rankNavbar" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameOverFragment"
+        android:name="com.whatsthegame.fragments.GameOverFragment"
+        android:label="fragment_game_over"
+        tools:layout="@layout/fragment_game_over" >
+        <action
+            android:id="@+id/action_gameOverFragment_to_minigamesNavbar"
+            app:destination="@id/minigamesNavbar" />
+    </fragment>
 
 </navigation>

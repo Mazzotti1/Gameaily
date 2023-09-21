@@ -8,7 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.whatsthegame.Api.ViewModel.DiaryGameViewModel
+import com.whatsthegame.Api.ViewModel.GuessDiaryGameViewModel
+import com.whatsthegame.Api.ViewModel.SendPointsViewModel
 import com.whatsthegame.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -25,9 +31,10 @@ class RightAnswerLoggedFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
+    private lateinit var diaryGameViewModel: DiaryGameViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        diaryGameViewModel = ViewModelProvider(this).get(DiaryGameViewModel::class.java)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -43,42 +50,71 @@ class RightAnswerLoggedFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_right_answer_logged, container, false)
 
+        // Dentro da função onCreateView
 
+        diaryGameViewModel.game.observe(viewLifecycleOwner, Observer { game ->
+            if (game != null) {
+                val timer = game.second
 
+                // Parse a string do timer para obter horas, minutos e segundos
+                val timeParts = timer.split(":")
+                val hours = timeParts[0].toLong()
+                val minutes = timeParts[1].toLong()
+                val seconds = timeParts[2].toLong()
 
-        countDownTimer = object : CountDownTimer(86400000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                val seconds = millisUntilFinished / 1000
-                val hours = seconds / 3600
-                val minutes = (seconds % 3600) / 60
-                val remainingSeconds = seconds % 60
+                // Calcule o tempo total em milissegundos
+                val totalTimeInMillis = (hours * 3600 + minutes * 60 + seconds) * 1000
 
-                timerTextView = view.findViewById(R.id.timerTextView)
+                // Configure o CountDownTimer com o tempo total
+                countDownTimer = object : CountDownTimer(totalTimeInMillis, 1000) {
+                    override fun onTick(millisUntilFinished: Long) {
+                        val seconds = millisUntilFinished / 1000
+                        val hours = seconds / 3600
+                        val minutes = (seconds % 3600) / 60
+                        val remainingSeconds = seconds % 60
 
-                timerTextView.text = String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
+                        timerTextView = view.findViewById(R.id.timerTextView)
+
+                        timerTextView.text = String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
+                    }
+
+                    override fun onFinish() {
+                        // O timer chegou ao fim
+                        timerTextView.text = "00:00:00"
+                    }
+                }
+
+                // Inicie o CountDownTimer
+                countDownTimer.start()
             }
+        })
 
-            override fun onFinish() {
-                // O timer de 24 horas chegou ao fim
-                timerTextView.text = "00:00:00"
-            }
-        }
 
         return view
     }
 
+    private fun parseTime(timeString: String): Long {
+        val timeParts = timeString.split(":")
+        val hours = timeParts[0].toLong()
+        val minutes = timeParts[1].toLong()
+        val seconds = timeParts[2].toLong()
+
+        return (hours * 3600 + minutes * 60 + seconds) * 1000
+    }
+
     override fun onResume() {
         super.onResume()
-        // Iniciar o timer quando a tela estiver visível
-        countDownTimer.start()
+        if (::countDownTimer.isInitialized) {
+            countDownTimer.start()
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        // Parar o timer quando a tela não estiver visível para economizar recursos
-        countDownTimer.cancel()
+        if (::countDownTimer.isInitialized) {
+            countDownTimer.cancel()
+        }
     }
-
 
     companion object {
         /**

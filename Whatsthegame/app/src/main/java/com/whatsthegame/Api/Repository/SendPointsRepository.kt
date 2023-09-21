@@ -1,14 +1,20 @@
 package com.whatsthegame.Api.Repository
 
+import android.content.Context
 import com.whatsthegame.Api.RetrofitService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
 
-class SendPointsRepository (private val authToken: String) {
+class SendPointsRepository(private val context: Context) {
+    private val apiService = RetrofitService.create(getAuthToken())
 
-    private val apiService = RetrofitService.create(authToken)
+    private fun getAuthToken(): String {
+        val sharedPreferences = context.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        return sharedPreferences.getString("tokenJwt", "") ?: ""
+    }
+
     suspend fun sendPoints(userId: Long, points: Int): String {
         return try {
             withContext(Dispatchers.IO) {

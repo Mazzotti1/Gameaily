@@ -35,10 +35,10 @@ class LoginFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var loginViewModel: LoginViewModel
-    private lateinit var sendPointsViewModel: SendPointsViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sendPointsViewModel = ViewModelProvider(this).get(SendPointsViewModel::class.java)
+
         loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
@@ -85,22 +85,7 @@ class LoginFragment : Fragment() {
                 val editor = sharedPreferences.edit()
                 editor.putString("tokenJwt", token)
                 editor.apply()
-
-                val authToken = sharedPreferences.getString("tokenJwt", "")
-                val points = sharedPreferences.getInt("points", 0)
-                try {
-                    val decodedJWT: DecodedJWT = JWT.decode(authToken)
-                    val userId = decodedJWT.subject
-
-                    if (authToken != null) {
-                        sendPointsViewModel.sendPoints(userId.toLong(), points, authToken)
-                    }
-
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-                editor.remove("points")
-                findNavController().navigate(R.id.action_loginFragment_to_rankNavbar)
+                findNavController().navigate(R.id.action_loginFragment_to_posLoginFragment)
             }
 
         }

@@ -9,7 +9,7 @@ import com.whatsthegame.models.DiaryGames
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class GameViewModel : ViewModel() {
+class DiaryGameViewModel : ViewModel() {
     private val repository = DiaryGameRepository()
     val game = MutableLiveData<DiaryGames?>()
 
