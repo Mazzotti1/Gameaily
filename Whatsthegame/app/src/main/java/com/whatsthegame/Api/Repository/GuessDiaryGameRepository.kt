@@ -20,7 +20,7 @@ class GuessDiaryGameRepository {
             }
 
         } catch (e: HttpException) {
-            println("Jogo errado")
+            println("Erro no guess $e")
             return ResponseBody.create(null, "HttpExecption")
 
         } catch (e: Throwable) {

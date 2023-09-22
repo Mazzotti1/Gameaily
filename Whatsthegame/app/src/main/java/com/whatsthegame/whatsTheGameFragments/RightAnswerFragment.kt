@@ -1,6 +1,7 @@
 package com.whatsthegame.whatsTheGameFragments
 
 
+import android.content.Context
 import androidx.navigation.fragment.findNavController
 import com.whatsthegame.R
 import android.os.Bundle
@@ -12,7 +13,11 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import com.whatsthegame.Api.ViewModel.DiaryGameViewModel
+import kotlinx.coroutines.launch
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -65,42 +70,81 @@ class RightAnswerFragment : Fragment() {
             //signInGoogle()
         }
 
-
-
-        countDownTimer = object : CountDownTimer(86400000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                val seconds = millisUntilFinished / 1000
-                val hours = seconds / 3600
-                val minutes = (seconds % 3600) / 60
-                val remainingSeconds = seconds % 60
-
-                timerTextView = view.findViewById(R.id.timerTextView)
-
-                timerTextView.text =
-                    String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
-            }
-
-            override fun onFinish() {
-                timerTextView.text = "00:00:00"
-            }
-        }
-
         return view
     }
 
 
+    private lateinit var diaryGameViewModel: DiaryGameViewModel
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        diaryGameViewModel = ViewModelProvider(this).get(DiaryGameViewModel::class.java)
+
+        val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("playerHasAnswer", true)
+        editor.apply()
+
+        diaryGameViewModel.game.observe(viewLifecycleOwner, Observer { game ->
+            if (game != null) {
+                val timer = game.second
+                println("Timer : $timer")
+                // Parse a string do timer para obter horas, minutos e segundos
+                val timeParts = timer.split(":")
+                val hours = timeParts[0].toLong()
+                val minutes = timeParts[1].toLong()
+                val seconds = timeParts[2].toLong()
+
+                // Calcule o tempo total em milissegundos
+                val totalTimeInMillis = (hours * 3600 + minutes * 60 + seconds) * 1000
+
+                // Configure o CountDownTimer com o tempo total
+                countDownTimer = object : CountDownTimer(totalTimeInMillis, 1000) {
+                    override fun onTick(millisUntilFinished: Long) {
+                        val seconds = millisUntilFinished / 1000
+                        val hours = seconds / 3600
+                        val minutes = (seconds % 3600) / 60
+                        val remainingSeconds = seconds % 60
+
+                        timerTextView = view.findViewById(R.id.timerTextView)
+
+                        timerTextView.text = String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
+                    }
+
+                    override fun onFinish() {
+
+                        timerTextView.text = "00:00:00"
+                        val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        editor.putBoolean("playerHasAnswer", false)
+                        editor.apply()
+                    }
+                }
+
+                // Inicie o CountDownTimer
+                countDownTimer.start()
+            }
+        })
+        viewLifecycleOwner.lifecycleScope.launch {
+            diaryGameViewModel.fetchDiaryGame()
+        }
+    }
+
+
+
     override fun onResume() {
         super.onResume()
-        // Iniciar o timer quando a tela estiver visível
-        countDownTimer.start()
+        if (::countDownTimer.isInitialized) {
+            countDownTimer.start()
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        // Parar o timer quando a tela não estiver visível para economizar recursos
-        countDownTimer.cancel()
+        if (::countDownTimer.isInitialized) {
+            countDownTimer.cancel()
+        }
     }
-
 
 
     companion object {

@@ -24,7 +24,7 @@ class SendPointsRepository(private val context: Context) {
 
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
-            println("Erro HTTP: $errorBody")
+            println("Erro ao enviar os pontos: $e")
             errorBody ?: "HttpException"
 
         } catch (e: Throwable) {

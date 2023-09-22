@@ -1,5 +1,6 @@
 package com.whatsthegame.whatsTheGameFragments
 
+import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import androidx.fragment.app.Fragment
@@ -11,11 +12,14 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.whatsthegame.Api.ViewModel.AllGamesViewModel
 import com.whatsthegame.Api.ViewModel.DiaryGameViewModel
 import com.whatsthegame.Api.ViewModel.GuessDiaryGameViewModel
 import com.whatsthegame.Api.ViewModel.SendPointsViewModel
 import com.whatsthegame.R
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -31,10 +35,9 @@ class RightAnswerLoggedFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    private lateinit var diaryGameViewModel: DiaryGameViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        diaryGameViewModel = ViewModelProvider(this).get(DiaryGameViewModel::class.java)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -50,12 +53,29 @@ class RightAnswerLoggedFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_right_answer_logged, container, false)
 
-        // Dentro da função onCreateView
+
+
+
+
+
+        return view
+    }
+
+    private lateinit var diaryGameViewModel: DiaryGameViewModel
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("playerHasAnswer", true)
+        editor.apply()
+
+        diaryGameViewModel = ViewModelProvider(this).get(DiaryGameViewModel::class.java)
 
         diaryGameViewModel.game.observe(viewLifecycleOwner, Observer { game ->
             if (game != null) {
                 val timer = game.second
-
+                println("Timer : $timer")
                 // Parse a string do timer para obter horas, minutos e segundos
                 val timeParts = timer.split(":")
                 val hours = timeParts[0].toLong()
@@ -81,6 +101,10 @@ class RightAnswerLoggedFragment : Fragment() {
                     override fun onFinish() {
                         // O timer chegou ao fim
                         timerTextView.text = "00:00:00"
+                        val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        editor.putBoolean("playerHasAnswer", false)
+                        editor.apply()
                     }
                 }
 
@@ -88,19 +112,12 @@ class RightAnswerLoggedFragment : Fragment() {
                 countDownTimer.start()
             }
         })
-
-
-        return view
+        viewLifecycleOwner.lifecycleScope.launch {
+            diaryGameViewModel.fetchDiaryGame()
+        }
     }
 
-    private fun parseTime(timeString: String): Long {
-        val timeParts = timeString.split(":")
-        val hours = timeParts[0].toLong()
-        val minutes = timeParts[1].toLong()
-        val seconds = timeParts[2].toLong()
 
-        return (hours * 3600 + minutes * 60 + seconds) * 1000
-    }
 
     override fun onResume() {
         super.onResume()

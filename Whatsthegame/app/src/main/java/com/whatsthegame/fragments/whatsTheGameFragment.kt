@@ -152,13 +152,11 @@ class whatsTheGameFragment : Fragment() {
             val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
             val choosedGame = sharedPreferences.getString("choosedGame", "")
 
-            val guessDiaryGameViewModel = ViewModelProvider(this).get(GuessDiaryGameViewModel::class.java)
+
 
             if (remainingLives > 0) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     if (!choosedGame.isNullOrEmpty()) {
-                        guessDiaryGameViewModel.guessDiaryGame(choosedGame)
-
                         if (choosedGame != gameName) {
 
                             remainingLives--
@@ -183,12 +181,33 @@ class whatsTheGameFragment : Fragment() {
                                 searchView.setQuery("", false)
                             }
                         } else if (token != null) {
+
+                            val sharedPreferences = requireContext().getSharedPreferences(
+                                "Preferences",
+                                Context.MODE_PRIVATE
+                            )
+                            val playerAnswer =
+                                sharedPreferences.getBoolean("playerHasAnswer", false)
                             //enviar direto pontos pro server
-                            points = calculateTipsPoints(gameTipUsed)
+                            if (playerAnswer) {
+                                val inflater = layoutInflater
+                                val layout = inflater.inflate(R.layout.empty_submit_layout, null)
+                                val toastText =
+                                    layout.findViewById<TextView>(R.id.empty_submit_text)
+                                toastText.text =
+                                    "Você já acertou o jogo hoje, novos pontos não serão computados!"
+                                val toast = Toast(requireContext())
+                                toast.duration = Toast.LENGTH_LONG
+                                toast.view = layout
+                                toast.show()
+
+                                findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
+                            } else {
+                                points = calculateTipsPoints(gameTipUsed)
                             points = calculateMinutesPoints(timePassedInMin)
                             points = calculateLivesPoints(remainingLives)
 
-                            val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+
                             val authToken = sharedPreferences.getString("tokenJwt", "")
 
                             try {
@@ -199,12 +218,13 @@ class whatsTheGameFragment : Fragment() {
                                 if (authToken != null) {
                                     sendPointsViewModel.sendPoints(userId.toLong(), points)
                                 }
-                                    findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
+                                findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
 
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
 
+                        }
                         } else {
                             findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
                             points = calculateTipsPoints(gameTipUsed)
@@ -315,8 +335,6 @@ class whatsTheGameFragment : Fragment() {
                 val gameImage = game.first.gameImage
                 gameTip = game.first.tips
                 val gameDifficulty = game.first.difficulty
-                val timer = game.second
-                println("TIMER: $timer")
                 val colorResId = when (gameDifficulty) {
                     "Fácil" -> R.color.win
                     "Médio" -> R.color.secundaria

@@ -16,6 +16,7 @@ class DiaryGameRepository {
             }
         } catch (e: HttpException) {
             // Handle HTTP exceptions here
+            println("Erro no jogo diario: $e")
             null
         } catch (e: Throwable) {
             // Handle other exceptions here
