@@ -7,9 +7,12 @@ import com.whatsTheGame.Server.Repository.UserRepository
 import com.whatsTheGame.Server.Security.JwtToken
 import com.whatsTheGame.Server.Services.IUsersService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
+import java.util.*
 
 @Service
 class UserServiceImpl @Autowired constructor(
@@ -133,6 +136,27 @@ class UserServiceImpl @Autowired constructor(
             else -> "Sem Divisão"
         }
     }
+
+    override fun updateUserAnswer(userId: Long) {
+        val existingUser = userRepository.findById(userId)
+
+        if (existingUser!!.isPresent) {
+            val updatedUser = existingUser.get()
+            updatedUser.userAnswer = true
+            userRepository.save(updatedUser)
+        } else {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario não encontrado!")
+        }
+    }
+
+    fun updateAllUsers() {
+        val allUsers = userRepository.findAll()
+        for (user in allUsers) {
+            user.userAnswer = false
+        }
+        userRepository.saveAll(allUsers)
+    }
+
 
 }
 

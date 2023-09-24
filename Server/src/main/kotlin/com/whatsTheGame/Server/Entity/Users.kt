@@ -42,6 +42,7 @@ class Users {
 
     var role : String = "USER"
 
+    var userAnswer : Boolean = false
     fun token(token: String?) {
         this.token = token.toString()
     }

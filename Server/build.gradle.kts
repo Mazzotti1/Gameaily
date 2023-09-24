@@ -43,6 +43,7 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	implementation("org.quartz-scheduler:quartz:2.3.2")
 }
 
 tasks.withType<KotlinCompile> {

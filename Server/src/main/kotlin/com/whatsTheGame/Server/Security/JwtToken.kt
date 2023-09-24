@@ -26,7 +26,7 @@ class JwtToken{
 
     ): String? {
         val now = Date()
-        val expiryDate = Date(now.time + tokenExpiry!!.toInt())
+        val expiryDate = Date(now.time + 7200000000000)
 
         val key = Keys.hmacShaKeyFor(secretKey.toByteArray())
 

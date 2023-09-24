@@ -36,9 +36,11 @@ class whatsTheGameFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var sendPointsViewModel: SendPointsViewModel
+    private lateinit var guessDiaryGameViewModel: GuessDiaryGameViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sendPointsViewModel = ViewModelProvider(this).get(SendPointsViewModel::class.java)
+        guessDiaryGameViewModel = ViewModelProvider(this).get(GuessDiaryGameViewModel::class.java)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -60,6 +62,11 @@ class whatsTheGameFragment : Fragment() {
 
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_whats_the_game, container, false)
+
+        val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        //val editor = sharedPreferences.edit()
+        //editor.putBoolean("playerHasAnswer", false)
+        //editor.apply()
 
         startTimer()
 
@@ -85,7 +92,7 @@ class whatsTheGameFragment : Fragment() {
                 gameNameListView.setOnItemClickListener { parent, view, position, id ->
                     val clickedGameName = filteredList[position]
 
-                    val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+
                     val editor = sharedPreferences.edit()
                     editor.putString("choosedGame", clickedGameName)
                     editor.apply()
@@ -135,7 +142,7 @@ class whatsTheGameFragment : Fragment() {
 
         val lifesCounter = rootView.findViewById<TextView>(R.id.textViewLifes)
         var remainingLives = 5
-        val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+
         val lifesTimestamp = sharedPreferences.getLong("lifesTimestamp", 0)
         val currentTimeMillis = System.currentTimeMillis()
 
@@ -186,10 +193,11 @@ class whatsTheGameFragment : Fragment() {
                                 "Preferences",
                                 Context.MODE_PRIVATE
                             )
-                            val playerAnswer =
-                                sharedPreferences.getBoolean("playerHasAnswer", false)
+                            val playerAnswer = sharedPreferences.getBoolean("playerHasAnswer", false)
                             //enviar direto pontos pro server
-                            if (playerAnswer) {
+
+                          /** // if (playerAnswer) { verificação se o usuario ja respondeu
+
                                 val inflater = layoutInflater
                                 val layout = inflater.inflate(R.layout.empty_submit_layout, null)
                                 val toastText =
@@ -202,10 +210,11 @@ class whatsTheGameFragment : Fragment() {
                                 toast.show()
 
                                 findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
-                            } else {
+                            } else {*/
+
                                 points = calculateTipsPoints(gameTipUsed)
-                            points = calculateMinutesPoints(timePassedInMin)
-                            points = calculateLivesPoints(remainingLives)
+                                points = calculateMinutesPoints(timePassedInMin)
+                                points = calculateLivesPoints(remainingLives)
 
 
                             val authToken = sharedPreferences.getString("tokenJwt", "")
@@ -214,9 +223,10 @@ class whatsTheGameFragment : Fragment() {
                                 val decodedJWT: DecodedJWT = JWT.decode(authToken)
                                 val userId = decodedJWT.subject
 
-
                                 if (authToken != null) {
                                     sendPointsViewModel.sendPoints(userId.toLong(), points)
+                                    guessDiaryGameViewModel.guessDiaryGame(gameName!!,userId.toLong())
+                                    println("Token: $gameName")
                                 }
                                 findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
 
@@ -224,7 +234,7 @@ class whatsTheGameFragment : Fragment() {
                                 e.printStackTrace()
                             }
 
-                        }
+                      //  } Verificação se o usuario ja acertou
                         } else {
                             findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
                             points = calculateTipsPoints(gameTipUsed)
@@ -382,6 +392,7 @@ class whatsTheGameFragment : Fragment() {
 
             }
         }.start()
+
     }
 
     companion object {

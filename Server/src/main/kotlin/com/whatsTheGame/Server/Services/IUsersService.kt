@@ -2,6 +2,7 @@ package com.whatsTheGame.Server.Services
 
 import com.whatsTheGame.Server.Entity.Forms.UserForm
 import com.whatsTheGame.Server.Entity.Users
+import java.util.*
 import javax.naming.AuthenticationException
 
 interface IUsersService {
@@ -15,4 +16,6 @@ interface IUsersService {
     fun deleteAccount(userId: Long): Boolean
 
     fun sendPoints(userId: Long, points: Int): Boolean
+
+    fun updateUserAnswer(userId: Long)
 }

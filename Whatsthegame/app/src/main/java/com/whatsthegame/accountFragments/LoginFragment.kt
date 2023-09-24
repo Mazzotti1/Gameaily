@@ -84,7 +84,7 @@ class LoginFragment : Fragment() {
                     requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
                 val playerAnswer = sharedPreferences.getBoolean("playerHasAnswer", false)
 
-                if (playerAnswer) {
+               /* if (playerAnswer) {
                     val inflater = layoutInflater
                     val layout = inflater.inflate(R.layout.empty_submit_layout, null)
                     val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
@@ -101,7 +101,7 @@ class LoginFragment : Fragment() {
                     editor.apply()
                     findNavController().navigate(R.id.action_loginFragment_to_rankNavbar)
 
-                } else {
+                } else { */
 
                     val token = loginViewModel.getToken()
                     val editor = sharedPreferences.edit()
@@ -111,7 +111,7 @@ class LoginFragment : Fragment() {
                 }
             }
 
-        }
+        //} Verificação se o usuario ja acertou
 
         view.setOnClickListener {
             hideKeyboard()

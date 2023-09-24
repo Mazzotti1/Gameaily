@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
+import com.whatsthegame.Api.ViewModel.GuessDiaryGameViewModel
 import com.whatsthegame.Api.ViewModel.SendPointsViewModel
 import com.whatsthegame.R
 
@@ -29,9 +30,11 @@ class PosLoginFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var sendPointsViewModel: SendPointsViewModel
+    private lateinit var guessDiaryGameViewModel: GuessDiaryGameViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sendPointsViewModel = ViewModelProvider(this).get(SendPointsViewModel::class.java)
+        guessDiaryGameViewModel = ViewModelProvider(this).get(GuessDiaryGameViewModel::class.java)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -50,12 +53,17 @@ class PosLoginFragment : Fragment() {
             val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
             val authToken = sharedPreferences.getString("tokenJwt", "")
             val points = sharedPreferences.getInt("points", 0)
-
+            val gameName = sharedPreferences.getString("choosedGame", "")
             try {
                 val decodedJWT: DecodedJWT = JWT.decode(authToken)
                 val userId = decodedJWT.subject
 
                 sendPointsViewModel.sendPoints(userId.toLong(), points)
+                guessDiaryGameViewModel.guessDiaryGame(gameName!!,userId.toLong())
+
+                val editor = sharedPreferences.edit()
+                editor.putString("choosedGame", null)
+                editor.apply()
 
             } catch (e: Exception) {
                 e.printStackTrace()

@@ -6,26 +6,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.HttpException
-import retrofit2.http.Body
-
 
 class GuessDiaryGameRepository {
     private val apiService = RetrofitService.create()
 
-    suspend fun guessDiaryGame(@Body request: GuessDiaryGame): ResponseBody {
+    suspend fun guessDiaryGame(gameName: String, userId: Long): ResponseBody {
         return try {
-            println("Jogo: $request")
             withContext(Dispatchers.IO) {
-                apiService.guessDiaryGame(request)
+                apiService.guessDiaryGame(gameName, userId)
             }
-
         } catch (e: HttpException) {
-            println("Erro no guess $e")
-            return ResponseBody.create(null, "HttpExecption")
-
+            val errorBody = e.response()?.errorBody()?.string() ?: "Unknown Error"
+            println("HTTP Error: ${e.code()}, $errorBody")
+            return ResponseBody.create(null, errorBody)
         } catch (e: Throwable) {
-            println("Erro servidor")
-            return ResponseBody.create(null, "Throwable")
+            println("Server Error: $e")
+            return ResponseBody.create(null, "Server Error: $e")
         }
     }
 }

@@ -4,6 +4,7 @@ import com.whatsTheGame.Server.Entity.Forms.GamesForm
 import com.whatsTheGame.Server.Entity.Games
 import com.whatsTheGame.Server.IncorrectException.RespostaIncorretaException
 import com.whatsTheGame.Server.Repository.GamesRepository
+import com.whatsTheGame.Server.Repository.UserRepository
 import com.whatsTheGame.Server.Services.IGamesService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -13,6 +14,7 @@ import kotlin.random.Random
 @Service
 class GamesServiceImpl @Autowired constructor(
     private val gamesRepository: GamesRepository,
+    private val userRepository: UserRepository,
 ) : IGamesService {
 
     override fun getAll(): List<Games?>? {
@@ -45,9 +47,10 @@ class GamesServiceImpl @Autowired constructor(
 
         val random = Random(nextDayMillis)
         val randomIndex = random.nextInt(allGames.size)
-        val gameOfTheDay = allGames[randomIndex]
+         gameOfTheDay = allGames[randomIndex]
 
         val timer = String.format("%02d:%02d:%02d", hoursUntilNextDay, minutesUntilNextDay, secondsUntilNextDay)
+
 
         return Pair(gameOfTheDay, timer)
     }

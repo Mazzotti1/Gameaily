@@ -5,6 +5,8 @@ import com.whatsTheGame.Server.Entity.Games
 
 interface IGamesService {
 
+
+
     fun getAll(): List<Games?>?
 
     fun getDiaryGame(): Pair<Games?, String?>

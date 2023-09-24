@@ -5,6 +5,7 @@ import com.whatsTheGame.Server.Entity.Forms.GamesForm
 import com.whatsTheGame.Server.Entity.Games
 import com.whatsTheGame.Server.IncorrectException.RegistroIncorretoException
 import com.whatsTheGame.Server.Services.Impl.GamesServiceImpl
+import com.whatsTheGame.Server.Services.Impl.UserServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -18,6 +19,8 @@ class GamesController {
 
     @Autowired
     private val gamesService: GamesServiceImpl? = null
+    @Autowired
+    private val userService: UserServiceImpl? = null
 
     private var lastQueryTime: Instant? = null
     private var lastGameIndex: Int = 0
@@ -39,13 +42,16 @@ class GamesController {
 
     data class GuessRequest(val gameName: String)
     data class GuessResponse(val message: String)
-    @PostMapping("/guess")
+    @PostMapping("/guess/{userId}")
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun guessDiaryGame(@RequestBody request: GuessRequest): ResponseEntity<GuessResponse> {
+    fun guessDiaryGame(@RequestBody request: GuessRequest, @PathVariable userId:Long): ResponseEntity<GuessResponse> {
         val isCorrect = gamesService!!.guessTheGame(request.gameName)
+
+
         if (isCorrect) {
             val responseMessage = "Resposta certa!"
             val response = GuessResponse(responseMessage)
+            userService!!.updateUserAnswer(userId)
             return ResponseEntity.ok(response)
         } else {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Jogo errado!")

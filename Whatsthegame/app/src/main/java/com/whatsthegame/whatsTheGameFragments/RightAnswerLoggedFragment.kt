@@ -54,10 +54,6 @@ class RightAnswerLoggedFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_right_answer_logged, container, false)
 
 
-
-
-
-
         return view
     }
 
@@ -96,6 +92,7 @@ class RightAnswerLoggedFragment : Fragment() {
                         timerTextView = view.findViewById(R.id.timerTextView)
 
                         timerTextView.text = String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
+
                     }
 
                     override fun onFinish() {
