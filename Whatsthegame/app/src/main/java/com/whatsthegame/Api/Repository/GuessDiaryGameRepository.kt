@@ -10,10 +10,10 @@ import retrofit2.HttpException
 class GuessDiaryGameRepository {
     private val apiService = RetrofitService.create()
 
-    suspend fun guessDiaryGame(gameName: String, userId: Long): ResponseBody {
+    suspend fun guessDiaryGame(request: GuessDiaryGame, userId: Long): ResponseBody {
         return try {
             withContext(Dispatchers.IO) {
-                apiService.guessDiaryGame(gameName, userId)
+                apiService.guessDiaryGame(request, userId)
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string() ?: "Unknown Error"

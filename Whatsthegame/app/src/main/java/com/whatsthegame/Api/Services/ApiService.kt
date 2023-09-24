@@ -11,8 +11,7 @@ interface ApiService {
     @GET("/games")
     suspend fun getAllNameGame(): List<AllGames>
     @POST("/games/guess/{userId}")
-    suspend fun guessDiaryGame(@Query("gameName") gameName: String, @Path("userId") userId: Long): ResponseBody
-
+    suspend fun guessDiaryGame(@Body request: GuessDiaryGame, @Path("userId") userId: Long): ResponseBody
 
     @POST("/users/register")
     suspend fun registerUser(@Body request: Register): ResponseBody

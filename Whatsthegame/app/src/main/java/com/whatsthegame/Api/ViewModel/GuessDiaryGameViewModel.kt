@@ -10,9 +10,9 @@ import kotlinx.coroutines.launch
 class GuessDiaryGameViewModel : ViewModel() {
     private val repository = GuessDiaryGameRepository()
 
-    fun guessDiaryGame(gameName: String, userId : Long) {
+    fun guessDiaryGame(request: GuessDiaryGame, userId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            val gameGuess = repository.guessDiaryGame(gameName, userId)
+            val gameGuess = repository.guessDiaryGame(request, userId)
         }
     }
 }

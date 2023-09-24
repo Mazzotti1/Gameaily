@@ -14,6 +14,7 @@ import com.auth0.jwt.interfaces.DecodedJWT
 import com.whatsthegame.Api.ViewModel.GuessDiaryGameViewModel
 import com.whatsthegame.Api.ViewModel.SendPointsViewModel
 import com.whatsthegame.R
+import com.whatsthegame.models.GuessDiaryGame
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -54,22 +55,21 @@ class PosLoginFragment : Fragment() {
             val authToken = sharedPreferences.getString("tokenJwt", "")
             val points = sharedPreferences.getInt("points", 0)
             val gameName = sharedPreferences.getString("choosedGame", "")
+            val choosedGameJson = GuessDiaryGame(gameName)
             try {
                 val decodedJWT: DecodedJWT = JWT.decode(authToken)
                 val userId = decodedJWT.subject
 
                 sendPointsViewModel.sendPoints(userId.toLong(), points)
-                guessDiaryGameViewModel.guessDiaryGame(gameName!!,userId.toLong())
+                guessDiaryGameViewModel.guessDiaryGame(choosedGameJson,userId.toLong())
 
-                val editor = sharedPreferences.edit()
-                editor.putString("choosedGame", null)
-                editor.apply()
 
             } catch (e: Exception) {
                 e.printStackTrace()
             }
             val editor = sharedPreferences.edit()
             editor.remove("points")
+            editor.remove("choosedGame")
             editor.apply()
             findNavController().navigate(R.id.action_posLoginFragment_to_rankNavbar)
         }

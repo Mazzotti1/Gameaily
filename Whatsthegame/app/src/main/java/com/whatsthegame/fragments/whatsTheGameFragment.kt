@@ -1,7 +1,6 @@
 package com.whatsthegame.fragments
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
 import android.widget.*
@@ -19,6 +18,7 @@ import android.os.CountDownTimer
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.whatsthegame.Api.ViewModel.*
+import com.whatsthegame.models.GuessDiaryGame
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -158,7 +158,7 @@ class whatsTheGameFragment : Fragment() {
         sendButton.setOnClickListener {
             val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
             val choosedGame = sharedPreferences.getString("choosedGame", "")
-
+            val choosedGameJson = GuessDiaryGame(choosedGame)
 
 
             if (remainingLives > 0) {
@@ -225,8 +225,9 @@ class whatsTheGameFragment : Fragment() {
 
                                 if (authToken != null) {
                                     sendPointsViewModel.sendPoints(userId.toLong(), points)
-                                    guessDiaryGameViewModel.guessDiaryGame(gameName!!,userId.toLong())
-                                    println("Token: $gameName")
+                                    guessDiaryGameViewModel.guessDiaryGame(choosedGameJson, userId.toLong())
+
+                                    println("Token: $authToken")
                                 }
                                 findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
 
@@ -249,7 +250,7 @@ class whatsTheGameFragment : Fragment() {
                         }
 
                         val editor = sharedPreferences.edit()
-                        editor.putString("choosedGame", null)
+                        editor.putString("choosedGame", choosedGame)
                         editor.putInt("remainingLives", remainingLives)
                         editor.putLong("lifesTimestamp", currentTimeMillis)
                         editor.apply()
