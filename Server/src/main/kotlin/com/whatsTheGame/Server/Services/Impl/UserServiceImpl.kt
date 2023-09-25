@@ -69,6 +69,7 @@ class UserServiceImpl @Autowired constructor(
             users.division,
             users.points,
             users.role,
+            users.userAnswer,
         )
         users.token(token)
         return users

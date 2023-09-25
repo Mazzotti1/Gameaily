@@ -23,6 +23,7 @@ class JwtToken{
         division: String?,
         points: Int?,
         role: String,
+        userAnswer: Boolean,
 
     ): String? {
         val now = Date()
@@ -39,6 +40,7 @@ class JwtToken{
             .claim("division", division)
             .claim("points", points)
             .claim("role", role)
+            .claim("userAnswer", userAnswer)
             .setIssuedAt(now)
             .setExpiration(expiryDate)
             .signWith(key)

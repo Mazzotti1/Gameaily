@@ -147,11 +147,11 @@ class whatsTheGameFragment : Fragment() {
         val currentTimeMillis = System.currentTimeMillis()
 
 
-        /*if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
+        if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
             remainingLives = sharedPreferences.getInt("remainingLives", 5)
 
             lifesCounter.text = "$remainingLives vidas restantes"
-        }*/
+        }
 
         val token = sharedPreferences.getString("tokenJwt", null)
         val sendButton = rootView.findViewById<Button>(R.id.sendButton)
@@ -193,10 +193,14 @@ class whatsTheGameFragment : Fragment() {
                                 "Preferences",
                                 Context.MODE_PRIVATE
                             )
-                            val playerAnswer = sharedPreferences.getBoolean("playerHasAnswer", false)
                             //enviar direto pontos pro server
 
-                          /** // if (playerAnswer) { verificação se o usuario ja respondeu
+                            val authToken = sharedPreferences.getString("tokenJwt", "")
+                            val decodedJWT: DecodedJWT = JWT.decode(authToken)
+                            val userId = decodedJWT.subject
+                            val playerAnswerString = decodedJWT.getClaim("userAnswer")
+                            val playerAnswer = playerAnswerString.asBoolean()
+                           if (playerAnswer) {
 
                                 val inflater = layoutInflater
                                 val layout = inflater.inflate(R.layout.empty_submit_layout, null)
@@ -210,32 +214,27 @@ class whatsTheGameFragment : Fragment() {
                                 toast.show()
 
                                 findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
-                            } else {*/
+                            } else {
 
                                 points = calculateTipsPoints(gameTipUsed)
                                 points = calculateMinutesPoints(timePassedInMin)
                                 points = calculateLivesPoints(remainingLives)
 
-
-                            val authToken = sharedPreferences.getString("tokenJwt", "")
-
                             try {
-                                val decodedJWT: DecodedJWT = JWT.decode(authToken)
-                                val userId = decodedJWT.subject
 
                                 if (authToken != null) {
                                     sendPointsViewModel.sendPoints(userId.toLong(), points)
                                     guessDiaryGameViewModel.guessDiaryGame(choosedGameJson, userId.toLong())
 
                                     println("Token: $authToken")
+
                                 }
                                 findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
 
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
-
-                      //  } Verificação se o usuario ja acertou
+                            }
                         } else {
                             findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
                             points = calculateTipsPoints(gameTipUsed)

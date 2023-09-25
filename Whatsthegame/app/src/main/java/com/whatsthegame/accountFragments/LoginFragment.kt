@@ -82,26 +82,6 @@ class LoginFragment : Fragment() {
 
                 val sharedPreferences =
                     requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-                val playerAnswer = sharedPreferences.getBoolean("playerHasAnswer", false)
-
-               /* if (playerAnswer) {
-                    val inflater = layoutInflater
-                    val layout = inflater.inflate(R.layout.empty_submit_layout, null)
-                    val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
-                    toastText.text =
-                        "Você já acertou o jogo hoje, novos pontos não serão computados!"
-                    val toast = Toast(requireContext())
-                    toast.duration = Toast.LENGTH_LONG
-                    toast.view = layout
-                    toast.show()
-
-                    val token = loginViewModel.getToken()
-                    val editor = sharedPreferences.edit()
-                    editor.putString("tokenJwt", token)
-                    editor.apply()
-                    findNavController().navigate(R.id.action_loginFragment_to_rankNavbar)
-
-                } else { */
 
                     val token = loginViewModel.getToken()
                     val editor = sharedPreferences.edit()
@@ -111,7 +91,6 @@ class LoginFragment : Fragment() {
                 }
             }
 
-        //} Verificação se o usuario ja acertou
 
         view.setOnClickListener {
             hideKeyboard()

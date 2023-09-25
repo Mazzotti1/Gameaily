@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.auth0.jwt.JWT
@@ -51,29 +53,48 @@ class PosLoginFragment : Fragment() {
         val recievePointsButton = view.findViewById<Button>(R.id.recievePoints)
         recievePointsButton.setOnClickListener {
 
-            val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+            val sharedPreferences =
+                requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
             val authToken = sharedPreferences.getString("tokenJwt", "")
             val points = sharedPreferences.getInt("points", 0)
             val gameName = sharedPreferences.getString("choosedGame", "")
             val choosedGameJson = GuessDiaryGame(gameName)
-            try {
-                val decodedJWT: DecodedJWT = JWT.decode(authToken)
-                val userId = decodedJWT.subject
 
-                sendPointsViewModel.sendPoints(userId.toLong(), points)
-                guessDiaryGameViewModel.guessDiaryGame(choosedGameJson,userId.toLong())
+            val decodedJWT: DecodedJWT = JWT.decode(authToken)
+            val playerAnswerString = decodedJWT.getClaim("userAnswer")
+            val playerAnswer = playerAnswerString.asBoolean()
+                println("resposta: $playerAnswer")
+            if (playerAnswer) {
+                val inflater = layoutInflater
+                val layout = inflater.inflate(R.layout.empty_submit_layout, null)
+                val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                toastText.text =
+                    "Você já acertou o jogo hoje, novos pontos não serão computados!"
+                val toast = Toast(requireContext())
+                toast.duration = Toast.LENGTH_LONG
+                toast.view = layout
+                toast.show()
 
+                findNavController().navigate(R.id.action_posLoginFragment_to_rankNavbar)
 
-            } catch (e: Exception) {
-                e.printStackTrace()
+            } else {
+                try {
+                    val decodedJWT: DecodedJWT = JWT.decode(authToken)
+                    val userId = decodedJWT.subject
+
+                    sendPointsViewModel.sendPoints(userId.toLong(), points)
+                    guessDiaryGameViewModel.guessDiaryGame(choosedGameJson, userId.toLong())
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                val editor = sharedPreferences.edit()
+                editor.remove("points")
+                editor.remove("choosedGame")
+                editor.apply()
+                findNavController().navigate(R.id.action_posLoginFragment_to_rankNavbar)
             }
-            val editor = sharedPreferences.edit()
-            editor.remove("points")
-            editor.remove("choosedGame")
-            editor.apply()
-            findNavController().navigate(R.id.action_posLoginFragment_to_rankNavbar)
         }
-
         return view
     }
 
