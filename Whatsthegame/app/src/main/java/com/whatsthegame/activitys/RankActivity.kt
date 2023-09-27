@@ -14,8 +14,6 @@ import com.whatsthegame.databinding.ActivityMainBinding
 
 class RankActivity : AppCompatActivity() {
 
-    private val layoutId = R.layout.activity_rank
-    private lateinit var viewBinding: ActivityMainBinding
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_app_bar, menu)
