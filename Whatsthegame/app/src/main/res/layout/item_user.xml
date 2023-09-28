@@ -10,8 +10,13 @@
      <ImageView
          android:id="@+id/iconImageView"
          android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:src="@drawable/plus" />
+         android:layout_height="match_parent"
+         android:layout_row="0"
+         android:layout_column="0"
+         android:layout_gravity="center_vertical"
+         android:layout_marginRight="10dp"
+         android:src="@drawable/plus"
+         android:layout_marginLeft="30dp"/>
 
      <TextView
         android:id="@+id/username"
@@ -41,24 +46,37 @@
          android:id="@+id/division"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:layout_row="1"
+         android:layout_row="0"
          android:layout_column="1"
          android:layout_marginRight="8dp"
          android:fontFamily="@font/poppins_medium"
          android:text="asdasd"
+         android:layout_gravity="bottom"
          android:textColor="@color/white"
-         android:textSize="14sp" />
+         android:textSize="14sp"
+         />
 
      <TextView
          android:id="@+id/points"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:layout_row="1"
+         android:layout_row="0"
          android:layout_column="2"
          android:layout_marginLeft="40sp"
          android:fontFamily="@font/poppins_medium"
          android:text="dasdasd"
+         android:layout_gravity="bottom"
          android:textColor="@color/white"
-         android:textSize="14sp" />
+         android:textSize="14sp"
+         />
 
+     <View
+         android:id="@+id/line"
+         android:layout_width="match_parent"
+         android:layout_height="1px"
+         android:layout_row="0"
+         android:layout_columnSpan="3"
+         android:background="@color/lineBackground"
+         android:layout_marginTop="10dp"
+         android:layout_marginBottom="10dp"/>
  </GridLayout>

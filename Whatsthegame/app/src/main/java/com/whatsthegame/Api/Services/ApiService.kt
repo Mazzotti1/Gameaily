@@ -25,4 +25,7 @@ interface ApiService {
     @POST("/users/sendPoints/{userId}/{points}")
     suspend fun sendPoints(@Path("userId") userId: Long, @Path("points") points: Int): ResponseBody
 
+    @GET("/users")
+    suspend fun getAllUsers(): List<AllUsers>
+
 }

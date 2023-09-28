@@ -23,7 +23,10 @@ class UsersController {
         val users = service!!.getAll(name)
         val usersDTOList = users?.map { user ->
             UsersDTO(
-                id = user?.id, name = user?.name, email = user?.email,
+                name = user?.name,
+                rank = user?.rank,
+                division = user?.division,
+                points = user?.points
             )
         }
         return usersDTOList

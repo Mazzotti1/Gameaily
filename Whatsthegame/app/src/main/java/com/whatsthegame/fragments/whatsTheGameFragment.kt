@@ -113,13 +113,6 @@ class whatsTheGameFragment : Fragment() {
                 false
             }
 
-            searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
-                if (!hasFocus) {
-                    gameNameListView.visibility = View.GONE
-                } else {
-                    gameNameListView.visibility = View.VISIBLE
-                }
-            }
 
 
         val tipButton = rootView.findViewById<Button>(R.id.tipButton)
