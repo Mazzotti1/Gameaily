@@ -43,8 +43,8 @@ class minigamesFragment : Fragment() {
         anagramSolverButton.setOnClickListener {
                 findNavController().navigate(R.id.action_minigamesNavbar_to_anagramaSolverFragment)
         }
-        val pistasSolverButton = view.findViewById<Button>(R.id.pistasButton)
-        pistasSolverButton.setOnClickListener {
+        val enigmaSolverButton = view.findViewById<Button>(R.id.enigmaButton)
+        enigmaSolverButton.setOnClickListener {
             findNavController().navigate(R.id.action_minigamesNavbar_to_pistasFragment)
         }
 

@@ -39,10 +39,11 @@
         app:layout_constraintVertical_bias="0.136" />
 
     <TextView
+        android:id="@+id/anagram"
         android:layout_width="70dp"
         android:layout_height="34dp"
         android:fontFamily="@font/poppins_medium"
-        android:text="Pedra"
+        android:text=""
         android:textAlignment="center"
         android:textColor="@color/appBar"
         android:textSize="20sp"
@@ -96,17 +97,17 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.394" />
+        app:layout_constraintVertical_bias="0.462" />
 
     <EditText
         android:id="@+id/editTextAnswer"
         android:layout_width="260dp"
         android:layout_height="40dp"
-        android:layout_marginTop="308dp"
+        android:layout_marginTop="440dp"
         android:background="@drawable/search_view_bg"
-        android:singleLine="true"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
+        android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"

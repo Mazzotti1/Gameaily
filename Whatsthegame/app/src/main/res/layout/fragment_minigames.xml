@@ -41,12 +41,12 @@
         app:layout_constraintVertical_bias="0.292" />
 
     <Button
-        android:id="@+id/pistasButton"
+        android:id="@+id/enigmaButton"
         android:layout_width="199dp"
         android:layout_height="90dp"
         android:backgroundTint="@color/destaques"
         android:fontFamily="@font/mochiypoppone_regular"
-        android:text="Pistas"
+        android:text="Enigma"
         android:textAlignment="center"
         android:textColor="#FFFFFF"
         android:textSize="13sp"

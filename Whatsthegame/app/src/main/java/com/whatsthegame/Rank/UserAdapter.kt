@@ -1,13 +1,18 @@
 package com.whatsthegame.Rank
 
+import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.auth0.jwt.JWT
+import com.auth0.jwt.interfaces.DecodedJWT
 import com.whatsthegame.R
 
 
@@ -19,6 +24,7 @@ class UserAdapter(private var userList: List<User>) : RecyclerView.Adapter<UserA
         val divisionTextView: TextView = itemView.findViewById(R.id.division)
         val pointsTextView: TextView = itemView.findViewById(R.id.points)
         val iconImageView: ImageView = itemView.findViewById(R.id.iconImageView)
+        val lineView: View = itemView.findViewById(R.id.line)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -56,7 +62,25 @@ class UserAdapter(private var userList: List<User>) : RecyclerView.Adapter<UserA
                 holder.iconImageView.setImageResource(R.drawable.bronze)
             }
         }
+
+        val sharedPreferences = holder.itemView.context.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val authToken = sharedPreferences.getString("tokenJwt", "")
+
+        if (!authToken.isNullOrEmpty()) {
+            val decodedJWT: DecodedJWT = JWT.decode(authToken)
+            val username = decodedJWT.getClaim("name").asString()
+
+            if (currentUser.username == username) {
+                holder.itemView.setBackgroundResource(R.drawable.border)
+                holder.lineView.setBackgroundResource(R.color.background)
+            } else {
+                holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+            }
+        } else {
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+        }
     }
+
 
     override fun getItemCount(): Int {
         return userList.size

@@ -1,5 +1,7 @@
 package com.whatsthegame.fragments
 
+import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.text.TextWatcher
 import androidx.fragment.app.Fragment
@@ -14,6 +16,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.auth0.jwt.JWT
+import com.auth0.jwt.interfaces.DecodedJWT
 import com.whatsthegame.Api.ViewModel.AllGamesViewModel
 import com.whatsthegame.Api.ViewModel.AllUsersViewModel
 import com.whatsthegame.Api.ViewModel.DiaryGameViewModel
@@ -64,6 +68,7 @@ class rankFragment : Fragment() {
                     User(user.name, user.rank, user.division, user.points)
                 }
 
+
                 val sortedUserList = originalUserList.sortedByDescending { it.points }
                 val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
                 adapter = UserAdapter(sortedUserList)
@@ -104,10 +109,17 @@ class rankFragment : Fragment() {
             }
         })
 
+
         return view
     }
 
-
+    private val rankIconsMap = mapOf(
+        "Bronze" to R.drawable.bronze,
+        "Prata" to R.drawable.prata,
+        "Ouro" to R.drawable.ouro,
+        "Platina" to R.drawable.platina,
+        "Diamante" to R.drawable.diamante
+    )
 
     companion object {
         /**

@@ -7,8 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import com.whatsthegame.Api.ViewModel.AllGamesViewModel
+import com.whatsthegame.Api.ViewModel.AnagramsViewModel
+import com.whatsthegame.Api.ViewModel.DiaryGameViewModel
 import com.whatsthegame.R
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -32,7 +40,8 @@ class AnagramaSolverFragment : Fragment() {
             param2 = it.getString(ARG_PARAM2)
         }
     }
-
+    private var tips: String? = null
+    private lateinit var anagramViewModel: AnagramsViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -58,9 +67,38 @@ class AnagramaSolverFragment : Fragment() {
             iconContainer.addView(imageView)
         }
 
-        return view
 
+        anagramViewModel = ViewModelProvider(this).get(AnagramsViewModel::class.java)
+
+        //val textViewDifficulty = view.findViewById<TextView>(R.id.difficulty)
+        val textViewAnagram = view.findViewById<TextView>(R.id.anagram)
+        anagramViewModel.anagram.observe(viewLifecycleOwner, Observer { anagram ->
+            if (anagram != null){
+                val wordname = anagram.wordName
+                val answer = anagram.answer
+                val gameDifficulty = anagram.difficulty
+                tips = anagram.tips
+                val colorResId = when (gameDifficulty) {
+                    "Fácil" -> R.color.win
+                    "Médio" -> R.color.secundaria
+                    "Difícil" -> R.color.destaques
+                    else -> android.R.color.white
+                }
+                activity?.runOnUiThread {
+                    textViewAnagram.text = "$wordname"
+                    //textViewDifficulty.text = "$gameDifficulty"
+                    //textViewDifficulty.setTextColor(ContextCompat.getColor(requireContext(), colorResId))
+                }
+            }
+        })
+        viewLifecycleOwner.lifecycleScope.launch {
+            anagramViewModel.fetchDiaryGame()
+        }
+
+        return view
     }
+
+
 
     companion object {
         /**

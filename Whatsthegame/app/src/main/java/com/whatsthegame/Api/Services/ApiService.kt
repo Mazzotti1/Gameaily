@@ -28,4 +28,6 @@ interface ApiService {
     @GET("/users")
     suspend fun getAllUsers(): List<AllUsers>
 
+    @GET("/anagrams/getAnagram")
+    suspend fun getAnagrams(): Anagrams
 }
