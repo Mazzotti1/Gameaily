@@ -30,4 +30,7 @@ interface ApiService {
 
     @GET("/anagrams/getAnagram")
     suspend fun getAnagrams(): Anagrams
+
+    @POST("/anagrams/guess")
+    suspend fun guessAnagram(@Body answer: GuessAnagram): ResponseBody
 }

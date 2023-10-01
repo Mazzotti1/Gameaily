@@ -15,7 +15,7 @@ class AnagramsViewModel : ViewModel() {
     private val repository = AnagramsRepository()
     val anagram = MutableLiveData<Anagrams?>()
 
-    fun fetchDiaryGame() {
+    fun fetchAnagramGame() {
         viewModelScope.launch(Dispatchers.IO) {
             val anagramData = repository.fetchAnagram()
             anagram.postValue(anagramData)

@@ -70,11 +70,20 @@
         android:id="@+id/anagramaSolverFragment2"
         android:name="com.whatsthegame.minigamesFragments.AnagramaSolverFragment"
         android:label="fragment_anagrama_solver"
-        tools:layout="@layout/fragment_anagrama_solver" />
+        tools:layout="@layout/fragment_anagrama_solver" >
+        <action
+            android:id="@+id/action_anagramaSolverFragment2_to_gameOverMinigamesFragment2"
+            app:destination="@id/gameOverMinigamesFragment2" />
+    </fragment>
     <fragment
         android:id="@+id/pistasFragment2"
         android:name="com.whatsthegame.minigamesFragments.PistasFragment"
         android:label="fragment_pistas"
         tools:layout="@layout/fragment_pistas" />
+    <fragment
+        android:id="@+id/gameOverMinigamesFragment2"
+        android:name="com.whatsthegame.fragments.GameOverMinigamesFragment"
+        android:label="fragment_game_over_minigames"
+        tools:layout="@layout/fragment_game_over_minigames" />
 
 </navigation>
