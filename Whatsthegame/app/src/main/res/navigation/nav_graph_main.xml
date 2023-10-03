@@ -134,9 +134,13 @@
     </fragment>
     <fragment
         android:id="@+id/pistasFragment"
-        android:name="com.whatsthegame.minigamesFragments.PistasFragment"
+        android:name="com.whatsthegame.minigamesFragments.EnigmaFragment"
         android:label="fragment_pistas"
-        tools:layout="@layout/fragment_pistas" />
+        tools:layout="@layout/fragment_pistas" >
+        <action
+            android:id="@+id/action_pistasFragment2_to_gameOverMinigamesFragment2"
+            app:destination="@id/gameOverMinigamesFragment" />
+    </fragment>
     <fragment
         android:id="@+id/posLoginFragment"
         android:name="com.whatsthegame.accountFragments.PosLoginFragment"

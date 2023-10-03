@@ -33,4 +33,10 @@ interface ApiService {
 
     @POST("/anagrams/guess")
     suspend fun guessAnagram(@Body answer: GuessAnagram): ResponseBody
+
+    @GET("/enigma/getEnigma")
+    suspend fun getEnigmas(): Enigmas
+
+    @POST("/enigma/guess")
+    suspend fun guessEnigma(@Body answer: GuessEnigma): ResponseBody
 }

@@ -77,9 +77,13 @@
     </fragment>
     <fragment
         android:id="@+id/pistasFragment2"
-        android:name="com.whatsthegame.minigamesFragments.PistasFragment"
+        android:name="com.whatsthegame.minigamesFragments.EnigmaFragment"
         android:label="fragment_pistas"
-        tools:layout="@layout/fragment_pistas" />
+        tools:layout="@layout/fragment_pistas" >
+        <action
+            android:id="@+id/action_pistasFragment2_to_gameOverMinigamesFragment2"
+            app:destination="@id/gameOverMinigamesFragment2" />
+    </fragment>
     <fragment
         android:id="@+id/gameOverMinigamesFragment2"
         android:name="com.whatsthegame.fragments.GameOverMinigamesFragment"
