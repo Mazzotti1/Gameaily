@@ -89,6 +89,11 @@ class rankFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                if (!::originalUserList.isInitialized) {
+
+                    return true
+                }
+
                 if (newText.isNullOrBlank()) {
                     isSearching = false
 

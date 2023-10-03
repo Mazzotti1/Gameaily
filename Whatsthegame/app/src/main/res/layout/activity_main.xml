@@ -26,6 +26,7 @@
         android:id="@+id/homeButtonStart"
         android:layout_width="130dp"
         android:layout_height="50dp"
+        android:backgroundTint="@color/destaques"
         android:fontFamily="@font/mochiypoppone_regular"
         android:text="Iniciar"
         android:textColor="#FFFFFF"
@@ -36,24 +37,23 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.607"
-        tools:ignore="MissingConstraints"
-        android:backgroundTint="@color/destaques"/>
+        app:layout_constraintVertical_bias="0.576"
+        tools:ignore="MissingConstraints" />
 
     <ImageButton
         android:id="@+id/homeButtonRank"
         android:layout_width="100dp"
         android:layout_height="80dp"
+        android:background="@drawable/rounded_buttons_home"
+        android:src="@drawable/trophythin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.128"
+        app:layout_constraintHorizontal_bias="0.083"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.757"
-        tools:ignore="MissingConstraints"
-        android:src="@drawable/trophythin"
         app:tint="@color/black"
-        android:background="@drawable/rounded_buttons_home"/>
+        tools:ignore="MissingConstraints" />
 
     <ImageButton
         android:id="@+id/homeButtonMiniGames"
@@ -74,16 +74,16 @@
         android:id="@+id/homeButtonSettings"
         android:layout_width="100dp"
         android:layout_height="80dp"
+        android:background="@drawable/rounded_buttons_home"
+        android:src="@drawable/gearthin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.868"
+        app:layout_constraintHorizontal_bias="0.913"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.757"
-        tools:ignore="MissingConstraints"
-        android:src="@drawable/gearthin"
         app:tint="@color/black"
-        android:background="@drawable/rounded_buttons_home"/>
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -93,12 +93,10 @@
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="11sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.17"
+        app:layout_constraintHorizontal_bias="0.127"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.802" />
+        app:layout_constraintTop_toBottomOf="@id/homeButtonRank" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -108,11 +106,10 @@
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="11sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/homeButtonMiniGames"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.802" />
 
     <TextView
@@ -123,13 +120,10 @@
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="11sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.807"
+        app:layout_constraintHorizontal_bias="0.851"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.802" />
-
+        app:layout_constraintTop_toBottomOf="@id/homeButtonSettings" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.minigamesFragment"
-    android:background="@color/background">
+    android:background="@color/background"
+    tools:context=".fragments.minigamesFragment">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
 
     <Button
         android:id="@+id/anagramSolverButton"
-        android:layout_width="199dp"
-        android:layout_height="90dp"
+        android:layout_width="150dp"
+        android:layout_height="80dp"
         android:backgroundTint="@color/destaques"
         android:fontFamily="@font/mochiypoppone_regular"
         android:text="Anagramas solver"
@@ -33,23 +39,23 @@
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/anagramSolverButton"
         app:layout_constraintVertical_bias="0.292" />
 
     <Button
         android:id="@+id/enigmaButton"
-        android:layout_width="199dp"
-        android:layout_height="90dp"
+        android:layout_width="150dp"
+        android:layout_height="80dp"
         android:backgroundTint="@color/destaques"
         android:fontFamily="@font/mochiypoppone_regular"
         android:text="Enigma"
         android:textAlignment="center"
         android:textColor="#FFFFFF"
         android:textSize="13sp"
+        android:layout_marginTop="125sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -62,15 +68,15 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_medium"
-        android:text="Os jogadores recebem pistas enigmáticas que levam a uma palavra específica. Eles precisam decifrar as pistas e adivinhar a palavra correta. Quanto mais complexa a pista, mais pontos ganham."
+        android:text="Os jogadores recebem pistas enigmáticas que levam a uma palavra específica. Eles precisam decifrar as pistas e adivinhar a palavra correta."
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/enigmaButton"
         app:layout_constraintVertical_bias="0.82" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

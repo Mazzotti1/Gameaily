@@ -29,7 +29,6 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_medium"
         android:text="Sobre What's the game?"
-        android:textAlignment="center"
         android:textColor="@color/secundaria"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -42,33 +41,32 @@
     <TextView
         android:id="@+id/textResp1"
         android:layout_width="296dp"
-        android:layout_height="125dp"
+        android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_medium"
         android:text="Whats the game? é um projeto de entreterimento baseado em jogos diários, que o usuário pode competir com outros usuários para conseguir a maior pontuação! E também o usuário pode usar para passar o tempo em minigames ilimitados!"
         android:textAlignment="textStart"
         android:textColor="@color/white"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.417"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textQuestion1"
         app:layout_constraintVertical_bias="0.24" />
 
     <TextView
         android:id="@+id/textQuestion2"
         android:layout_width="266dp"
-        android:layout_height="22dp"
+        android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_medium"
         android:text="Versão"
         android:textAlignment="textStart"
         android:textColor="@color/secundaria"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.331"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textResp1"
+        android:layout_marginTop="15sp"
         app:layout_constraintVertical_bias="0.403" />
 
     <TextView
@@ -80,10 +78,9 @@
         android:textAlignment="textStart"
         android:textColor="@color/white"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.4"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/textQuestion2"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

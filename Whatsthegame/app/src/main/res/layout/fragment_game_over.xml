@@ -23,8 +23,9 @@
         app:layout_constraintVertical_bias="0.145" />
 
     <TextView
+        android:id="@+id/text1"
         android:layout_width="250dp"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_medium"
         android:text="Você perdeu todas as vidas no jogo diário!"
         android:textAlignment="center"
@@ -38,19 +39,19 @@
         app:layout_constraintVertical_bias="0.327" />
 
     <TextView
+        android:id="@+id/text2"
         android:layout_width="250dp"
-        android:layout_height="105dp"
+        android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_medium"
         android:text="Mas não fique triste, tem outros desafios te esperando!"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.525" />
+        app:layout_constraintVertical_bias="0.525"
+        app:layout_constraintTop_toBottomOf="@id/text1"/>
 
     <Button
         android:id="@+id/minigames"
@@ -62,13 +63,12 @@
         android:textAlignment="center"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.833"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.747"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        app:layout_constraintTop_toBottomOf="@id/text2"/>
 
     <Button
         android:id="@+id/wtgInfinito"
@@ -80,13 +80,12 @@
         android:textAlignment="center"
         android:textColor="#FFFFFF"
         android:textSize="19sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.211"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.748"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        app:layout_constraintTop_toBottomOf="@id/text2"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

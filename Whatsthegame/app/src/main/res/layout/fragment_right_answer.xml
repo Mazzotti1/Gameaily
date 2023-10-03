@@ -22,16 +22,18 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.081" />
+        app:layout_constraintVertical_bias="0.079" />
 
     <TextView
         android:layout_width="293dp"
-        android:layout_height="174dp"
+        android:layout_height="wrap_content"
         android:fontFamily="@font/mochiypoppone_regular"
         android:text="Caso você queira competir e registrar seus pontos, crie um usuário!"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="25sp"
+        android:textSize="18sp"
+        android:layout_marginTop="30sp"
+        android:layout_marginBottom="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.483"
