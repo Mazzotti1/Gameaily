@@ -14,9 +14,13 @@ import com.whatsthegame.R
 import kotlinx.coroutines.launch
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.*
 import android.os.CountDownTimer
+import android.renderscript.Allocation
+import android.renderscript.Element
+import android.renderscript.RenderScript
+import android.renderscript.ScriptIntrinsicBlur
+import androidx.core.graphics.drawable.toBitmap
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.google.firebase.storage.FirebaseStorage
@@ -24,6 +28,7 @@ import com.google.firebase.storage.StorageReference
 import com.whatsthegame.Api.ViewModel.*
 import com.whatsthegame.models.GuessDiaryGame
 import java.io.File
+
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -46,6 +51,7 @@ class whatsTheGameFragment : Fragment() {
         super.onCreate(savedInstanceState)
         sendPointsViewModel = ViewModelProvider(this).get(SendPointsViewModel::class.java)
         guessDiaryGameViewModel = ViewModelProvider(this).get(GuessDiaryGameViewModel::class.java)
+
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -75,6 +81,7 @@ class whatsTheGameFragment : Fragment() {
         //editor.apply()
 
         startTimer()
+
 
         val searchView = rootView.findViewById<SearchView>(R.id.searchView)
         val gameNameListView = rootView.findViewById<ListView>(R.id.gameNameListView)
@@ -404,13 +411,64 @@ class whatsTheGameFragment : Fragment() {
 
             val resizedBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, false)
 
-            imageViewGame?.setImageBitmap(resizedBitmap)
+            imageViewGame!!.setImageBitmap(resizedBitmap)
+            applyBlur(requireContext(), imageViewGame, 25f)
+            applyBlur(requireContext(), imageViewGame, 25f)
+            applyBlur(requireContext(), imageViewGame, 25f)
+            applyBlur(requireContext(), imageViewGame, 25f)
+            applyBlur(requireContext(), imageViewGame, 25f)
+            applyBlur(requireContext(), imageViewGame, 25f)
+            applyBlur(requireContext(), imageViewGame, 25f)
+            applyBlur(requireContext(), imageViewGame, 25f)
+            applyBlur(requireContext(), imageViewGame, 25f)
+            applyBlur(requireContext(), imageViewGame, 25f)
+            applyBlur(requireContext(), imageViewGame, 25f)
+            applyBlur(requireContext(), imageViewGame, 25f)
+            applyBlur(requireContext(), imageViewGame, 25f)
+            applyBlur(requireContext(), imageViewGame, 25f)
 
         }.addOnFailureListener {
             println("Erro ao fazer o download da imagem do jogo")
         }
     }
 
+
+    private fun applyBlur(context: Context, imageView: ImageView, radius: Float) {
+        // Obtenha a imagem da ImageView
+        val originalBitmap = imageView.drawable.toBitmap()
+
+        // Crie uma cópia da imagem original para evitar a sobreposição
+        val blurredBitmap = Bitmap.createBitmap(
+            originalBitmap.width,
+            originalBitmap.height,
+            Bitmap.Config.ARGB_8888
+        )
+
+        // Crie um Canvas para desenhar a imagem borrada
+        val canvas = Canvas(blurredBitmap)
+
+        // Crie um Paint com o filtro de desfoque
+        val paint = Paint()
+        paint.isAntiAlias = true
+        paint.isFilterBitmap = true
+        paint.shader = BitmapShader(originalBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+
+        // Crie um efeito RenderScript para o desfoque
+        val renderScript = RenderScript.create(context)
+        val blurScript = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript))
+        blurScript.setInput(Allocation.createFromBitmap(renderScript, originalBitmap))
+        blurScript.setRadius(radius)
+        blurScript.forEach(Allocation.createFromBitmap(renderScript, blurredBitmap))
+
+        // Desenhe a imagem borrada no Canvas
+        canvas.drawBitmap(blurredBitmap, 0f, 0f, paint)
+
+        // Defina a imagem borrada na ImageView
+        imageView.setImageBitmap(blurredBitmap)
+
+        // Libere recursos do RenderScript
+        renderScript.destroy()
+    }
 
 
     override fun onDestroyView() {
