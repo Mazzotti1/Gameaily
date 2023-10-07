@@ -77,6 +77,21 @@
         app:layout_constraintVertical_bias="0.634"
         tools:ignore="MissingConstraints" />
 
+
+    <ImageView
+        android:id="@+id/imageViewGame"
+        android:layout_width="230dp"
+        android:layout_height="230dp"
+        app:layout_constraintDimensionRatio="H,1:1"
+        android:layout_gravity="center"
+        android:scaleType="centerInside"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.243" />
+
     <ListView
         android:id="@+id/gameNameListView"
         android:layout_width="match_parent"

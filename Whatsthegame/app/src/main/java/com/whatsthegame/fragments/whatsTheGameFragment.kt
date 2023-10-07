@@ -14,11 +14,16 @@ import com.whatsthegame.R
 import kotlinx.coroutines.launch
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.CountDownTimer
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.whatsthegame.Api.ViewModel.*
 import com.whatsthegame.models.GuessDiaryGame
+import java.io.File
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -50,6 +55,7 @@ class whatsTheGameFragment : Fragment() {
     private val gameNameList = mutableListOf<String>()
     private var gameTip: String? = null
     private var gameName: String? = null
+    private var gameImage: String? = null
     private var gameTipUsed = false
 
     private var timer: CountDownTimer? = null
@@ -105,7 +111,13 @@ class whatsTheGameFragment : Fragment() {
             }
         })
 
-
+        searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                gameNameListView.visibility = View.VISIBLE
+            } else {
+                gameNameListView.visibility = View.GONE
+            }
+        }
         rootView.setOnTouchListener { _, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     searchView.clearFocus()
@@ -335,7 +347,7 @@ class whatsTheGameFragment : Fragment() {
         diaryGameViewModel.game.observe(viewLifecycleOwner, Observer { game ->
             if (game != null){
                 gameName = game.first.gameName
-                val gameImage = game.first.gameImage
+                gameImage = game.first.gameImage
                 gameTip = game.first.tips
                 val gameDifficulty = game.first.difficulty
                 val colorResId = when (gameDifficulty) {
@@ -344,6 +356,7 @@ class whatsTheGameFragment : Fragment() {
                     "Difícil" -> R.color.destaques
                     else -> android.R.color.white
                 }
+                getImageFromBucket()
                 activity?.runOnUiThread {
                     textViewDifficulty.text = "$gameDifficulty"
                     textViewDifficulty.setTextColor(ContextCompat.getColor(requireContext(), colorResId))
@@ -366,8 +379,38 @@ class whatsTheGameFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             diaryGameViewModel.fetchDiaryGame()
             allGamesViewModel.fetchAllGames()
+
+        }
+
+    }
+    private fun getImageFromBucket() {
+        val storage = FirebaseStorage.getInstance()
+        val storageRef = storage.reference
+        val imageRef: StorageReference = storageRef.child("/capa jogos/$gameImage.png")
+
+        val imageViewGame = view?.findViewById<ImageView>(R.id.imageViewGame)
+
+        val screenWidth = resources.displayMetrics.widthPixels // Largura da tela
+        val screenHeight = resources.displayMetrics.heightPixels // Altura da tela
+
+        val localFile = File.createTempFile("temp_image", "jpg")
+
+        imageRef.getFile(localFile).addOnSuccessListener { taskSnapshot ->
+            val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+
+            val targetWidth = screenWidth
+            val scaleFactor = targetWidth.toFloat() / bitmap.width
+            val targetHeight = (bitmap.height * scaleFactor).toInt()
+
+            val resizedBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, false)
+
+            imageViewGame?.setImageBitmap(resizedBitmap)
+
+        }.addOnFailureListener {
+            println("Erro ao fazer o download da imagem do jogo")
         }
     }
+
 
 
     override fun onDestroyView() {
