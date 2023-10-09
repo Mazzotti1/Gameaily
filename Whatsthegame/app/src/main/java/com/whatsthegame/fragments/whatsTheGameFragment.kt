@@ -195,6 +195,18 @@ class whatsTheGameFragment : Fragment() {
                                 toast.view = layout
                                 toast.show()
 
+                                val imageViewGame = view?.findViewById<ImageView>(R.id.imageViewGame)
+                                if (imageViewGame != null) {
+                                    when (remainingLives) {
+                                        4 -> displayMosaic(requireContext(), imageViewGame, blockSize = 80)
+                                        3 -> displayMosaic(requireContext(), imageViewGame, blockSize = 50)
+                                        2 -> displayMosaic(requireContext(), imageViewGame, blockSize = 30)
+                                        1 -> displayMosaic(requireContext(), imageViewGame, blockSize = 15)
+                                        else -> {
+                                            println("Número de vidas desconhecido: $remainingLives")
+                                        }
+                                    }
+                                }
 
                                 val searchView = rootView.findViewById<SearchView>(R.id.searchView)
                                 searchView.setQuery("", false)
@@ -390,15 +402,16 @@ class whatsTheGameFragment : Fragment() {
         }
 
     }
+
     private fun getImageFromBucket() {
         val storage = FirebaseStorage.getInstance()
         val storageRef = storage.reference
         val imageRef: StorageReference = storageRef.child("/capa jogos/$gameImage.png")
 
-        val imageViewGame = view?.findViewById<ImageView>(R.id.imageViewGame)
-
         val screenWidth = resources.displayMetrics.widthPixels // Largura da tela
         val screenHeight = resources.displayMetrics.heightPixels // Altura da tela
+
+        val imageViewGame = view?.findViewById<ImageView>(R.id.imageViewGame)
 
         val localFile = File.createTempFile("temp_image", "jpg")
 
@@ -412,62 +425,121 @@ class whatsTheGameFragment : Fragment() {
             val resizedBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, false)
 
             imageViewGame!!.setImageBitmap(resizedBitmap)
-            applyBlur(requireContext(), imageViewGame, 25f)
-            applyBlur(requireContext(), imageViewGame, 25f)
-            applyBlur(requireContext(), imageViewGame, 25f)
-            applyBlur(requireContext(), imageViewGame, 25f)
-            applyBlur(requireContext(), imageViewGame, 25f)
-            applyBlur(requireContext(), imageViewGame, 25f)
-            applyBlur(requireContext(), imageViewGame, 25f)
-            applyBlur(requireContext(), imageViewGame, 25f)
-            applyBlur(requireContext(), imageViewGame, 25f)
-            applyBlur(requireContext(), imageViewGame, 25f)
-            applyBlur(requireContext(), imageViewGame, 25f)
-            applyBlur(requireContext(), imageViewGame, 25f)
-            applyBlur(requireContext(), imageViewGame, 25f)
-            applyBlur(requireContext(), imageViewGame, 25f)
+
+            applyMosaic(requireContext(), imageViewGame, blockSize = 100)
 
         }.addOnFailureListener {
             println("Erro ao fazer o download da imagem do jogo")
         }
     }
 
-
-    private fun applyBlur(context: Context, imageView: ImageView, radius: Float) {
+    private var originalBitmap: Bitmap? = null
+    private fun applyMosaic(context: Context, imageView: ImageView, blockSize: Int) {
         // Obtenha a imagem da ImageView
-        val originalBitmap = imageView.drawable.toBitmap()
+        originalBitmap = imageView.drawable.toBitmap()
 
         // Crie uma cópia da imagem original para evitar a sobreposição
-        val blurredBitmap = Bitmap.createBitmap(
-            originalBitmap.width,
-            originalBitmap.height,
+        val mosaicBitmap = Bitmap.createBitmap(
+            originalBitmap!!.width,
+            originalBitmap!!.height,
             Bitmap.Config.ARGB_8888
         )
 
-        // Crie um Canvas para desenhar a imagem borrada
-        val canvas = Canvas(blurredBitmap)
-
-        // Crie um Paint com o filtro de desfoque
+        val canvas = Canvas(mosaicBitmap)
         val paint = Paint()
-        paint.isAntiAlias = true
-        paint.isFilterBitmap = true
-        paint.shader = BitmapShader(originalBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
 
-        // Crie um efeito RenderScript para o desfoque
-        val renderScript = RenderScript.create(context)
-        val blurScript = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript))
-        blurScript.setInput(Allocation.createFromBitmap(renderScript, originalBitmap))
-        blurScript.setRadius(radius)
-        blurScript.forEach(Allocation.createFromBitmap(renderScript, blurredBitmap))
+        // Percorra a imagem original em blocos e aplique o efeito de mosaico
+        for (x in 0 until originalBitmap!!.width step blockSize) {
+            for (y in 0 until originalBitmap!!.height step blockSize) {
+                // Calcule a cor média do bloco
+                var redSum = 0
+                var greenSum = 0
+                var blueSum = 0
+                var pixelCount = 0
 
-        // Desenhe a imagem borrada no Canvas
-        canvas.drawBitmap(blurredBitmap, 0f, 0f, paint)
+                for (i in x until x + blockSize) {
+                    for (j in y until y + blockSize) {
+                        if (i < originalBitmap!!.width && j < originalBitmap!!.height) {
+                            val pixelColor = originalBitmap!!.getPixel(i, j)
+                            redSum += Color.red(pixelColor)
+                            greenSum += Color.green(pixelColor)
+                            blueSum += Color.blue(pixelColor)
+                            pixelCount++
+                        }
+                    }
+                }
 
-        // Defina a imagem borrada na ImageView
-        imageView.setImageBitmap(blurredBitmap)
+                // Calcule a cor média do bloco
+                val averageRed = redSum / pixelCount
+                val averageGreen = greenSum / pixelCount
+                val averageBlue = blueSum / pixelCount
 
-        // Libere recursos do RenderScript
-        renderScript.destroy()
+                // Pinte o bloco com a cor média
+                val blockColor = Color.rgb(averageRed, averageGreen, averageBlue)
+                paint.color = blockColor
+                canvas.drawRect(
+                    x.toFloat(),
+                    y.toFloat(),
+                    (x + blockSize).toFloat(),
+                    (y + blockSize).toFloat(),
+                    paint
+                )
+            }
+        }
+
+        imageView.setImageBitmap(mosaicBitmap)
+    }
+    private fun displayMosaic(context: Context, imageView: ImageView, blockSize: Int) {
+        // Verifique se temos uma imagem original para restaurar
+        if (originalBitmap != null) {
+            // Clone a imagem original para evitar a modificação da imagem original
+            val mosaicBitmap = originalBitmap!!.copy(originalBitmap!!.config, true)
+
+            // Reduza a resolução da imagem usando o blockSize fornecido
+            val width = mosaicBitmap.width
+            val height = mosaicBitmap.height
+
+            for (x in 0 until width step blockSize) {
+                for (y in 0 until height step blockSize) {
+                    // Calcule a média das cores dentro do bloco
+                    var totalRed = 0
+                    var totalGreen = 0
+                    var totalBlue = 0
+                    var blockPixels = 0
+
+                    for (i in x until x + blockSize) {
+                        for (j in y until y + blockSize) {
+                            if (i < width && j < height) {
+                                val pixelColor = mosaicBitmap.getPixel(i, j)
+                                totalRed += Color.red(pixelColor)
+                                totalGreen += Color.green(pixelColor)
+                                totalBlue += Color.blue(pixelColor)
+                                blockPixels++
+                            }
+                        }
+                    }
+
+                    val averageRed = totalRed / blockPixels
+                    val averageGreen = totalGreen / blockPixels
+                    val averageBlue = totalBlue / blockPixels
+
+                    // Pinte o bloco inteiro com a cor média
+                    for (i in x until x + blockSize) {
+                        for (j in y until y + blockSize) {
+                            if (i < width && j < height) {
+                                mosaicBitmap.setPixel(i, j, Color.rgb(averageRed, averageGreen, averageBlue))
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Defina a imagem mosaico na ImageView
+            imageView.setImageBitmap(mosaicBitmap)
+        } else {
+            // Se não houver uma imagem original, exiba uma mensagem de erro ou faça o que for apropriado
+            println("Não há imagem original disponível.")
+        }
     }
 
 
