@@ -1,7 +1,9 @@
 package com.whatsthegame.whatsTheGameFragments
 
 
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
 import androidx.navigation.fragment.findNavController
 import com.whatsthegame.R
 import android.os.Bundle
@@ -12,11 +14,20 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.whatsthegame.Api.ViewModel.DiaryGameViewModel
+import com.whatsthegame.Api.ViewModel.LoginViewModel
+import com.whatsthegame.Api.ViewModel.RegisterViewModel
+import io.github.cdimascio.dotenv.dotenv
 import kotlinx.coroutines.launch
 
 
@@ -34,15 +45,22 @@ class RightAnswerFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
+    private lateinit var loginViewModel: LoginViewModel
+    private lateinit var registerViewModel: RegisterViewModel
+    private lateinit var auth: FirebaseAuth
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
+        registerViewModel = ViewModelProvider(this).get(RegisterViewModel::class.java)
+
+        auth = FirebaseAuth.getInstance()
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
 
         }
     }
+
 
     private lateinit var countDownTimer: CountDownTimer
     private lateinit var timerTextView: TextView
@@ -67,7 +85,7 @@ class RightAnswerFragment : Fragment() {
 
         val googleButton = view.findViewById<ImageButton>(R.id.googleButton)
         googleButton.setOnClickListener {
-            //signInGoogle()
+            signInGoogle()
         }
 
         return view
@@ -129,9 +147,132 @@ class RightAnswerFragment : Fragment() {
             diaryGameViewModel.fetchDiaryGame()
         }
     }
+    
+    private val dotenv = dotenv {
+        directory = "/assets"
+        filename = "env"
+    }
+
+    private val clientId = dotenv["CLIENT_ID"]!!
+    private fun signInGoogle() {
+        // Configura a solicitação de login com o Google
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(clientId)
+            .setHostedDomain("asdasdasda.com")
+            .requestEmail()
+            .build()
+
+        val googleSignInClient = GoogleSignIn.getClient(requireContext(), gso)
+
+        val signInIntent = googleSignInClient.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                // Google Sign-In was successful, authenticate with Firebase
+                val account = task.getResult(ApiException::class.java)
+                firebaseAuthWithGoogle(account?.idToken)
+            } catch (e: ApiException) {
+                // Google Sign-In failed
+                println("Google sign-in failed: $e")
+            }
+        }
+    }
+
+    private var googleName: String? = null
+    private var googleEmail: String? = null
+    private var googleUid: String? = null
 
 
+    private fun authAndRegister() {
+        registerViewModel.registerUser(googleName!!, googleEmail!!, googleUid!!)
+        registerViewModel.registerStatus.observe(viewLifecycleOwner) { registerStatus ->
+            val inflater = layoutInflater
+            val layout = inflater.inflate(R.layout.submit_layout, null)
+            val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+            toastText.text = registerStatus
+            val toast = Toast(requireContext())
+            toast.duration = Toast.LENGTH_SHORT
+            toast.view = layout
+            toast.show()
 
+            if (registerStatus == "Conta criada com sucesso!") {
+               login()
+            } else {
+                loginViewModel.loginUser(googleEmail!!, googleUid!!)
+                loginViewModel.loginStatus.observe(viewLifecycleOwner) { loginStatus ->
+                    if (loginStatus == "Logado com sucesso!") {
+                        val inflater = layoutInflater
+                        val layout = inflater.inflate(R.layout.submit_layout, null)
+                        val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                        toastText.text = loginStatus
+                        val toast = Toast(requireContext())
+                        toast.duration = Toast.LENGTH_SHORT
+                        toast.view = layout
+                        toast.show()
+
+                        val sharedPreferences = requireContext().getSharedPreferences(
+                            "Preferences",
+                            Context.MODE_PRIVATE
+                        )
+                        val token = loginViewModel.getToken()
+                        val editor = sharedPreferences.edit()
+                        editor.putString("tokenJwt", token)
+                        editor.apply()
+                        findNavController().navigate(R.id.action_rightAnswerFragment_to_posLoginFragment)
+                    }
+                }
+            }
+        }
+    }
+    private fun login() {
+        loginViewModel.loginUser(googleEmail!!, googleUid!!)
+        loginViewModel.loginStatus.observe(viewLifecycleOwner) { loginStatus ->
+            if (loginStatus == "Logado com sucesso!") {
+                val inflater = layoutInflater
+                val layout = inflater.inflate(R.layout.submit_layout, null)
+                val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                toastText.text = loginStatus
+                val toast = Toast(requireContext())
+                toast.duration = Toast.LENGTH_SHORT
+                toast.view = layout
+                toast.show()
+
+                val sharedPreferences = requireContext().getSharedPreferences(
+                    "Preferences",
+                    Context.MODE_PRIVATE
+                )
+                val token = loginViewModel.getToken()
+                println("Token do usuario: $token")
+                val editor = sharedPreferences.edit()
+                editor.putString("tokenJwt", token)
+                editor.apply()
+                findNavController().navigate(R.id.action_rightAnswerFragment_to_posLoginFragment)
+            }
+        }
+    }
+    private fun firebaseAuthWithGoogle(idToken: String?) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    if (user != null) {
+                        googleName = user.displayName
+                        googleEmail = user.email
+                        googleUid = user.uid
+                        authAndRegister()
+                    }
+                } else {
+                    println("Google sign-in failed")
+                }
+            }
+        }
     override fun onResume() {
         super.onResume()
         if (::countDownTimer.isInitialized) {
@@ -148,6 +289,7 @@ class RightAnswerFragment : Fragment() {
 
 
     companion object {
+        private const val RC_SIGN_IN = 9001
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.

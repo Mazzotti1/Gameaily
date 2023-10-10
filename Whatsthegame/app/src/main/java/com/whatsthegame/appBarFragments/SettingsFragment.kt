@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
+import com.google.firebase.auth.FirebaseAuth
 import com.whatsthegame.Api.ViewModel.DeleteUserViewModel
 
 import com.whatsthegame.R
@@ -77,6 +78,7 @@ class SettingsFragment : Fragment() {
                         editor.remove("tokenJwt")
                         editor.apply()
                         findNavController().navigate(R.id.action_settingsFragment_to_whatsTheGame)
+                        FirebaseAuth.getInstance().signOut();
                     }
 
                     alertDialogBuilder.setNegativeButton("Cancelar") { _, _ ->
