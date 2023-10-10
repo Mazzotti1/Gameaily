@@ -14,10 +14,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.whatsthegame.Api.ViewModel.DeleteUserViewModel
 
 import com.whatsthegame.R
+import io.github.cdimascio.dotenv.dotenv
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -79,6 +82,7 @@ class SettingsFragment : Fragment() {
                         editor.apply()
                         findNavController().navigate(R.id.action_settingsFragment_to_whatsTheGame)
                         FirebaseAuth.getInstance().signOut();
+                        signOutGoogle()
                     }
 
                     alertDialogBuilder.setNegativeButton("Cancelar") { _, _ ->
@@ -147,8 +151,23 @@ class SettingsFragment : Fragment() {
         return view
     }
 
+    private val dotenv = dotenv {
+        directory = "/assets"
+        filename = "env"
+    }
 
+    private val clientId = dotenv["CLIENT_ID"]!!
+    private fun signOutGoogle() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(clientId)
+            .requestEmail()
+            .build()
 
+        val googleSignInClient = GoogleSignIn.getClient(requireContext(), gso)
+
+        googleSignInClient.signOut().addOnCompleteListener(requireActivity()) {
+        }
+    }
     companion object {
         /**
          * Use this factory method to create a new instance of

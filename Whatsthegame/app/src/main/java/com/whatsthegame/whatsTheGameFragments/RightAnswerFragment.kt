@@ -147,7 +147,7 @@ class RightAnswerFragment : Fragment() {
             diaryGameViewModel.fetchDiaryGame()
         }
     }
-    
+
     private val dotenv = dotenv {
         directory = "/assets"
         filename = "env"
@@ -155,10 +155,8 @@ class RightAnswerFragment : Fragment() {
 
     private val clientId = dotenv["CLIENT_ID"]!!
     private fun signInGoogle() {
-        // Configura a solicitação de login com o Google
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(clientId)
-            .setHostedDomain("asdasdasda.com")
             .requestEmail()
             .build()
 
