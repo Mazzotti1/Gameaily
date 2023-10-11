@@ -22,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.whatsthegame.Api.ViewModel.DiaryGameViewModel
@@ -72,6 +73,8 @@ class RightAnswerFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_right_answer, container, false)
 
+        logUserEnteredScreenEvent()
+
         val registerButton = view.findViewById<Button>(R.id.registerButton)
         registerButton.setOnClickListener {
             findNavController().navigate(R.id.action_rightAnswerFragment_to_registerFragment)
@@ -89,6 +92,14 @@ class RightAnswerFragment : Fragment() {
         }
 
         return view
+    }
+
+    private fun logUserEnteredScreenEvent() {
+        val firebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
+
+        val bundle = Bundle()
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "RightAnswerFragment")
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
     }
 
 

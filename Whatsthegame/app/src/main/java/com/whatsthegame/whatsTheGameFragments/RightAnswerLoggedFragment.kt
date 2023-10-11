@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.whatsthegame.Api.ViewModel.AllGamesViewModel
 import com.whatsthegame.Api.ViewModel.DiaryGameViewModel
 import com.whatsthegame.Api.ViewModel.GuessDiaryGameViewModel
@@ -61,6 +62,7 @@ class RightAnswerLoggedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        logUserEnteredScreenEvent()
         val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putBoolean("playerHasAnswer", true)
@@ -114,6 +116,13 @@ class RightAnswerLoggedFragment : Fragment() {
         }
     }
 
+    private fun logUserEnteredScreenEvent() {
+        val firebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
+
+        val bundle = Bundle()
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "RightAnswerLoggedFragment")
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
+    }
 
 
     override fun onResume() {
