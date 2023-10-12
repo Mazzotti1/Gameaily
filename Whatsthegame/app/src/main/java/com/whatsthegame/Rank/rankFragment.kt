@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import com.whatsthegame.Api.ViewModel.AllGamesViewModel
 import com.whatsthegame.Api.ViewModel.AllUsersViewModel
 import com.whatsthegame.Api.ViewModel.DiaryGameViewModel
@@ -53,12 +55,17 @@ class rankFragment : Fragment() {
     private lateinit var adapter: UserAdapter
     private var filteredList: List<User> = mutableListOf()
     private lateinit var allUsersViewModel: AllUsersViewModel
+    lateinit var mAdView : AdView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_rank, container, false)
+
+        mAdView = view.findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
 
         allUsersViewModel = ViewModelProvider(this).get(AllUsersViewModel::class.java)
         allUsersViewModel.users.observe(viewLifecycleOwner, Observer { users ->

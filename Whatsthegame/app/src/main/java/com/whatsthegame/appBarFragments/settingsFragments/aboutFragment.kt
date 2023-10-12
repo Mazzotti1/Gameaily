@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import com.whatsthegame.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -22,6 +24,7 @@ class aboutFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    lateinit var mAdView : AdView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -35,7 +38,13 @@ class aboutFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_about, container, false)
+        val view = inflater.inflate(R.layout.fragment_about, container, false)
+
+        mAdView = view.findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+
+        return view
     }
 
     companion object {

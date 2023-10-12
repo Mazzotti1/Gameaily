@@ -1,14 +1,15 @@
 package com.whatsthegame.activitys
 
-import MyReceiver
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
+
+
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageButton
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.firebase.FirebaseApp
 
 import com.whatsthegame.R
@@ -17,11 +18,16 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
+    lateinit var mAdView : AdView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
+        MobileAds.initialize(this) {}
         setContentView(R.layout.activity_main)
 
+        mAdView = findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
 
         val startButton = findViewById<Button>(R.id.homeButtonStart)
         startButton.setOnClickListener {

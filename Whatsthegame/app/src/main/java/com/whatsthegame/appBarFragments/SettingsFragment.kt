@@ -14,6 +14,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -46,6 +48,7 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    lateinit var mAdView : AdView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -53,6 +56,9 @@ class SettingsFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
+        mAdView = view.findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
 
         val faqButton = view.findViewById<Button>(R.id.faq)
         val aboutButton = view.findViewById<Button>(R.id.about)

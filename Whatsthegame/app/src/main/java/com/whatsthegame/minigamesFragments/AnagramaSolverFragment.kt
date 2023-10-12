@@ -17,6 +17,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.whatsthegame.Api.ViewModel.*
 import com.whatsthegame.R
 import com.whatsthegame.models.GuessAnagram
@@ -50,6 +54,7 @@ class AnagramaSolverFragment : Fragment() {
     private var tips: String? = null
     private var answer: GuessAnagram? = null
     private lateinit var anagramViewModel: AnagramsViewModel
+    private var mInterstitialAd: InterstitialAd? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,11 +63,12 @@ class AnagramaSolverFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_anagrama_solver, container, false)
 
+        loadAd()
         val pointsCounter = view.findViewById<TextView>(R.id.points)
         var points = 0
         val lifesCounter = view.findViewById<TextView>(R.id.textViewLifes)
         var remainingLives = 3
-
+        var submitButtonClickCount = 0
 
         val iconList = listOf(
             R.drawable.heartthin,
@@ -122,6 +128,7 @@ class AnagramaSolverFragment : Fragment() {
         val editText = view.findViewById<EditText>(R.id.editTextAnswer)
         val submitButton = view.findViewById<Button>(R.id.submitButton)
 
+
         submitButton.setOnClickListener {
             val text = editText.text
             val choosedAnswer = GuessAnagram(text.toString())
@@ -135,6 +142,11 @@ class AnagramaSolverFragment : Fragment() {
                             lifesCounter.text = "$remainingLives vidas restantes"
 
                             if (remainingLives <= 0) {
+                                if (mInterstitialAd != null) {
+                                    mInterstitialAd?.show(requireActivity())
+                                } else {
+                                    println("O anúncio intersticial ainda não estava pronto.")
+                                }
                                 findNavController().navigate(R.id.action_anagramaSolverFragment2_to_gameOverMinigamesFragment2)
                             } else {
 
@@ -153,12 +165,24 @@ class AnagramaSolverFragment : Fragment() {
                                 editText.text.clear()
                             }
                         } else {
-
                             guessAnagramViewModel.guessAnagram(choosedAnswer)
+
                             points++
                             pointsCounter.text = "$points Pontos"
                             editText.text.clear()
                             tipTextView.text = ""
+                            submitButtonClickCount++
+                            println("Clicks do botão: $submitButtonClickCount")
+                            if (submitButtonClickCount >= 3) {
+                                loadAd()
+                                if (mInterstitialAd != null) {
+                                    mInterstitialAd?.show(requireActivity())
+                                    submitButtonClickCount = 0
+                                } else {
+                                    println("O anúncio intersticial ainda não estava pronto.")
+                                }
+                            }
+
                             anagramViewModel.anagram.observe(viewLifecycleOwner, Observer { anagram ->
                                 if (anagram != null){
                                     val wordname = anagram.wordName
@@ -219,7 +243,21 @@ class AnagramaSolverFragment : Fragment() {
         return view
     }
 
+    private fun loadAd(){
+        var adRequest = AdRequest.Builder().build()
 
+        InterstitialAd.load(requireContext(),"ca-app-pub-3940256099942544/1033173712", adRequest, object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                println(adError?.toString())
+                mInterstitialAd = null
+            }
+
+            override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                println("Ad was loaded.")
+                mInterstitialAd = interstitialAd
+            }
+        })
+    }
 
     companion object {
         /**

@@ -12,6 +12,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.whatsthegame.Api.ViewModel.EnigmasViewModel
 import com.whatsthegame.Api.ViewModel.GuessEnigmaViewModel
 import com.whatsthegame.R
@@ -46,6 +50,8 @@ class EnigmaFragment : Fragment() {
     private var tips: String? = null
     private var answer: GuessEnigma? = null
     private lateinit var enigmasViewModel: EnigmasViewModel
+    private var mInterstitialAd: InterstitialAd? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -53,10 +59,12 @@ class EnigmaFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_pistas, container, false)
 
+        loadAd()
         val pointsCounter = view.findViewById<TextView>(R.id.points)
         var points = 0
         val lifesCounter = view.findViewById<TextView>(R.id.textViewLifes)
         var remainingLives = 3
+        var submitButtonClickCount = 0
 
         val iconList = listOf(
             R.drawable.heartthin,
@@ -128,6 +136,13 @@ class EnigmaFragment : Fragment() {
                             lifesCounter.text = "$remainingLives vidas restantes"
 
                             if (remainingLives <= 0) {
+
+                                    if (mInterstitialAd != null) {
+                                        mInterstitialAd?.show(requireActivity())
+                                    } else {
+                                        println("O anúncio intersticial ainda não estava pronto.")
+                                    }
+
                                 findNavController().navigate(R.id.action_pistasFragment2_to_gameOverMinigamesFragment2)
                             } else {
 
@@ -152,6 +167,19 @@ class EnigmaFragment : Fragment() {
                             pointsCounter.text = "$points Pontos"
                             editText.text.clear()
                             tipTextView.text = ""
+
+                            submitButtonClickCount++
+                            println("Clicks do botão: $submitButtonClickCount")
+                            if (submitButtonClickCount >= 3) {
+                                loadAd()
+                                if (mInterstitialAd != null) {
+                                    mInterstitialAd?.show(requireActivity())
+                                    submitButtonClickCount = 0
+                                } else {
+                                    println("O anúncio intersticial ainda não estava pronto.")
+                                }
+                            }
+
                             enigmasViewModel.enigma.observe(viewLifecycleOwner, Observer { enigma ->
                                 if (enigma != null){
                                     val wordname = enigma.enigmaName
@@ -205,6 +233,22 @@ class EnigmaFragment : Fragment() {
 
         return view
 
+    }
+
+    private fun loadAd(){
+        var adRequest = AdRequest.Builder().build()
+
+        InterstitialAd.load(requireContext(),"ca-app-pub-3940256099942544/1033173712", adRequest, object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                println(adError?.toString())
+                mInterstitialAd = null
+            }
+
+            override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                println("Ad was loaded.")
+                mInterstitialAd = interstitialAd
+            }
+        })
     }
     companion object {
         /**

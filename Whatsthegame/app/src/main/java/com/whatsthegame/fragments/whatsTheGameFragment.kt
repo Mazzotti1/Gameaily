@@ -23,6 +23,10 @@ import android.renderscript.ScriptIntrinsicBlur
 import androidx.core.graphics.drawable.toBitmap
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.whatsthegame.Api.ViewModel.*
@@ -67,6 +71,8 @@ class whatsTheGameFragment : Fragment() {
     private var timer: CountDownTimer? = null
     private var timeElapsedInMs: Long = 0
     private var timePassedInMin = timeElapsedInMs / 60000
+
+    private var mInterstitialAd: InterstitialAd? = null
     @SuppressLint("ClickableViewAccessibility", "MissingInflatedId", "SuspiciousIndentation")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -76,12 +82,9 @@ class whatsTheGameFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.fragment_whats_the_game, container, false)
 
         val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-        //val editor = sharedPreferences.edit()
-        //editor.putBoolean("playerHasAnswer", false)
-        //editor.apply()
 
         startTimer()
-
+        loadAd()
 
         val searchView = rootView.findViewById<SearchView>(R.id.searchView)
         val gameNameListView = rootView.findViewById<ListView>(R.id.gameNameListView)
@@ -159,11 +162,11 @@ class whatsTheGameFragment : Fragment() {
         val currentTimeMillis = System.currentTimeMillis()
 
 
-       /* if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
+        if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
             remainingLives = sharedPreferences.getInt("remainingLives", 5)
 
             lifesCounter.text = "$remainingLives vidas restantes"
-        }*/
+        }
 
         val token = sharedPreferences.getString("tokenJwt", null)
         val sendButton = rootView.findViewById<Button>(R.id.sendButton)
@@ -236,7 +239,11 @@ class whatsTheGameFragment : Fragment() {
                                 toast.duration = Toast.LENGTH_LONG
                                 toast.view = layout
                                 toast.show()
-
+                               if (mInterstitialAd != null) {
+                                   mInterstitialAd?.show(requireActivity())
+                               } else {
+                                   println("O anúncio intersticial ainda não estava pronto.")
+                               }
                                 findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
                             } else {
 
@@ -260,6 +267,13 @@ class whatsTheGameFragment : Fragment() {
                             }
                             }
                         } else {
+
+                            if (mInterstitialAd != null) {
+                                mInterstitialAd?.show(requireActivity())
+                            } else {
+                                println("O anúncio intersticial ainda não estava pronto.")
+                            }
+
                             findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
                             points = calculateTipsPoints(gameTipUsed)
                             points = calculateMinutesPoints(timePassedInMin)
@@ -351,9 +365,6 @@ class whatsTheGameFragment : Fragment() {
         return points
     }
 
-
-
-
     private lateinit var diaryGameViewModel: DiaryGameViewModel
     private lateinit var allGamesViewModel: AllGamesViewModel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -402,6 +413,21 @@ class whatsTheGameFragment : Fragment() {
         }
 
     }
+    private fun loadAd(){
+        var adRequest = AdRequest.Builder().build()
+
+        InterstitialAd.load(requireContext(),"ca-app-pub-3940256099942544/1033173712", adRequest, object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                println(adError?.toString())
+                mInterstitialAd = null
+            }
+
+            override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                println("Ad was loaded.")
+                mInterstitialAd = interstitialAd
+            }
+        })
+    }
 
     private fun getImageFromBucket() {
         val storage = FirebaseStorage.getInstance()
@@ -435,10 +461,9 @@ class whatsTheGameFragment : Fragment() {
 
     private var originalBitmap: Bitmap? = null
     private fun applyMosaic(context: Context, imageView: ImageView, blockSize: Int) {
-        // Obtenha a imagem da ImageView
+
         originalBitmap = imageView.drawable.toBitmap()
 
-        // Crie uma cópia da imagem original para evitar a sobreposição
         val mosaicBitmap = Bitmap.createBitmap(
             originalBitmap!!.width,
             originalBitmap!!.height,
@@ -448,10 +473,8 @@ class whatsTheGameFragment : Fragment() {
         val canvas = Canvas(mosaicBitmap)
         val paint = Paint()
 
-        // Percorra a imagem original em blocos e aplique o efeito de mosaico
         for (x in 0 until originalBitmap!!.width step blockSize) {
             for (y in 0 until originalBitmap!!.height step blockSize) {
-                // Calcule a cor média do bloco
                 var redSum = 0
                 var greenSum = 0
                 var blueSum = 0
@@ -469,12 +492,10 @@ class whatsTheGameFragment : Fragment() {
                     }
                 }
 
-                // Calcule a cor média do bloco
                 val averageRed = redSum / pixelCount
                 val averageGreen = greenSum / pixelCount
                 val averageBlue = blueSum / pixelCount
 
-                // Pinte o bloco com a cor média
                 val blockColor = Color.rgb(averageRed, averageGreen, averageBlue)
                 paint.color = blockColor
                 canvas.drawRect(
@@ -490,18 +511,14 @@ class whatsTheGameFragment : Fragment() {
         imageView.setImageBitmap(mosaicBitmap)
     }
     private fun displayMosaic(context: Context, imageView: ImageView, blockSize: Int) {
-        // Verifique se temos uma imagem original para restaurar
         if (originalBitmap != null) {
-            // Clone a imagem original para evitar a modificação da imagem original
             val mosaicBitmap = originalBitmap!!.copy(originalBitmap!!.config, true)
 
-            // Reduza a resolução da imagem usando o blockSize fornecido
             val width = mosaicBitmap.width
             val height = mosaicBitmap.height
 
             for (x in 0 until width step blockSize) {
                 for (y in 0 until height step blockSize) {
-                    // Calcule a média das cores dentro do bloco
                     var totalRed = 0
                     var totalGreen = 0
                     var totalBlue = 0
@@ -523,7 +540,6 @@ class whatsTheGameFragment : Fragment() {
                     val averageGreen = totalGreen / blockPixels
                     val averageBlue = totalBlue / blockPixels
 
-                    // Pinte o bloco inteiro com a cor média
                     for (i in x until x + blockSize) {
                         for (j in y until y + blockSize) {
                             if (i < width && j < height) {
@@ -534,10 +550,8 @@ class whatsTheGameFragment : Fragment() {
                 }
             }
 
-            // Defina a imagem mosaico na ImageView
             imageView.setImageBitmap(mosaicBitmap)
         } else {
-            // Se não houver uma imagem original, exiba uma mensagem de erro ou faça o que for apropriado
             println("Não há imagem original disponível.")
         }
     }
