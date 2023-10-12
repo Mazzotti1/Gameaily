@@ -1,6 +1,7 @@
 package com.whatsthegame.fragments
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
 import android.widget.*
@@ -25,8 +26,11 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.whatsthegame.Api.ViewModel.*
@@ -73,6 +77,9 @@ class whatsTheGameFragment : Fragment() {
     private var timePassedInMin = timeElapsedInMs / 60000
 
     private var mInterstitialAd: InterstitialAd? = null
+    private var rewardedAd: RewardedAd? = null
+    private var watchedRewardAd = false
+
     @SuppressLint("ClickableViewAccessibility", "MissingInflatedId", "SuspiciousIndentation")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,7 +91,9 @@ class whatsTheGameFragment : Fragment() {
         val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
 
         startTimer()
-        loadAd()
+        loadAdInterstitial()
+        loadAdRewarded()
+
 
         val searchView = rootView.findViewById<SearchView>(R.id.searchView)
         val gameNameListView = rootView.findViewById<ListView>(R.id.gameNameListView)
@@ -162,11 +171,11 @@ class whatsTheGameFragment : Fragment() {
         val currentTimeMillis = System.currentTimeMillis()
 
 
-        if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
+        /*if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
             remainingLives = sharedPreferences.getInt("remainingLives", 5)
 
             lifesCounter.text = "$remainingLives vidas restantes"
-        }
+        }*/
 
         val token = sharedPreferences.getString("tokenJwt", null)
         val sendButton = rootView.findViewById<Button>(R.id.sendButton)
@@ -186,17 +195,49 @@ class whatsTheGameFragment : Fragment() {
 
                             if (remainingLives <= 0) {
 
-                                findNavController().navigate(R.id.action_whatsTheGame_to_gameOverFragment)
-                            } else {
+                                if (watchedRewardAd) {
+                                    findNavController().navigate(R.id.action_whatsTheGame_to_gameOverFragment)
+                                } else {
 
-                                val inflater = layoutInflater
-                                val layout = inflater.inflate(R.layout.submit_layout, null)
-                                val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
-                                toastText.text = "Jogo errado!"
-                                val toast = Toast(requireContext())
-                                toast.duration = Toast.LENGTH_SHORT
-                                toast.view = layout
-                                toast.show()
+                                    val alertDialogBuilder = AlertDialog.Builder(
+                                        ContextThemeWrapper(
+                                            requireContext(),
+                                            R.style.AlertDialogStyle
+                                        )
+                                    )
+
+                                    alertDialogBuilder.setTitle("Sem vidas restantes")
+                                    alertDialogBuilder.setMessage("Você gostaria de assistir um anúncio para mais uma última chance?")
+
+                                    alertDialogBuilder.setPositiveButton("Sim") { dialog, which ->
+
+                                        rewardedAd?.let { ad ->
+                                            ad.show(
+                                                requireActivity(),
+                                                OnUserEarnedRewardListener { rewardItem ->
+                                                    watchedRewardAd = true
+                                                    remainingLives = 1
+                                                    lifesCounter.text =
+                                                        "$remainingLives vidas restantes"
+                                                })
+                                        } ?: run {
+                                            println("The rewarded ad wasn't ready yet.")
+                                        }
+                                    }
+
+
+                                alertDialogBuilder.setNegativeButton("Não") { dialog, which ->
+                                    if (mInterstitialAd != null) {
+                                        mInterstitialAd?.show(requireActivity())
+                                    } else {
+                                        println("O anúncio intersticial ainda não estava pronto.")
+                                    }
+                                    findNavController().navigate(R.id.action_whatsTheGame_to_gameOverFragment)
+                                }
+
+                                alertDialogBuilder.create().show()
+                             }
+                            } else {
 
                                 val imageViewGame = view?.findViewById<ImageView>(R.id.imageViewGame)
                                 if (imageViewGame != null) {
@@ -213,6 +254,15 @@ class whatsTheGameFragment : Fragment() {
 
                                 val searchView = rootView.findViewById<SearchView>(R.id.searchView)
                                 searchView.setQuery("", false)
+
+                                val inflater = layoutInflater
+                                val layout = inflater.inflate(R.layout.submit_layout, null)
+                                val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                                toastText.text = "Jogo errado!"
+                                val toast = Toast(requireContext())
+                                toast.duration = Toast.LENGTH_SHORT
+                                toast.view = layout
+                                toast.show()
                             }
                         } else if (token != null) {
 
@@ -413,7 +463,7 @@ class whatsTheGameFragment : Fragment() {
         }
 
     }
-    private fun loadAd(){
+    private fun loadAdInterstitial(){
         var adRequest = AdRequest.Builder().build()
 
         InterstitialAd.load(requireContext(),"ca-app-pub-3940256099942544/1033173712", adRequest, object : InterstitialAdLoadCallback() {
@@ -428,6 +478,22 @@ class whatsTheGameFragment : Fragment() {
             }
         })
     }
+
+    private fun loadAdRewarded(){
+        var adRequest = AdRequest.Builder().build()
+        RewardedAd.load(requireContext(),"ca-app-pub-3940256099942544/5224354917", adRequest, object : RewardedAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                println(adError?.toString())
+                rewardedAd = null
+            }
+
+            override fun onAdLoaded(ad: RewardedAd) {
+                println("Ad was loaded.")
+                rewardedAd = ad
+            }
+        })
+    }
+
 
     private fun getImageFromBucket() {
         val storage = FirebaseStorage.getInstance()

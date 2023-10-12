@@ -1,14 +1,12 @@
 package com.whatsthegame.minigamesFragments
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -19,8 +17,11 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.whatsthegame.Api.ViewModel.*
 import com.whatsthegame.R
 import com.whatsthegame.models.GuessAnagram
@@ -55,7 +56,8 @@ class AnagramaSolverFragment : Fragment() {
     private var answer: GuessAnagram? = null
     private lateinit var anagramViewModel: AnagramsViewModel
     private var mInterstitialAd: InterstitialAd? = null
-
+    private var rewardedAd: RewardedAd? = null
+    private var watchedRewardAd = false
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -63,6 +65,7 @@ class AnagramaSolverFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_anagrama_solver, container, false)
 
+        loadAdRewarded()
         loadAd()
         val pointsCounter = view.findViewById<TextView>(R.id.points)
         var points = 0
@@ -142,12 +145,56 @@ class AnagramaSolverFragment : Fragment() {
                             lifesCounter.text = "$remainingLives vidas restantes"
 
                             if (remainingLives <= 0) {
-                                if (mInterstitialAd != null) {
-                                    mInterstitialAd?.show(requireActivity())
+
+                                if (watchedRewardAd) {
+                                    loadAd()
+                                    if (mInterstitialAd != null) {
+                                        mInterstitialAd?.show(requireActivity())
+                                        submitButtonClickCount = 0
+                                    } else {
+                                        println("O anúncio intersticial ainda não estava pronto.")
+                                    }
+                                    findNavController().navigate(R.id.action_anagramaSolverFragment2_to_gameOverMinigamesFragment2)
                                 } else {
-                                    println("O anúncio intersticial ainda não estava pronto.")
+
+                                    val alertDialogBuilder = AlertDialog.Builder(
+                                        ContextThemeWrapper(
+                                            requireContext(),
+                                            R.style.AlertDialogStyle
+                                        )
+                                    )
+
+                                    alertDialogBuilder.setTitle("Sem vidas restantes")
+                                    alertDialogBuilder.setMessage("Você gostaria de assistir um anúncio para mais uma última chance?")
+
+                                    alertDialogBuilder.setPositiveButton("Sim") { dialog, which ->
+                                        loadAdRewarded()
+                                        rewardedAd?.let { ad ->
+                                            ad.show(
+                                                requireActivity(),
+                                                OnUserEarnedRewardListener { rewardItem ->
+                                                    watchedRewardAd = true
+                                                    remainingLives = 1
+                                                    lifesCounter.text =
+                                                        "$remainingLives vidas restantes"
+                                                })
+                                        } ?: run {
+                                            println("The rewarded ad wasn't ready yet.")
+                                        }
+                                    }
+
+
+                                    alertDialogBuilder.setNegativeButton("Não") { dialog, which ->
+                                        if (mInterstitialAd != null) {
+                                            mInterstitialAd?.show(requireActivity())
+                                        } else {
+                                            println("O anúncio intersticial ainda não estava pronto.")
+                                        }
+                                        findNavController().navigate(R.id.action_anagramaSolverFragment2_to_gameOverMinigamesFragment2)
+                                    }
+                                    alertDialogBuilder.create().show()
                                 }
-                                findNavController().navigate(R.id.action_anagramaSolverFragment2_to_gameOverMinigamesFragment2)
+
                             } else {
 
                                 val inflater = layoutInflater
@@ -255,6 +302,21 @@ class AnagramaSolverFragment : Fragment() {
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
                 println("Ad was loaded.")
                 mInterstitialAd = interstitialAd
+            }
+        })
+    }
+
+    private fun loadAdRewarded(){
+        var adRequest = AdRequest.Builder().build()
+        RewardedAd.load(requireContext(),"ca-app-pub-3940256099942544/5224354917", adRequest, object : RewardedAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                println(adError?.toString())
+                rewardedAd = null
+            }
+
+            override fun onAdLoaded(ad: RewardedAd) {
+                println("Ad was loaded.")
+                rewardedAd = ad
             }
         })
     }
