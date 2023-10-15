@@ -19,7 +19,7 @@ interface ApiService {
     @POST("/users/login")
     suspend fun loginUser(@Body request: Login): ResponseBody
 
-    @DELETE("/users/{userId}")
+    @DELETE("/users/delete/{userId}")
     suspend fun deleteUser(@Path("userId") userId: Long): ResponseBody
 
     @POST("/users/sendPoints/{userId}/{points}")
@@ -39,4 +39,13 @@ interface ApiService {
 
     @POST("/enigma/guess")
     suspend fun guessEnigma(@Body answer: GuessEnigma): ResponseBody
+
+    @GET("/users/rolls/{userId}")
+    suspend fun getRollsByUserId(@Path("userId") userId: Long): Int
+
+    @GET("/users/vip/{userId}")
+    suspend fun getVipStatus(@Path("userId") userId: Long): Boolean
+
+    @PATCH("/users/change/vip/{userId}")
+    suspend fun setVipStatus(@Path("userId") userId: Long): ResponseBody
 }

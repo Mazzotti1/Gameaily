@@ -18,4 +18,10 @@ interface IUsersService {
     fun sendPoints(userId: Long, points: Int): Boolean
 
     fun updateUserAnswer(userId: Long)
+
+    fun getRollsByUserId(userId: Long): Int?
+
+    fun setVipStatus(userId: Long)
+
+    fun getVipStatus(userId: Long): Boolean?
 }

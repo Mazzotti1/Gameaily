@@ -1,6 +1,7 @@
 package com.whatsthegame.minigamesFragments
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -10,6 +11,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.auth0.jwt.JWT
+import com.auth0.jwt.interfaces.DecodedJWT
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.OnUserEarnedRewardListener
@@ -19,6 +22,7 @@ import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.whatsthegame.Api.ViewModel.EnigmasViewModel
 import com.whatsthegame.Api.ViewModel.GuessEnigmaViewModel
+import com.whatsthegame.Api.ViewModel.UserVipViewModel
 import com.whatsthegame.R
 import com.whatsthegame.models.GuessEnigma
 import kotlinx.coroutines.launch
@@ -38,7 +42,7 @@ class EnigmaFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var guessEnigmasViewModel: GuessEnigmaViewModel
-
+    private lateinit var userVipViewModel: UserVipViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,8 +67,38 @@ class EnigmaFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_pistas, container, false)
 
+        val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val adController = sharedPreferences.getBoolean("adControl", false)
+
+        val timestamp = sharedPreferences.getLong("adControlTimestamp", 0L)
+        val vinteEQuatroHoras = 24 * 60 * 60 * 1000
+        if (System.currentTimeMillis() - timestamp >= vinteEQuatroHoras) {
+            val editor = sharedPreferences.edit()
+            editor.putBoolean("adControl", false)
+            editor.apply()
+        }
+
+        val authToken = sharedPreferences.getString("tokenJwt", "")
+        if(!authToken.isNullOrEmpty()){
+            val decodedJWT: DecodedJWT = JWT.decode(authToken)
+            val userId = decodedJWT.subject
+
+            userVipViewModel = ViewModelProvider(this).get(UserVipViewModel::class.java)
+            userVipViewModel.vip.observe(viewLifecycleOwner) { vip ->
+                val userVip = vip ?: false
+                if (!userVip && !adController) {
+                    loadAd()
+                }
+            }
+
+            userVipViewModel.getVip(userId.toLong())
+        }
+
+
+
         loadAdRewarded()
-        loadAd()
+
+
         val pointsCounter = view.findViewById<TextView>(R.id.points)
         var points = 0
         val lifesCounter = view.findViewById<TextView>(R.id.textViewLifes)

@@ -31,6 +31,22 @@ class UsersController {
         }
         return usersDTOList
     }
+
+    @GetMapping("/rolls/{userId}")
+    fun getRollsByUserId(@PathVariable userId: Long): Int? {
+        return service!!.getRollsByUserId(userId)
+    }
+
+    @GetMapping("/vip/{userId}")
+    fun getVipStatus(@PathVariable userId: Long): Boolean? {
+        return service!!.getVipStatus(userId)
+    }
+
+    @PatchMapping("/change/vip/{userId}")
+    fun setVipStatus(@PathVariable userId: Long) {
+        return service!!.setVipStatus(userId)
+    }
+
     @PostMapping("/register")
     fun create(@RequestBody form: UserForm?): ResponseEntity<out Any> {
         try {
@@ -55,7 +71,7 @@ class UsersController {
         }
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/delete/{userId}")
     fun deleteAccount(@PathVariable userId: Long): ResponseEntity<String> {
         val deleted = service!!.deleteAccount(userId)
         return if (deleted) {

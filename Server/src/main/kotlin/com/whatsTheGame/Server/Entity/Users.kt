@@ -26,21 +26,19 @@ class Users {
 
     var password: String? = null
 
-    var rank: String? = null
+    var rank: String = ""
 
-    var division: String? = null
+    var division: String = ""
 
-    var points: Int? = null
+    var points: Int = 0
 
     var token: String? = null
 
-    var lifesWtg: Int = 5
-
-    var lifesAnagrams: Int = 3
-
-    var lifePistas: Int = 3
-
     var role : String = "USER"
+
+    var rolls: Int = 1
+
+    var vip: Boolean = false
 
     var userAnswer : Boolean = false
     fun token(token: String?) {

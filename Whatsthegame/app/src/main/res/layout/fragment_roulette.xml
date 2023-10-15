@@ -49,23 +49,36 @@
         app:layout_constraintVertical_bias="0.447" />
 
 
-
     <Button
         android:id="@+id/rouletteRollButton"
         android:layout_width="130dp"
         android:layout_height="70dp"
+        android:layout_marginTop="16sp"
         android:backgroundTint="@color/destaques"
         android:fontFamily="@font/mochiypoppone_regular"
         android:text="Rodar"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:layout_marginTop="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.263"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/rouletteBord"
-        app:layout_constraintVertical_bias="0.86"
         tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/textViewRolls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35sp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="0 Giros restantes"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:layout_marginLeft="20sp"
+        app:layout_constraintHorizontal_bias="0.738"
+        app:layout_constraintStart_toEndOf="@id/rouletteRollButton"
+        app:layout_constraintTop_toBottomOf="@id/rouletteBord" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

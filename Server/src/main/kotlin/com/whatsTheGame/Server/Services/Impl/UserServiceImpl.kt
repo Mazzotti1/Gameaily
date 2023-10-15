@@ -28,6 +28,22 @@ class UserServiceImpl @Autowired constructor(
     override fun getAll(name: String?): List<Users?>? {
         return userRepository!!.findAll()
     }
+    override fun getRollsByUserId(userId: Long): Int? {
+        val user = userRepository.findById(userId).orElse(null)
+        return user?.rolls
+    }
+
+    override fun setVipStatus(userId: Long) {
+        val userOptional = userRepository.findById(userId)
+            val user = userOptional.get()
+            user.vip = true
+            userRepository.save(user)
+    }
+
+    override fun getVipStatus(userId: Long): Boolean? {
+        val user = userRepository.findById(userId).orElse(null)
+        return user?.vip
+    }
 
     @Throws(RegistroIncorretoException::class)
     override fun create(form: UserForm?): Users {
@@ -154,6 +170,7 @@ class UserServiceImpl @Autowired constructor(
         val allUsers = userRepository.findAll()
         for (user in allUsers) {
             user.userAnswer = false
+            user.rolls += 1
         }
         userRepository.saveAll(allUsers)
     }

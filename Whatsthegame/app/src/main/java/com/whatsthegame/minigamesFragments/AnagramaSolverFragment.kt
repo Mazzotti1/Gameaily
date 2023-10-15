@@ -43,6 +43,7 @@ class AnagramaSolverFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var guessAnagramViewModel: GuessAnagramViewModel
+    private lateinit var userVipViewModel: UserVipViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         guessAnagramViewModel = ViewModelProvider(this).get(GuessAnagramViewModel::class.java)
@@ -65,8 +66,36 @@ class AnagramaSolverFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_anagrama_solver, container, false)
 
-        loadAdRewarded()
-        loadAd()
+        val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val adController = sharedPreferences.getBoolean("adControl", false)
+
+        val timestamp = sharedPreferences.getLong("adControlTimestamp", 0L)
+        val vinteEQuatroHoras = 24 * 60 * 60 * 1000
+        if (System.currentTimeMillis() - timestamp >= vinteEQuatroHoras) {
+            val editor = sharedPreferences.edit()
+            editor.putBoolean("adControl", false)
+            editor.apply()
+        }
+
+        val authToken = sharedPreferences.getString("tokenJwt", "")
+        if(!authToken.isNullOrEmpty()){
+            val decodedJWT: DecodedJWT = JWT.decode(authToken)
+            val userId = decodedJWT.subject
+
+            userVipViewModel = ViewModelProvider(this).get(UserVipViewModel::class.java)
+            userVipViewModel.vip.observe(viewLifecycleOwner) { vip ->
+                val userVip = vip ?: false
+                if (!userVip && !adController) {
+                    loadAd()
+                }
+            }
+
+            userVipViewModel.getVip(userId.toLong())
+        }
+
+
+       loadAdRewarded()
+
         val pointsCounter = view.findViewById<TextView>(R.id.points)
         var points = 0
         val lifesCounter = view.findViewById<TextView>(R.id.textViewLifes)

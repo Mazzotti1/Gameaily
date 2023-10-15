@@ -55,6 +55,7 @@ class whatsTheGameFragment : Fragment() {
     private var param2: String? = null
     private lateinit var sendPointsViewModel: SendPointsViewModel
     private lateinit var guessDiaryGameViewModel: GuessDiaryGameViewModel
+    private lateinit var userVipViewModel: UserVipViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sendPointsViewModel = ViewModelProvider(this).get(SendPointsViewModel::class.java)
@@ -80,6 +81,7 @@ class whatsTheGameFragment : Fragment() {
     private var rewardedAd: RewardedAd? = null
     private var watchedRewardAd = false
 
+
     @SuppressLint("ClickableViewAccessibility", "MissingInflatedId", "SuspiciousIndentation")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -89,11 +91,35 @@ class whatsTheGameFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.fragment_whats_the_game, container, false)
 
         val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val adController = sharedPreferences.getBoolean("adControl", false)
 
-        startTimer()
-        loadAdInterstitial()
+        val timestamp = sharedPreferences.getLong("adControlTimestamp", 0L)
+        val vinteEQuatroHoras = 24 * 60 * 60 * 1000
+        if (System.currentTimeMillis() - timestamp >= vinteEQuatroHoras) {
+            val editor = sharedPreferences.edit()
+            editor.putBoolean("adControl", false)
+            editor.apply()
+        }
+
+        val authToken = sharedPreferences.getString("tokenJwt", "")
+        if(!authToken.isNullOrEmpty()){
+            val decodedJWT: DecodedJWT = JWT.decode(authToken)
+            val userId = decodedJWT.subject
+
+            userVipViewModel = ViewModelProvider(this).get(UserVipViewModel::class.java)
+            userVipViewModel.vip.observe(viewLifecycleOwner) { vip ->
+                val userVip = vip ?: false
+                if (!userVip && !adController) {
+                    loadAdInterstitial()
+                }
+            }
+
+            userVipViewModel.getVip(userId.toLong())
+        }
+
+
         loadAdRewarded()
-
+        startTimer()
 
         val searchView = rootView.findViewById<SearchView>(R.id.searchView)
         val gameNameListView = rootView.findViewById<ListView>(R.id.gameNameListView)
@@ -171,11 +197,11 @@ class whatsTheGameFragment : Fragment() {
         val currentTimeMillis = System.currentTimeMillis()
 
 
-        /*if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
+        if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
             remainingLives = sharedPreferences.getInt("remainingLives", 5)
 
             lifesCounter.text = "$remainingLives vidas restantes"
-        }*/
+        }
 
         val token = sharedPreferences.getString("tokenJwt", null)
         val sendButton = rootView.findViewById<Button>(R.id.sendButton)
@@ -239,8 +265,7 @@ class whatsTheGameFragment : Fragment() {
                              }
                             } else {
 
-                                val imageViewGame = view?.findViewById<ImageView>(R.id.imageViewGame)
-                                if (imageViewGame != null) {
+                                val imageViewGame = view!!.findViewById<ImageView>(R.id.imageViewGame)
                                     when (remainingLives) {
                                         4 -> displayMosaic(requireContext(), imageViewGame, blockSize = 80)
                                         3 -> displayMosaic(requireContext(), imageViewGame, blockSize = 50)
@@ -250,7 +275,7 @@ class whatsTheGameFragment : Fragment() {
                                             println("Número de vidas desconhecido: $remainingLives")
                                         }
                                     }
-                                }
+
 
                                 val searchView = rootView.findViewById<SearchView>(R.id.searchView)
                                 searchView.setQuery("", false)
@@ -310,6 +335,13 @@ class whatsTheGameFragment : Fragment() {
                                     println("Token: $authToken")
 
                                 }
+
+                                if (mInterstitialAd != null) {
+                                    mInterstitialAd?.show(requireActivity())
+                                } else {
+                                    println("O anúncio intersticial ainda não estava pronto.")
+                                }
+
                                 findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
 
                             } catch (e: Exception) {
@@ -419,6 +451,9 @@ class whatsTheGameFragment : Fragment() {
     private lateinit var allGamesViewModel: AllGamesViewModel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+
 
         diaryGameViewModel = ViewModelProvider(this).get(DiaryGameViewModel::class.java)
 
