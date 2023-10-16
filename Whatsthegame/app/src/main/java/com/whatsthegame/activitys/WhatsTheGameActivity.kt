@@ -1,5 +1,6 @@
 package com.whatsthegame.activitys
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -12,6 +13,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.whatsthegame.R
 import com.whatsthegame.databinding.ActivityMainBinding
+import com.whatsthegame.tutorial.TutorialWhatsThegame
 
 class WhatsTheGameActivity : AppCompatActivity() {
 
@@ -46,6 +48,17 @@ class WhatsTheGameActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val sharedPreferences = this.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val isFirstTime = sharedPreferences.getBoolean("isFirstTime", true)
+        if (isFirstTime) {
+            val initialStep = 1
+            val title = "Bem-vindo à nossa tela!"
+            val imageResId = R.drawable.diamante
+            val tutorialDialog = TutorialWhatsThegame.newInstance(title, imageResId)
+            tutorialDialog.show(supportFragmentManager, "tutorial_dialog")
+            sharedPreferences.edit().putBoolean("isFirstTime", false).apply()
+        }
 
         setContentView(R.layout.activity_whats_the_game)
         setUpBottomNavigation()

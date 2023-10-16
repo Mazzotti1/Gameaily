@@ -35,6 +35,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.whatsthegame.Api.ViewModel.*
 import com.whatsthegame.models.GuessDiaryGame
+import com.whatsthegame.tutorial.TutorialWhatsThegame
 import java.io.File
 
 
@@ -91,6 +92,7 @@ class whatsTheGameFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.fragment_whats_the_game, container, false)
 
         val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+
         val adController = sharedPreferences.getBoolean("adControl", false)
 
         val timestamp = sharedPreferences.getLong("adControlTimestamp", 0L)
