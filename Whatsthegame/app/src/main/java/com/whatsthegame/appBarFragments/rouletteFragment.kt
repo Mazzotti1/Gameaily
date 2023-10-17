@@ -78,7 +78,6 @@ class rouletteFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_roulette, container, false)
 
         val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)

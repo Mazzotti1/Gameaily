@@ -13,6 +13,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.whatsthegame.R
 import com.whatsthegame.databinding.ActivityMainBinding
+import com.whatsthegame.tutorial.TutorialStep
 import com.whatsthegame.tutorial.TutorialWhatsThegame
 
 class WhatsTheGameActivity : AppCompatActivity() {
@@ -52,13 +53,20 @@ class WhatsTheGameActivity : AppCompatActivity() {
         val sharedPreferences = this.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
         val isFirstTime = sharedPreferences.getBoolean("isFirstTime", true)
         if (isFirstTime) {
-            val initialStep = 1
-            val title = "Bem-vindo à nossa tela!"
-            val imageResId = R.drawable.diamante
-            val tutorialDialog = TutorialWhatsThegame.newInstance(title, imageResId)
-            tutorialDialog.show(supportFragmentManager, "tutorial_dialog")
-            sharedPreferences.edit().putBoolean("isFirstTime", false).apply()
+        val steps = listOf(
+            TutorialStep("Bem-vindo ao Whats The game!", R.drawable.step1wtg),
+            TutorialStep("Aqui você vai ter diarimente uma capa de um jogo aleatório, e você pode tentar advinhar para ganhar alguns pontos!", R.drawable.step2wtg),
+            TutorialStep("Mas calma! Se você quer ser o melhor tem que se atentar a algumas coisas!", R.drawable.step3wtg),
+            TutorialStep("As pontuações são calculadas baseados nas suas ações, se usou dicas ou não, quanto tempo demorou para descobrir, quantas vidas você perdeu no processo, e outras coisas...", R.drawable.step4wtg),
+            TutorialStep("E claro, se você quiser me apoiar a continuar atualizando o What's The Game? você é sempre bem vindo para virar VIP, dessa forma você evita ver anúncios e me ajuda muito!", R.drawable.step5wtg)
+        )
+
+        val tutorialDialog = TutorialWhatsThegame.newInstance(steps)
+        tutorialDialog.show(supportFragmentManager, "tutorial_dialog")
+
+        sharedPreferences.edit().putBoolean("isFirstTime", false).apply()
         }
+
 
         setContentView(R.layout.activity_whats_the_game)
         setUpBottomNavigation()

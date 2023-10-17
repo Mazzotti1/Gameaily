@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
@@ -17,33 +18,46 @@ private const val ARG_PARAM2 = "param2"
 
 
 class TutorialWhatsThegame : DialogFragment() {
-    companion object {
-        fun newInstance(title: String, imageResId: Int): TutorialWhatsThegame {
-            val fragment = TutorialWhatsThegame()
-            val args = Bundle()
-            args.putString("title", title)
-            args.putInt("imageResId", imageResId)
-            fragment.arguments = args
-            return fragment
-        }
-    }
-
+    private var steps: List<TutorialStep>? = null
+    private var currentStepIndex = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_tutorial_whats_thegame, container, false)
-
-        val title = arguments?.getString("title")
-        val imageResId = arguments?.getInt("imageResId")
-
-        val titleTextView = view.findViewById<TextView>(R.id.textView)
+        val textView = view.findViewById<TextView>(R.id.textView)
         val imageView = view.findViewById<ImageView>(R.id.imageView)
 
-        titleTextView.text = title
-        imageView.setImageResource(imageResId ?: R.drawable.roulettebody)
+        steps?.get(currentStepIndex)?.let { step ->
+            textView.text = step.text
+            imageView.setImageResource(step.imageResource)
+        }
+
+        val button = view.findViewById<Button>(R.id.button)
+        button.setOnClickListener {
+            if (currentStepIndex < steps!!.size - 1) {
+                currentStepIndex++
+                steps?.get(currentStepIndex)?.let { step ->
+                    textView.text = step.text
+                    imageView.setImageResource(step.imageResource)
+                }
+            } else {
+                dismiss()
+            }
+        }
+
 
         return view
     }
+
+    companion object {
+        fun newInstance(steps: List<TutorialStep>): TutorialWhatsThegame {
+            val fragment = TutorialWhatsThegame()
+            fragment.steps = steps
+            return fragment
+        }
+    }
 }
+
+
