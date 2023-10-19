@@ -1,5 +1,6 @@
 package com.whatsthegame.activitys
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -11,12 +12,13 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.whatsthegame.R
 import com.whatsthegame.databinding.ActivityMainBinding
+import com.whatsthegame.tutorial.TutorialStep
+import com.whatsthegame.tutorial.TutorialWhatsThegame
 
 
 class SettingsActivity : AppCompatActivity() {
 
-    private val layoutId = R.layout.activity_rank
-    private lateinit var viewBinding: ActivityMainBinding
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_app_bar, menu)

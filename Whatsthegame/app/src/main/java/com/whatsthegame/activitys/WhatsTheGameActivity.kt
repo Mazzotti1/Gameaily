@@ -1,5 +1,6 @@
 package com.whatsthegame.activitys
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -10,17 +11,20 @@ import android.widget.Button
 
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
+import com.android.billingclient.api.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.ImmutableList
 import com.whatsthegame.R
 import com.whatsthegame.databinding.ActivityMainBinding
 import com.whatsthegame.tutorial.TutorialStep
 import com.whatsthegame.tutorial.TutorialWhatsThegame
 
+
 class WhatsTheGameActivity : AppCompatActivity() {
 
-    private val layoutId = R.layout.activity_whats_the_game
-    private lateinit var viewBinding: ActivityMainBinding
 
+    private lateinit var billingClient: BillingClient
+    private val sku = "123456"
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_app_bar, menu)
         return true
@@ -69,11 +73,70 @@ class WhatsTheGameActivity : AppCompatActivity() {
 
 
         setContentView(R.layout.activity_whats_the_game)
+        setUpBillingClient()
         setUpBottomNavigation()
     }
-    private fun setUpBottomNavigation(){
-        val navView : BottomNavigationView = findViewById(R.id.bottom_navigation)
+
+    private fun setUpBillingClient() {
+        billingClient = BillingClient.newBuilder(this)
+            .setListener(purchasesUpdatedListener)
+            .enablePendingPurchases()
+            .build()
+
+        billingClient.startConnection(object : BillingClientStateListener {
+            override fun onBillingSetupFinished(billingResult: BillingResult) {
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    println("O BillingClient está pronto.")
+                }
+            }
+
+            override fun onBillingServiceDisconnected() {
+                println(" Tente reiniciar a conexão na próxima solicitação ao Google Play chamando o método startConnection().")
+
+            }
+        })
+    }
+    private val purchasesUpdatedListener =
+        PurchasesUpdatedListener { billingResult, purchases ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
+                // Processar a compra aqui, fornecer conteúdo ao usuário, etc.
+            } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
+                println(" Tratar um erro causado pelo usuário cancelando o fluxo de compra.")
+
+            } else {
+                println("Tratar outros códigos de erro.")
+
+            }
+        }
+
+    private fun setUpBottomNavigation() {
+        val navView: BottomNavigationView = findViewById(R.id.bottom_navigation)
         val navController = findNavController(R.id.fragment)
         navView.setupWithNavController(navController)
+
+        val adNavbarItem = navView.menu.findItem(R.id.adNavbar)
+
+        adNavbarItem.setOnMenuItemClickListener {
+            // Iniciar o processo de compra quando o item da barra de navegação é clicado
+            val skuList = ArrayList<String>()
+            skuList.add(sku)
+
+            val params = SkuDetailsParams.newBuilder()
+                .setSkusList(skuList)
+                .setType(BillingClient.SkuType.INAPP)
+                .build()
+
+            billingClient.querySkuDetailsAsync(params) { billingResult, skuDetailsList ->
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && skuDetailsList != null) {
+                    val skuDetails = skuDetailsList[0]
+                    val billingFlowParams = BillingFlowParams.newBuilder()
+                        .setSkuDetails(skuDetails)
+                        .build()
+                    val responseCode = billingClient.launchBillingFlow(this, billingFlowParams)
+                }
+            }
+
+            true
+        }
     }
 }

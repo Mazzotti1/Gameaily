@@ -199,11 +199,11 @@ class whatsTheGameFragment : Fragment() {
         val currentTimeMillis = System.currentTimeMillis()
 
 
-        if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
-            remainingLives = sharedPreferences.getInt("remainingLives", 5)
+       // if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
+           // remainingLives = sharedPreferences.getInt("remainingLives", 5)
 
-            lifesCounter.text = "$remainingLives vidas restantes"
-        }
+           // lifesCounter.text = "$remainingLives vidas restantes"
+       // }
 
         val token = sharedPreferences.getString("tokenJwt", null)
         val sendButton = rootView.findViewById<Button>(R.id.sendButton)

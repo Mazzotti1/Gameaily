@@ -1,46 +1,47 @@
 {
   "project_info": {
-    "project_number": "574316356252",
-    "project_id": "whatsthegame-62cda",
-    "storage_bucket": "whatsthegame-62cda.appspot.com"
+    "project_number": "492214802217",
+    "project_id": "what-s-the-game",
+    "storage_bucket": "what-s-the-game.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:574316356252:android:0d22d83ab7e50a57aec359",
+        "mobilesdk_app_id": "1:492214802217:android:56d7276688b9864d84c938",
         "android_client_info": {
           "package_name": "com.whatsthegame"
         }
       },
       "oauth_client": [
         {
-          "client_id": "574316356252-tg4of0rsp92g6f369n45n3tr5nka78up.apps.googleusercontent.com",
+          "client_id": "492214802217-120r5a123sp5veein0l10do2f6q6agpm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.whatsthegame",
-            "certificate_hash": "e2d04bea7592063aba61d5618aeb0219f4a55db9"
+            "certificate_hash": "f353016ce4f96f5a0eb6ef6aec46f12b04afd67a"
           }
         },
         {
-          "client_id": "574316356252-ekalpoa7m2fqek4bqjg5jvsf084ui2mk.apps.googleusercontent.com",
+          "client_id": "492214802217-s5illj5cosoolv3m3877r9qsg26iqkrv.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDHv13IxHbMxLL7GGuDTpaqSBFdg8TtFL8"
+          "current_key": "AIzaSyAueHLoW9Bq82ek2v9S00yr4gYlkVgxMms"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "574316356252-ekalpoa7m2fqek4bqjg5jvsf084ui2mk.apps.googleusercontent.com",
+              "client_id": "492214802217-s5illj5cosoolv3m3877r9qsg26iqkrv.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-4026039457973102~2400832476"
     }
   ],
   "configuration_version": "1"
