@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
+import androidx.lifecycle.MutableLiveData
 
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -23,8 +24,6 @@ import com.whatsthegame.tutorial.TutorialWhatsThegame
 class WhatsTheGameActivity : AppCompatActivity() {
 
 
-    private lateinit var billingClient: BillingClient
-    private val sku = "123456"
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_app_bar, menu)
         return true
@@ -71,43 +70,7 @@ class WhatsTheGameActivity : AppCompatActivity() {
         sharedPreferences.edit().putBoolean("isFirstTime", false).apply()
         }
 
-
-        setContentView(R.layout.activity_whats_the_game)
-        setUpBillingClient()
-        setUpBottomNavigation()
     }
-
-    private fun setUpBillingClient() {
-        billingClient = BillingClient.newBuilder(this)
-            .setListener(purchasesUpdatedListener)
-            .enablePendingPurchases()
-            .build()
-
-        billingClient.startConnection(object : BillingClientStateListener {
-            override fun onBillingSetupFinished(billingResult: BillingResult) {
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    println("O BillingClient está pronto.")
-                }
-            }
-
-            override fun onBillingServiceDisconnected() {
-                println(" Tente reiniciar a conexão na próxima solicitação ao Google Play chamando o método startConnection().")
-
-            }
-        })
-    }
-    private val purchasesUpdatedListener =
-        PurchasesUpdatedListener { billingResult, purchases ->
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
-                // Processar a compra aqui, fornecer conteúdo ao usuário, etc.
-            } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
-                println(" Tratar um erro causado pelo usuário cancelando o fluxo de compra.")
-
-            } else {
-                println("Tratar outros códigos de erro.")
-
-            }
-        }
 
     private fun setUpBottomNavigation() {
         val navView: BottomNavigationView = findViewById(R.id.bottom_navigation)
@@ -117,26 +80,8 @@ class WhatsTheGameActivity : AppCompatActivity() {
         val adNavbarItem = navView.menu.findItem(R.id.adNavbar)
 
         adNavbarItem.setOnMenuItemClickListener {
-            // Iniciar o processo de compra quando o item da barra de navegação é clicado
-            val skuList = ArrayList<String>()
-            skuList.add(sku)
-
-            val params = SkuDetailsParams.newBuilder()
-                .setSkusList(skuList)
-                .setType(BillingClient.SkuType.INAPP)
-                .build()
-
-            billingClient.querySkuDetailsAsync(params) { billingResult, skuDetailsList ->
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && skuDetailsList != null) {
-                    val skuDetails = skuDetailsList[0]
-                    val billingFlowParams = BillingFlowParams.newBuilder()
-                        .setSkuDetails(skuDetails)
-                        .build()
-                    val responseCode = billingClient.launchBillingFlow(this, billingFlowParams)
-                }
-            }
-
-            true
+           // initiatePurchase()
+             true
         }
     }
 }

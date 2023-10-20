@@ -3,15 +3,16 @@ package com.whatsthegame.appBarFragments
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.android.billingclient.api.*
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.google.android.gms.ads.AdRequest
@@ -20,9 +21,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.whatsthegame.Api.ViewModel.DeleteUserViewModel
-
 import com.whatsthegame.R
 import io.github.cdimascio.dotenv.dotenv
+import java.util.*
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -39,14 +41,21 @@ class SettingsFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var deleteUserViewModel: DeleteUserViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         deleteUserViewModel = ViewModelProvider(this).get(DeleteUserViewModel::class.java)
+
+
+
+
+
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
     }
+
 
     lateinit var mAdView : AdView
     override fun onCreateView(
@@ -59,6 +68,13 @@ class SettingsFragment : Fragment() {
         mAdView = view.findViewById(R.id.adView)
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
+
+        val adButton = view.findViewById<Button>(R.id.adButton)
+
+
+        adButton.setOnClickListener {
+
+        }
 
         val faqButton = view.findViewById<Button>(R.id.faq)
         val aboutButton = view.findViewById<Button>(R.id.about)
@@ -154,8 +170,11 @@ class SettingsFragment : Fragment() {
 
         }
 
+
         return view
     }
+
+
 
     private val dotenv = dotenv {
         directory = "/assets"
@@ -174,6 +193,9 @@ class SettingsFragment : Fragment() {
         googleSignInClient.signOut().addOnCompleteListener(requireActivity()) {
         }
     }
+
+
+
     companion object {
         /**
          * Use this factory method to create a new instance of
