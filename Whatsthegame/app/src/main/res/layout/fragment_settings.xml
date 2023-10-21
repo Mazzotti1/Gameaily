@@ -91,7 +91,7 @@
         android:layout_height="49dp"
         android:backgroundTint="@color/background"
         android:fontFamily="@font/poppins_medium"
-        android:text="Ad"
+        android:text="Remover Anúncios"
         android:textAlignment="textStart"
         android:textColor="@color/destaques"
         android:textSize="15sp"

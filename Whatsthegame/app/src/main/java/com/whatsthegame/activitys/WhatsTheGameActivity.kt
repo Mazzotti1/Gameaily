@@ -15,6 +15,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.android.billingclient.api.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.ImmutableList
+import com.whatsthegame.Api.ViewModel.DeleteUserViewModel
 import com.whatsthegame.R
 import com.whatsthegame.databinding.ActivityMainBinding
 import com.whatsthegame.tutorial.TutorialStep
@@ -22,10 +23,18 @@ import com.whatsthegame.tutorial.TutorialWhatsThegame
 
 
 class WhatsTheGameActivity : AppCompatActivity() {
+    private val purchasesUpdatedListener = PurchasesUpdatedListener { billingResult, purchases ->
+        // Você pode implementar a lógica relacionada a compras aqui
+        // Por exemplo, verificar o resultado e processar as compras
+    }
 
+    private var billingClient: BillingClient? = null
 
+    private var productDetails: ProductDetails? = null
+    private lateinit var selectedOfferToken : String
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_app_bar, menu)
+
         return true
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -50,8 +59,59 @@ class WhatsTheGameActivity : AppCompatActivity() {
             else -> return super.onOptionsItemSelected(item)
         }
     }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_whats_the_game)
+
+        billingClient = BillingClient.newBuilder(this)
+            .setListener(purchasesUpdatedListener)
+            .enablePendingPurchases()
+            .build()
+
+        // Conecte-se ao BillingClient
+        billingClient?.startConnection(object : BillingClientStateListener {
+            override fun onBillingSetupFinished(billingResult: BillingResult) {
+                // Verifique se a configuração do BillingClient foi concluída com sucesso
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+
+                    val productDetailsParams = QueryProductDetailsParams.newBuilder()
+                        .setProductList(
+                            ImmutableList.of(
+                                QueryProductDetailsParams.Product.newBuilder()
+                                    .setProductId("remove_ad")
+                                    .setProductType(BillingClient.ProductType.SUBS)
+                                    .build()
+                            )
+                        )
+                        .build()
+
+                    billingClient?.queryProductDetailsAsync(productDetailsParams) { billingResult, productDetailsList ->
+                        // Verifique o resultado da consulta
+                        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                            println("Passou produtos: $productDetailsList")
+                            productDetails = productDetailsList[0]
+                            val product = productDetailsList[0]
+                            val offers = product.subscriptionOfferDetails
+                            if (!offers.isNullOrEmpty()) {
+                                selectedOfferToken = offers[0].offerToken
+                            } else {
+                                // Não há ofertas disponíveis
+                            }
+
+                        } else {
+                            println("não pegou nenhum produtos")
+
+                        }
+                    }
+                }
+            }
+
+            override fun onBillingServiceDisconnected() {
+                billingClient?.startConnection(this)
+            }
+        })
 
         val sharedPreferences = this.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
         val isFirstTime = sharedPreferences.getBoolean("isFirstTime", true)
@@ -80,7 +140,24 @@ class WhatsTheGameActivity : AppCompatActivity() {
         val adNavbarItem = navView.menu.findItem(R.id.adNavbar)
 
         adNavbarItem.setOnMenuItemClickListener {
-           // initiatePurchase()
+            println("Cliado mercado")
+            if (productDetails != null) {
+                val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
+                    .setProductDetails(productDetails!!)
+                    .setOfferToken(selectedOfferToken)
+                    .build()
+
+                val productDetailsParamsList = listOf(productDetailsParams)
+
+                val billingFlowParams = BillingFlowParams.newBuilder()
+                    .setProductDetailsParamsList(productDetailsParamsList)
+                    .build()
+
+                val billingResult = billingClient!!.launchBillingFlow(this, billingFlowParams)
+            } else {
+                println("Produto esta nulo")
+            }
+
              true
         }
     }
