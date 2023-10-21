@@ -20,6 +20,7 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.ImmutableList
 import com.whatsthegame.Api.ViewModel.DeleteUserViewModel
 import com.whatsthegame.R
 import io.github.cdimascio.dotenv.dotenv
@@ -42,12 +43,64 @@ class SettingsFragment : Fragment() {
     private var param2: String? = null
     private lateinit var deleteUserViewModel: DeleteUserViewModel
 
+    private val purchasesUpdatedListener = PurchasesUpdatedListener { billingResult, purchases ->
+        // Você pode implementar a lógica relacionada a compras aqui
+        // Por exemplo, verificar o resultado e processar as compras
+    }
+
+    private var billingClient: BillingClient? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         deleteUserViewModel = ViewModelProvider(this).get(DeleteUserViewModel::class.java)
 
+        billingClient = BillingClient.newBuilder(requireContext())
+            .setListener(purchasesUpdatedListener)
+            .enablePendingPurchases()
+            .build()
 
+        // Conecte-se ao BillingClient
+        billingClient?.startConnection(object : BillingClientStateListener {
+            override fun onBillingSetupFinished(billingResult: BillingResult) {
+                // Verifique se a configuração do BillingClient foi concluída com sucesso
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
 
+                    val productDetailsParams = QueryProductDetailsParams.newBuilder()
+                        .setProductList(
+                            ImmutableList.of(
+                                QueryProductDetailsParams.Product.newBuilder()
+                                    .setProductId("remove_ad")
+                                    .setProductType(BillingClient.ProductType.SUBS)
+                                    .build()
+                            )
+                        )
+                        .build()
+
+                    billingClient?.queryProductDetailsAsync(productDetailsParams) { billingResult, productDetailsList ->
+                        // Verifique o resultado da consulta
+                        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                            println("Passou produtos: $productDetailsList")
+                             productDetails = productDetailsList[0]
+                                val product = productDetailsList[0]
+                                val offers = product.subscriptionOfferDetails
+                                if (!offers.isNullOrEmpty()) {
+                                     selectedOfferToken = offers[0].offerToken
+                                } else {
+                                    // Não há ofertas disponíveis
+                                }
+
+                        } else {
+                            println("não pegou nenhum produtos")
+
+                        }
+                    }
+                }
+            }
+
+            override fun onBillingServiceDisconnected() {
+                billingClient?.startConnection(this)
+            }
+        })
 
 
         arguments?.let {
@@ -56,7 +109,8 @@ class SettingsFragment : Fragment() {
         }
     }
 
-
+    private var productDetails: ProductDetails? = null
+    private lateinit var selectedOfferToken : String
     lateinit var mAdView : AdView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,7 +127,24 @@ class SettingsFragment : Fragment() {
 
 
         adButton.setOnClickListener {
+            if (productDetails != null) {
+                val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
+                    .setProductDetails(productDetails!!)
+                    .setOfferToken(selectedOfferToken)
+                    .build()
 
+                val productDetailsParamsList = listOf(productDetailsParams)
+
+                val billingFlowParams = BillingFlowParams.newBuilder()
+                    .setProductDetailsParamsList(productDetailsParamsList)
+                    .build()
+
+                val billingResult = billingClient!!.launchBillingFlow(requireActivity(), billingFlowParams)
+            } else {
+                println("Produto esta nulo")
+                // Handle the case when productDetails is null
+                // You can display an error message or take appropriate action here
+            }
         }
 
         val faqButton = view.findViewById<Button>(R.id.faq)
