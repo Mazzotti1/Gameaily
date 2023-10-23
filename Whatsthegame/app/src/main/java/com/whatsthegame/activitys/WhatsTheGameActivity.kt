@@ -8,14 +8,20 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.android.billingclient.api.*
+import com.auth0.jwt.JWT
+import com.auth0.jwt.interfaces.DecodedJWT
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.ImmutableList
 import com.whatsthegame.Api.ViewModel.DeleteUserViewModel
+import com.whatsthegame.Api.ViewModel.SetUserVipViewModel
 import com.whatsthegame.R
 import com.whatsthegame.databinding.ActivityMainBinding
 import com.whatsthegame.tutorial.TutorialStep
@@ -23,9 +29,26 @@ import com.whatsthegame.tutorial.TutorialWhatsThegame
 
 
 class WhatsTheGameActivity : AppCompatActivity() {
+    private lateinit var setUserVipViewModel: SetUserVipViewModel
     private val purchasesUpdatedListener = PurchasesUpdatedListener { billingResult, purchases ->
-        // Você pode implementar a lógica relacionada a compras aqui
-        // Por exemplo, verificar o resultado e processar as compras
+        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
+            for (purchase in purchases) {
+                val sharedPreferences = this.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+                val authToken = sharedPreferences.getString("tokenJwt", "")
+                println("Compra bem sucedida")
+                val decodedJWT: DecodedJWT = JWT.decode(authToken)
+                val userId = decodedJWT.subject
+                setUserVipViewModel.setVipStatus(userId.toLong())
+
+                setUserVipViewModel.setVipStatus.observe(this, Observer { response ->
+                    println("Resposta da api: $response")
+                })
+            }
+        } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
+            println("Compra cancelada pelo usuário")
+        } else {
+            println("Erro durante a compra. Código de resposta: ${billingResult.responseCode}")
+        }
     }
 
     private var billingClient: BillingClient? = null
@@ -129,36 +152,52 @@ class WhatsTheGameActivity : AppCompatActivity() {
 
         sharedPreferences.edit().putBoolean("isFirstTime", false).apply()
         }
-
+        setUpBottomNavigation()
     }
 
     private fun setUpBottomNavigation() {
         val navView: BottomNavigationView = findViewById(R.id.bottom_navigation)
+
+        val adNavItem = navView.menu.findItem(R.id.adNavbar)
+        val sharedPreferences = this.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val authToken = sharedPreferences.getString("tokenJwt", "")
+
+        adNavItem.setOnMenuItemClickListener {
+            if (!authToken.isNullOrEmpty()) {
+                if (productDetails != null) {
+                    val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
+                        .setProductDetails(productDetails!!)
+                        .setOfferToken(selectedOfferToken)
+                        .build()
+
+                    val productDetailsParamsList = listOf(productDetailsParams)
+
+                    val billingFlowParams = BillingFlowParams.newBuilder()
+                        .setProductDetailsParamsList(productDetailsParamsList)
+                        .build()
+
+                    val billingResult = billingClient!!.launchBillingFlow(this, billingFlowParams)
+                } else {
+                    println("Produto está nulo")
+                    // Handle the case when productDetails is null
+                    // You can display an error message or take appropriate action here
+                }
+            } else {
+                println("authToken está vazio ou nulo")
+                val inflater = layoutInflater
+                val layout = inflater.inflate(R.layout.submit_layout, null)
+                val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                toastText.text = "Primeiro esteja logado em uma conta para poder adquirir o bloqueador de anúncios!"
+                val toast = Toast(this)
+                toast.duration = Toast.LENGTH_LONG
+                toast.view = layout
+                toast.show()
+            }
+            false
+        }
+
         val navController = findNavController(R.id.fragment)
         navView.setupWithNavController(navController)
 
-        val adNavbarItem = navView.menu.findItem(R.id.adNavbar)
-
-        adNavbarItem.setOnMenuItemClickListener {
-            println("Cliado mercado")
-            if (productDetails != null) {
-                val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
-                    .setProductDetails(productDetails!!)
-                    .setOfferToken(selectedOfferToken)
-                    .build()
-
-                val productDetailsParamsList = listOf(productDetailsParams)
-
-                val billingFlowParams = BillingFlowParams.newBuilder()
-                    .setProductDetailsParamsList(productDetailsParamsList)
-                    .build()
-
-                val billingResult = billingClient!!.launchBillingFlow(this, billingFlowParams)
-            } else {
-                println("Produto esta nulo")
-            }
-
-             true
-        }
     }
 }

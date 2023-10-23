@@ -23,6 +23,7 @@ import com.google.android.gms.ads.AdView
 import com.whatsthegame.Api.ViewModel.AllGamesViewModel
 import com.whatsthegame.Api.ViewModel.AllUsersViewModel
 import com.whatsthegame.Api.ViewModel.DiaryGameViewModel
+import com.whatsthegame.Api.ViewModel.UserVipViewModel
 import com.whatsthegame.R
 import com.whatsthegame.Rank.User
 import com.whatsthegame.Rank.UserAdapter
@@ -63,9 +64,30 @@ class rankFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_rank, container, false)
 
-        mAdView = view.findViewById(R.id.adView)
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
+
+        val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val authToken = sharedPreferences.getString("tokenJwt", "")
+        val userVipViewModel = ViewModelProvider(this).get(UserVipViewModel::class.java)
+
+        if (authToken.isNullOrEmpty()) {
+            mAdView = view.findViewById(R.id.adView)
+            val adRequest = AdRequest.Builder().build()
+            mAdView.loadAd(adRequest)
+        } else {
+            val decodedJWT: DecodedJWT = JWT.decode(authToken)
+            val userId = decodedJWT.subject
+
+            userVipViewModel.vip.observe(this) { vip ->
+                val userVip = vip ?: false
+                if (!userVip) {
+                    mAdView = view.findViewById(R.id.adView)
+                    val adRequest = AdRequest.Builder().build()
+                    mAdView.loadAd(adRequest)
+                }
+            }
+
+            userVipViewModel.getVip(userId.toLong())
+        }
 
         allUsersViewModel = ViewModelProvider(this).get(AllUsersViewModel::class.java)
         allUsersViewModel.users.observe(viewLifecycleOwner, Observer { users ->

@@ -8,40 +8,66 @@
     android:background="@color/background">
 
 
-
-
     <TextView
-        android:id="@+id/userName"
-        android:layout_width="100dp"
+        android:id="@+id/textTitle"
+        android:layout_width="296dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_medium"
-        android:text="Gabriel"
+        android:text="Gostou do app?"
         android:textAlignment="center"
         android:textColor="@color/white"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.327" />
+
+    <TextView
+        android:id="@+id/textDesc"
+        android:layout_width="296dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Saiba que você é sempre bem vindo para apoiar ele! E claro, em troca você recebe imunidade a todo e qualquer anúncio no aplicativo!"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:layout_marginTop="10sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.469"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="0.198"
+        app:layout_constraintTop_toBottomOf="@id/textTitle"/>
+
+
+    <Button
+        android:id="@+id/adButton"
+        android:layout_width="268dp"
+        android:layout_marginTop="20sp"
+        android:layout_height="49dp"
+        android:backgroundTint="@color/background"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Remover Anúncios"
+        android:textAlignment="center"
+        android:textColor="@color/destaques"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.266"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.188" />
+        app:layout_constraintTop_toBottomOf="@id/textDesc"
+        app:layout_constraintVertical_bias="0.452"
+        tools:ignore="MissingConstraints" />
 
-
-
-    <TextView
-        android:id="@+id/points"
-        android:layout_width="100dp"
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins_medium"
-        android:text="3200 Pontos"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.948"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.188" />
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-3940256099942544/6300978111" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

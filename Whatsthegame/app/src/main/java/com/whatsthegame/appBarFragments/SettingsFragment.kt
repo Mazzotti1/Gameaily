@@ -22,9 +22,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.ImmutableList
 import com.whatsthegame.Api.ViewModel.DeleteUserViewModel
+import com.whatsthegame.Api.ViewModel.SetUserVipViewModel
+import com.whatsthegame.Api.ViewModel.UserVipViewModel
 import com.whatsthegame.R
 import io.github.cdimascio.dotenv.dotenv
 import java.util.*
+import androidx.lifecycle.Observer
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -42,17 +45,36 @@ class SettingsFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var deleteUserViewModel: DeleteUserViewModel
+    private lateinit var setUserVipViewModel: SetUserVipViewModel
 
     private val purchasesUpdatedListener = PurchasesUpdatedListener { billingResult, purchases ->
-        // Você pode implementar a lógica relacionada a compras aqui
-        // Por exemplo, verificar o resultado e processar as compras
-    }
+        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
+            for (purchase in purchases) {
+                val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+                val authToken = sharedPreferences.getString("tokenJwt", "")
+                println("Compra bem sucedida")
+                val decodedJWT: DecodedJWT = JWT.decode(authToken)
+                val userId = decodedJWT.subject
+                setUserVipViewModel.setVipStatus(userId.toLong())
+
+                setUserVipViewModel.setVipStatus.observe(this, Observer { response ->
+                    println("Resposta da api: $response")
+                })
+            }
+            } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
+                println("Compra cancelada pelo usuário")
+            } else {
+                println("Erro durante a compra. Código de resposta: ${billingResult.responseCode}")
+            }
+        }
+
 
     private var billingClient: BillingClient? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         deleteUserViewModel = ViewModelProvider(this).get(DeleteUserViewModel::class.java)
+        setUserVipViewModel = ViewModelProvider(this).get(SetUserVipViewModel::class.java)
 
         billingClient = BillingClient.newBuilder(requireContext())
             .setListener(purchasesUpdatedListener)
@@ -119,33 +141,62 @@ class SettingsFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
-        mAdView = view.findViewById(R.id.adView)
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
+        val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val authToken = sharedPreferences.getString("tokenJwt", "")
+        val userVipViewModel = ViewModelProvider(this).get(UserVipViewModel::class.java)
 
+        if (authToken.isNullOrEmpty()) {
+            mAdView = view.findViewById(R.id.adView)
+            val adRequest = AdRequest.Builder().build()
+            mAdView.loadAd(adRequest)
+        } else {
+            val decodedJWT: DecodedJWT = JWT.decode(authToken)
+            val userId = decodedJWT.subject
+
+            userVipViewModel.vip.observe(this) { vip ->
+                val userVip = vip ?: false
+                if (!userVip) {
+                    mAdView = view.findViewById(R.id.adView)
+                    val adRequest = AdRequest.Builder().build()
+                    mAdView.loadAd(adRequest)
+                }
+            }
+
+            userVipViewModel.getVip(userId.toLong())
+        }
         val adButton = view.findViewById<Button>(R.id.adButton)
-
-
         adButton.setOnClickListener {
-            if (productDetails != null) {
-                val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
-                    .setProductDetails(productDetails!!)
-                    .setOfferToken(selectedOfferToken)
-                    .build()
+            if (!authToken.isNullOrEmpty()) {
+                if (productDetails != null) {
+                    val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
+                        .setProductDetails(productDetails!!)
+                        .setOfferToken(selectedOfferToken)
+                        .build()
 
-                val productDetailsParamsList = listOf(productDetailsParams)
+                    val productDetailsParamsList = listOf(productDetailsParams)
 
-                val billingFlowParams = BillingFlowParams.newBuilder()
-                    .setProductDetailsParamsList(productDetailsParamsList)
-                    .build()
+                    val billingFlowParams = BillingFlowParams.newBuilder()
+                        .setProductDetailsParamsList(productDetailsParamsList)
+                        .build()
 
-                val billingResult = billingClient!!.launchBillingFlow(requireActivity(), billingFlowParams)
+                    val billingResult = billingClient!!.launchBillingFlow(requireActivity(), billingFlowParams)
+
+                } else {
+                    println("Produto está nulo")
+                }
             } else {
-                println("Produto esta nulo")
-                // Handle the case when productDetails is null
-                // You can display an error message or take appropriate action here
+                println("authToken está vazio ou nulo")
+                val inflater = layoutInflater
+                val layout = inflater.inflate(R.layout.submit_layout, null)
+                val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                toastText.text = "Primeiro esteja logado em uma conta para poder adquirir o bloqueador de anúncios!"
+                val toast = Toast(requireContext())
+                toast.duration = Toast.LENGTH_LONG
+                toast.view = layout
+                toast.show()
             }
         }
+
 
         val faqButton = view.findViewById<Button>(R.id.faq)
         val aboutButton = view.findViewById<Button>(R.id.about)
@@ -160,8 +211,7 @@ class SettingsFragment : Fragment() {
         }
 
         logoutButton.setOnClickListener {
-            val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-            val authToken = sharedPreferences.getString("tokenJwt", "")
+
 
             if (!authToken.isNullOrEmpty()) {
                 try {

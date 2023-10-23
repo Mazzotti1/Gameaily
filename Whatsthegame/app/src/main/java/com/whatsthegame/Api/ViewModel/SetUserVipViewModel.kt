@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class SetUserVipViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: SetUserVipRepository
-    private val setVipStatus = MutableLiveData<String>()
+    val setVipStatus = MutableLiveData<String>()
 
     init {
         val context = application.applicationContext

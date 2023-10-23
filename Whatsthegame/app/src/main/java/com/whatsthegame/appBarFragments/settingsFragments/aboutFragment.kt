@@ -1,12 +1,17 @@
 package com.whatsthegame.appBarFragments.settingsFragments
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
+import com.auth0.jwt.JWT
+import com.auth0.jwt.interfaces.DecodedJWT
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
+import com.whatsthegame.Api.ViewModel.UserVipViewModel
 import com.whatsthegame.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -40,9 +45,30 @@ class aboutFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_about, container, false)
 
-        mAdView = view.findViewById(R.id.adView)
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
+
+        val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+        val authToken = sharedPreferences.getString("tokenJwt", "")
+        val userVipViewModel = ViewModelProvider(this).get(UserVipViewModel::class.java)
+
+        if (authToken.isNullOrEmpty()) {
+            mAdView = view.findViewById(R.id.adView)
+            val adRequest = AdRequest.Builder().build()
+            mAdView.loadAd(adRequest)
+        } else {
+            val decodedJWT: DecodedJWT = JWT.decode(authToken)
+            val userId = decodedJWT.subject
+
+            userVipViewModel.vip.observe(this) { vip ->
+                val userVip = vip ?: false
+                if (!userVip) {
+                    mAdView = view.findViewById(R.id.adView)
+                    val adRequest = AdRequest.Builder().build()
+                    mAdView.loadAd(adRequest)
+                }
+            }
+
+            userVipViewModel.getVip(userId.toLong())
+        }
 
         return view
     }
