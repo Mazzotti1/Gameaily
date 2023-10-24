@@ -77,7 +77,7 @@ class PosLoginFragment : Fragment() {
                 toast.view = layout
                 toast.show()
 
-                findNavController().navigate(R.id.action_posLoginFragment_to_rankNavbar)
+                findNavController().navigate(R.id.action_posLoginFragment_to_mainActivity)
 
             } else {
                 try {
@@ -94,7 +94,7 @@ class PosLoginFragment : Fragment() {
                 editor.remove("points")
                 editor.remove("choosedGame")
                 editor.apply()
-                findNavController().navigate(R.id.action_posLoginFragment_to_rankNavbar)
+                findNavController().navigate(R.id.action_posLoginFragment_to_mainActivity)
             }
         }
         return view

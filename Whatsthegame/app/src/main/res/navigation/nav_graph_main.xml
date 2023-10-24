@@ -68,10 +68,10 @@
             android:id="@+id/action_settingsFragment_to_faqFragment"
             app:destination="@id/faqFragment"
             app:popUpTo="@id/settingsFragment" />
-        <action
-            android:id="@+id/action_settingsFragment_to_whatsTheGame"
-            app:destination="@id/whatsTheGame" />
-    </fragment>
+         <action
+             android:id="@+id/action_settingsFragment_to_mainActivity"
+             app:destination="@id/mainActivity3" />
+     </fragment>
     <fragment
         android:id="@+id/aboutFragment"
         android:name="com.whatsthegame.appBarFragments.settingsFragments.aboutFragment"
@@ -150,8 +150,8 @@
         android:label="fragment_pos_login"
         tools:layout="@layout/fragment_pos_login" >
         <action
-            android:id="@+id/action_posLoginFragment_to_rankNavbar"
-            app:destination="@id/rankNavbar" />
+            android:id="@+id/action_posLoginFragment_to_mainActivity"
+            app:destination="@id/mainActivity3" />
     </fragment>
     <fragment
         android:id="@+id/gameOverFragment"
@@ -167,5 +167,10 @@
         android:name="com.whatsthegame.fragments.GameOverMinigamesFragment"
         android:label="fragment_game_over_minigames"
         tools:layout="@layout/fragment_game_over_minigames" />
+    <activity
+        android:id="@+id/mainActivity3"
+        android:name="com.whatsthegame.activitys.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main" />
 
 </navigation>

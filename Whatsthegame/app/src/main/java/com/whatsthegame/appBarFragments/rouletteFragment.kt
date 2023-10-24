@@ -25,6 +25,7 @@ import com.whatsthegame.R
 import com.whatsthegame.models.GuessEnigma
 import kotlinx.coroutines.launch
 import java.util.*
+import androidx.lifecycle.Observer
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -72,7 +73,7 @@ class rouletteFragment : Fragment() {
     private lateinit var rouletteRollBody: ImageView
 
     private lateinit var userRollsViewModel: UserRollsViewModel
-
+    private lateinit var setUserRollsViewModel: SetUserRollsViewModel
     var defaultRolls = 0
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -96,6 +97,7 @@ class rouletteFragment : Fragment() {
             val userId = decodedJWT.subject
 
             userRollsViewModel = ViewModelProvider(this).get(UserRollsViewModel::class.java)
+            setUserRollsViewModel = ViewModelProvider(this).get(SetUserRollsViewModel::class.java)
 
             userRollsViewModel.rolls.observe(viewLifecycleOwner) { rolls ->
                 rollsCounter.text = "$rolls Giros restantes"
@@ -109,6 +111,11 @@ class rouletteFragment : Fragment() {
             if (defaultRolls > 0 && !isSpinning) {
                 defaultRolls--
                 rollsCounter.text = "$defaultRolls Giros restantes"
+
+                val decodedJWT: DecodedJWT = JWT.decode(authToken)
+                val userId = decodedJWT.subject
+                setUserRollsViewModel.setUserRollsUpdate(userId.toLong())
+
                 spin()
                 isSpinning = true
             } else {

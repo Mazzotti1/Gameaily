@@ -104,7 +104,11 @@ class whatsTheGameFragment : Fragment() {
         }
 
         val authToken = sharedPreferences.getString("tokenJwt", "")
-        if(!authToken.isNullOrEmpty()){
+        if (authToken.isNullOrEmpty()) {
+            if (!adController) {
+                loadAdInterstitial()
+            }
+        } else {
             val decodedJWT: DecodedJWT = JWT.decode(authToken)
             val userId = decodedJWT.subject
 
@@ -120,11 +124,16 @@ class whatsTheGameFragment : Fragment() {
         }
 
 
+
         loadAdRewarded()
         startTimer()
 
         val searchView = rootView.findViewById<SearchView>(R.id.searchView)
         val gameNameListView = rootView.findViewById<ListView>(R.id.gameNameListView)
+
+        searchView.setOnClickListener {
+            searchView.isIconified = false
+        }
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {

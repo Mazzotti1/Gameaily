@@ -48,4 +48,7 @@ interface ApiService {
 
     @PATCH("/users/change/vip/{userId}")
     suspend fun setVipStatus(@Path("userId") userId: Long): ResponseBody
+
+    @PATCH("/users/rolls/{userId}")
+    suspend fun setRollsUpdate(@Path("userId") userId: Long): ResponseBody
 }

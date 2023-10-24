@@ -10,12 +10,7 @@
        android:name="com.whatsthegame.fragments.rankFragment"
        android:label="Rankings"
        tools:layout="@layout/fragment_rank" />
-    <fragment
-        android:id="@+id/whatsTheGame"
-        android:name="com.whatsthegame.fragments.whatsTheGameFragment"
-        android:label="What's the Game"
-        tools:layout="@layout/fragment_whats_the_game" />
-    <fragment
+ <fragment
         android:id="@+id/adNavbar"
         android:name="com.whatsthegame.fragments.adFragment"
         android:label="Advertisement"
@@ -44,8 +39,8 @@
       app:destination="@id/faqFragment"
       app:popUpTo="@id/settingsFragment" />
   <action
-      android:id="@+id/action_settingsFragment_to_whatsTheGame"
-      app:destination="@id/whatsTheGame" />
+      android:id="@+id/action_settingsFragment_to_mainActivity"
+      app:destination="@id/mainActivity2" />
  </fragment>
  <fragment
      android:id="@+id/aboutFragment"
@@ -57,6 +52,11 @@
      android:name="com.whatsthegame.appBarFragments.settingsFragments.faqFragment"
      android:label="fragment_faq"
      tools:layout="@layout/fragment_faq" />
+ <activity
+     android:id="@+id/mainActivity2"
+     android:name="com.whatsthegame.activitys.MainActivity"
+     android:label="activity_main"
+     tools:layout="@layout/activity_main" />
 
 
 </navigation>

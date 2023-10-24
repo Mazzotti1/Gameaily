@@ -1,6 +1,7 @@
 package com.whatsthegame.activitys
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -36,6 +37,15 @@ class WhatsTheGameActivity : AppCompatActivity() {
                 val sharedPreferences = this.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
                 val authToken = sharedPreferences.getString("tokenJwt", "")
                 println("Compra bem sucedida")
+                val dialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogStyle)
+
+                dialogBuilder.setMessage("Parabéns! Você agora é um membro VIP!")
+                dialogBuilder.setPositiveButton("Fechar") { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+                val dialog = dialogBuilder.create()
+                dialog.show()
                 val decodedJWT: DecodedJWT = JWT.decode(authToken)
                 val userId = decodedJWT.subject
                 setUserVipViewModel.setVipStatus(userId.toLong())

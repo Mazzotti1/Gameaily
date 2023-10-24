@@ -52,7 +52,17 @@ class SettingsFragment : Fragment() {
             for (purchase in purchases) {
                 val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
                 val authToken = sharedPreferences.getString("tokenJwt", "")
+                setUserVipViewModel = ViewModelProvider(this).get(SetUserVipViewModel::class.java)
                 println("Compra bem sucedida")
+                val dialogBuilder = AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
+
+                dialogBuilder.setMessage("Parabéns! Você agora é um membro VIP!")
+                dialogBuilder.setPositiveButton("Fechar") { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+                val dialog = dialogBuilder.create()
+                dialog.show()
                 val decodedJWT: DecodedJWT = JWT.decode(authToken)
                 val userId = decodedJWT.subject
                 setUserVipViewModel.setVipStatus(userId.toLong())
@@ -74,7 +84,7 @@ class SettingsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         deleteUserViewModel = ViewModelProvider(this).get(DeleteUserViewModel::class.java)
-        setUserVipViewModel = ViewModelProvider(this).get(SetUserVipViewModel::class.java)
+
 
         billingClient = BillingClient.newBuilder(requireContext())
             .setListener(purchasesUpdatedListener)
@@ -165,6 +175,7 @@ class SettingsFragment : Fragment() {
             userVipViewModel.getVip(userId.toLong())
         }
         val adButton = view.findViewById<Button>(R.id.adButton)
+
         adButton.setOnClickListener {
             if (!authToken.isNullOrEmpty()) {
                 if (productDetails != null) {
@@ -223,7 +234,7 @@ class SettingsFragment : Fragment() {
                         val editor = sharedPreferences.edit()
                         editor.remove("tokenJwt")
                         editor.apply()
-                        findNavController().navigate(R.id.action_settingsFragment_to_whatsTheGame)
+                        findNavController().navigate(R.id.action_settingsFragment_to_mainActivity)
                         FirebaseAuth.getInstance().signOut();
                         signOutGoogle()
                     }
@@ -266,7 +277,7 @@ class SettingsFragment : Fragment() {
                         val editor = sharedPreferences.edit()
                         editor.remove("tokenJwt")
                         editor.apply()
-                        findNavController().navigate(R.id.action_settingsFragment_to_whatsTheGame)
+                        findNavController().navigate(R.id.action_settingsFragment_to_mainActivity)
                     }
 
                     alertDialogBuilder.setNegativeButton("Cancelar") { _, _ ->

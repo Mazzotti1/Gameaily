@@ -18,8 +18,8 @@
             app:destination="@id/faqFragment"
             app:popUpTo="@id/settingsFragment" />
         <action
-            android:id="@+id/action_settingsFragment_to_whatsTheGame"
-            app:destination="@id/whatsTheGame" />
+            android:id="@+id/action_settingsFragment_to_mainActivity"
+            app:destination="@id/mainActivity" />
     </fragment>
 
     <fragment
@@ -57,7 +57,11 @@
         android:name="com.whatsthegame.appBarFragments.settingsFragments.aboutFragment"
         android:label="fragment_about"
         tools:layout="@layout/fragment_about" />
-
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.whatsthegame.activitys.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main" />
 
 
 </navigation>

@@ -33,11 +33,18 @@ class UserServiceImpl @Autowired constructor(
         return user?.rolls
     }
 
-    override fun setVipStatus(userId: Long) {
+    override fun setRollsByUserId(userId: Long) {
         val userOptional = userRepository.findById(userId)
             val user = userOptional.get()
-            user.vip = true
+            user.rolls -= 1
             userRepository.save(user)
+    }
+
+    override fun setVipStatus(userId: Long) {
+        val userOptional = userRepository.findById(userId)
+        val user = userOptional.get()
+        user.vip = true
+        userRepository.save(user)
     }
 
     override fun getVipStatus(userId: Long): Boolean? {

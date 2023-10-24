@@ -3,27 +3,27 @@
     <item
         android:id="@+id/whatsTheGame"
         android:enabled="true"
-        android:icon="@drawable/play"
+        android:icon="@drawable/play96x"
         android:title=""
         />
     <item
         android:id="@+id/minigamesNavbar"
         android:enabled="true"
-        android:icon="@drawable/gamecontrollerthin"
+        android:icon="@drawable/gamecontroller96x"
         android:title=""
         />
 
     <item
         android:id="@+id/rankNavbar"
         android:enabled="true"
-        android:icon="@drawable/trophythin"
+        android:icon="@drawable/trophy96x"
         android:title=""
         />
 
     <item
         android:id="@+id/adNavbar"
         android:enabled="true"
-        android:icon="@drawable/cart"
+        android:icon="@drawable/cart96x"
         android:title=""
         />
 

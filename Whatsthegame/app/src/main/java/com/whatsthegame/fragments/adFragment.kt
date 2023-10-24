@@ -1,5 +1,6 @@
 package com.whatsthegame.fragments
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -40,6 +41,15 @@ class adFragment : Fragment() {
                 val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
                 val authToken = sharedPreferences.getString("tokenJwt", "")
                 println("Compra bem sucedida")
+                val dialogBuilder = AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
+
+                dialogBuilder.setMessage("Parabéns! Você agora é um membro VIP!")
+                dialogBuilder.setPositiveButton("Fechar") { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+                val dialog = dialogBuilder.create()
+                dialog.show()
                 val decodedJWT: DecodedJWT = JWT.decode(authToken)
                 val userId = decodedJWT.subject
                 setUserVipViewModel.setVipStatus(userId.toLong())

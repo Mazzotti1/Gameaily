@@ -53,8 +53,8 @@
             app:destination="@id/faqFragment"
             app:popUpTo="@id/settingsFragment" />
         <action
-            android:id="@+id/action_settingsFragment_to_whatsTheGame"
-            app:destination="@id/whatsTheGame" />
+            android:id="@+id/action_settingsFragment_to_mainActivity"
+            app:destination="@id/mainActivity4" />
     </fragment>
     <fragment
         android:id="@+id/aboutFragment"
@@ -89,5 +89,10 @@
         android:name="com.whatsthegame.fragments.GameOverMinigamesFragment"
         android:label="fragment_game_over_minigames"
         tools:layout="@layout/fragment_game_over_minigames" />
+    <activity
+        android:id="@+id/mainActivity4"
+        android:name="com.whatsthegame.activitys.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main" />
 
 </navigation>

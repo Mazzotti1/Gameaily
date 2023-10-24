@@ -112,10 +112,16 @@ class rankFragment : Fragment() {
         }
 
         val searchView = view.findViewById<SearchView>(R.id.searchView)
+
+        searchView.setOnClickListener {
+            searchView.isIconified = false
+        }
+
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return true
             }
+
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (!::originalUserList.isInitialized) {

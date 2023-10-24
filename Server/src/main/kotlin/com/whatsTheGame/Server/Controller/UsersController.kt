@@ -37,6 +37,11 @@ class UsersController {
         return service!!.getRollsByUserId(userId)
     }
 
+    @PatchMapping("/rolls/{userId}")
+    fun setRollsByUserId(@PathVariable userId: Long) {
+        return service!!.setRollsByUserId(userId)
+    }
+
     @GetMapping("/vip/{userId}")
     fun getVipStatus(@PathVariable userId: Long): Boolean? {
         return service!!.getVipStatus(userId)

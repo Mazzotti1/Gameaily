@@ -78,7 +78,11 @@ class AnagramaSolverFragment : Fragment() {
         }
 
         val authToken = sharedPreferences.getString("tokenJwt", "")
-        if(!authToken.isNullOrEmpty()){
+        if (authToken.isNullOrEmpty()) {
+            if (!adController) {
+                loadAd()
+            }
+        } else {
             val decodedJWT: DecodedJWT = JWT.decode(authToken)
             val userId = decodedJWT.subject
 
