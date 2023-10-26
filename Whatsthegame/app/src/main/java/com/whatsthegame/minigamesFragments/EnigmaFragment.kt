@@ -168,13 +168,14 @@ class EnigmaFragment : Fragment() {
         val submitButton = view.findViewById<Button>(R.id.submitButton)
 
         submitButton.setOnClickListener {
-            val text = editText.text
-            val choosedAnswer = GuessEnigma(text.toString())
+            val text = editText.text.toString()
+            val choosedAnswer = capitalizeWords(text)
+            val formattedAnswer = GuessEnigma(choosedAnswer)
 
             if (remainingLives > 0) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     if (!text.isNullOrEmpty()) {
-                        if (choosedAnswer != answer) {
+                        if (formattedAnswer != answer) {
 
                             remainingLives--
                             lifesCounter.text = "$remainingLives vidas restantes"
@@ -249,7 +250,7 @@ class EnigmaFragment : Fragment() {
                             }
                         } else {
 
-                            guessEnigmasViewModel.guessEnigma(choosedAnswer)
+                            guessEnigmasViewModel.guessEnigma(formattedAnswer)
                             points++
                             pointsCounter.text = "$points Pontos"
                             editText.text.clear()
@@ -320,6 +321,12 @@ class EnigmaFragment : Fragment() {
 
         return view
 
+    }
+
+    fun capitalizeWords(input: String): String {
+        val words = input.split(" ")
+        val capitalizedWords = words.map { it.capitalize() }
+        return capitalizedWords.joinToString(" ")
     }
 
     private fun loadAd(){

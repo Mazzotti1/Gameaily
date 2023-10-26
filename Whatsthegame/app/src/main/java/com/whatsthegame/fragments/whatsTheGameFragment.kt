@@ -141,7 +141,6 @@ class whatsTheGameFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-
                 val filteredList = gameNameList.filter { gameName ->
                     gameName.contains(newText.orEmpty(), ignoreCase = true)
                 }
@@ -278,10 +277,10 @@ class whatsTheGameFragment : Fragment() {
 
                                 val imageViewGame = view!!.findViewById<ImageView>(R.id.imageViewGame)
                                     when (remainingLives) {
-                                        4 -> displayMosaic(requireContext(), imageViewGame, blockSize = 80)
-                                        3 -> displayMosaic(requireContext(), imageViewGame, blockSize = 50)
-                                        2 -> displayMosaic(requireContext(), imageViewGame, blockSize = 30)
-                                        1 -> displayMosaic(requireContext(), imageViewGame, blockSize = 15)
+                                        4 -> displayMosaic(requireContext(), imageViewGame, blockSize = 50)
+                                        3 -> displayMosaic(requireContext(), imageViewGame, blockSize = 30)
+                                        2 -> displayMosaic(requireContext(), imageViewGame, blockSize = 20)
+                                        1 -> displayMosaic(requireContext(), imageViewGame, blockSize = 10)
                                         else -> {
                                             println("Número de vidas desconhecido: $remainingLives")
                                         }
@@ -386,6 +385,7 @@ class whatsTheGameFragment : Fragment() {
                         editor.apply()
 
                     } else {
+                        println("Caiu aqui")
                         val inflater = layoutInflater
                         val layout = inflater.inflate(R.layout.empty_submit_layout, null)
                         val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
@@ -564,7 +564,7 @@ class whatsTheGameFragment : Fragment() {
 
             imageViewGame!!.setImageBitmap(resizedBitmap)
 
-            applyMosaic(requireContext(), imageViewGame, blockSize = 100)
+            applyMosaic(requireContext(), imageViewGame, blockSize = 70)
 
         }.addOnFailureListener {
             println("Erro ao fazer o download da imagem do jogo")
@@ -573,20 +573,24 @@ class whatsTheGameFragment : Fragment() {
 
     private var originalBitmap: Bitmap? = null
     private fun applyMosaic(context: Context, imageView: ImageView, blockSize: Int) {
-
         originalBitmap = imageView.drawable.toBitmap()
 
+        // Redimensionar a imagem original para uma resolução menor
+        val originalWidth = originalBitmap!!.width
+        val originalHeight = originalBitmap!!.height
+        val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap!!, originalWidth / 2, originalHeight / 2, true)
+
         val mosaicBitmap = Bitmap.createBitmap(
-            originalBitmap!!.width,
-            originalBitmap!!.height,
+            scaledBitmap.width,
+            scaledBitmap.height,
             Bitmap.Config.ARGB_8888
         )
 
         val canvas = Canvas(mosaicBitmap)
         val paint = Paint()
 
-        for (x in 0 until originalBitmap!!.width step blockSize) {
-            for (y in 0 until originalBitmap!!.height step blockSize) {
+        for (x in 0 until scaledBitmap.width step blockSize) {
+            for (y in 0 until scaledBitmap.height step blockSize) {
                 var redSum = 0
                 var greenSum = 0
                 var blueSum = 0
@@ -594,8 +598,8 @@ class whatsTheGameFragment : Fragment() {
 
                 for (i in x until x + blockSize) {
                     for (j in y until y + blockSize) {
-                        if (i < originalBitmap!!.width && j < originalBitmap!!.height) {
-                            val pixelColor = originalBitmap!!.getPixel(i, j)
+                        if (i < scaledBitmap.width && j < scaledBitmap.height) {
+                            val pixelColor = scaledBitmap.getPixel(i, j)
                             redSum += Color.red(pixelColor)
                             greenSum += Color.green(pixelColor)
                             blueSum += Color.blue(pixelColor)
@@ -622,9 +626,15 @@ class whatsTheGameFragment : Fragment() {
 
         imageView.setImageBitmap(mosaicBitmap)
     }
+
     private fun displayMosaic(context: Context, imageView: ImageView, blockSize: Int) {
         if (originalBitmap != null) {
-            val mosaicBitmap = originalBitmap!!.copy(originalBitmap!!.config, true)
+            // Redimensionar a imagem original para uma resolução menor
+            val originalWidth = originalBitmap!!.width
+            val originalHeight = originalBitmap!!.height
+            val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap!!, originalWidth / 2, originalHeight / 2, true)
+
+            val mosaicBitmap = scaledBitmap.copy(scaledBitmap.config, true)
 
             val width = mosaicBitmap.width
             val height = mosaicBitmap.height
@@ -667,7 +677,6 @@ class whatsTheGameFragment : Fragment() {
             println("Não há imagem original disponível.")
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -26,6 +26,7 @@ import com.whatsthegame.Api.ViewModel.*
 import com.whatsthegame.R
 import com.whatsthegame.models.GuessAnagram
 import com.whatsthegame.models.GuessDiaryGame
+import com.whatsthegame.models.GuessEnigma
 import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
@@ -166,13 +167,14 @@ class AnagramaSolverFragment : Fragment() {
 
 
         submitButton.setOnClickListener {
-            val text = editText.text
-            val choosedAnswer = GuessAnagram(text.toString())
+            val text = editText.text.toString()
+            val choosedAnswer = capitalizeWords(text)
+            val formattedAnswer = GuessAnagram(choosedAnswer)
 
             if (remainingLives > 0) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     if (!text.isNullOrEmpty()) {
-                        if (choosedAnswer != answer) {
+                        if (formattedAnswer != answer) {
 
                             remainingLives--
                             lifesCounter.text = "$remainingLives vidas restantes"
@@ -245,7 +247,7 @@ class AnagramaSolverFragment : Fragment() {
                                 editText.text.clear()
                             }
                         } else {
-                            guessAnagramViewModel.guessAnagram(choosedAnswer)
+                            guessAnagramViewModel.guessAnagram(formattedAnswer)
 
                             points++
                             pointsCounter.text = "$points Pontos"
@@ -323,6 +325,11 @@ class AnagramaSolverFragment : Fragment() {
         return view
     }
 
+    fun capitalizeWords(input: String): String {
+        val words = input.split(" ")
+        val capitalizedWords = words.map { it.capitalize() }
+        return capitalizedWords.joinToString(" ")
+    }
     private fun loadAd(){
         var adRequest = AdRequest.Builder().build()
 
