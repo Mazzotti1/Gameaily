@@ -26,6 +26,8 @@ import com.whatsthegame.Api.ViewModel.UserVipViewModel
 import com.whatsthegame.R
 import com.whatsthegame.models.GuessEnigma
 import kotlinx.coroutines.launch
+import kotlin.math.max
+import kotlin.math.min
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -110,24 +112,44 @@ class EnigmaFragment : Fragment() {
         var remainingLives = 3
         var submitButtonClickCount = 0
 
-        val iconList = listOf(
-            R.drawable.heartthin,
-            R.drawable.heartthin,
-            R.drawable.heartthin,
-        )
-        val iconContainer = view.findViewById<LinearLayout>(R.id.hearts)
+        val heartContainer = view.findViewById<LinearLayout>(R.id.hearts)
         val iconSize = resources.getDimensionPixelSize(R.dimen.icon_size)
-        for (iconResId in iconList) {
-            val imageView = ImageView(requireContext())
-            imageView.setImageResource(iconResId)
-            imageView.layoutParams = LinearLayout.LayoutParams(
-                resources.getDimensionPixelSize(R.dimen.icon_size),
-                resources.getDimensionPixelSize(R.dimen.icon_size)
-            )
-            imageView.setColorFilter(ContextCompat.getColor(requireContext(), R.color.destaques))
 
-            iconContainer.addView(imageView)
+        val heartFullIcons = listOf(
+            R.drawable.heart,
+            R.drawable.heart,
+            R.drawable.heart,
+        )
+
+        val heartEmptyIcons = listOf(
+            R.drawable.heartbreak,
+            R.drawable.heartbreak,
+            R.drawable.heartbreak,
+        )
+
+        fun updateHeartIcons(remainingLives: Int) {
+            heartContainer.removeAllViews()
+
+            val numFullHearts = min(remainingLives, heartFullIcons.size)
+
+            for (i in 0 until numFullHearts) {
+                val imageView = ImageView(requireContext())
+                imageView.setImageResource(heartFullIcons[i])
+                imageView.layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+                heartContainer.addView(imageView)
+            }
+
+            val numEmptyHearts = max(0, heartEmptyIcons.size - numFullHearts)
+
+
+            for (i in 0 until numEmptyHearts) {
+                val imageView = ImageView(requireContext())
+                imageView.setImageResource(heartEmptyIcons[i])
+                imageView.layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+                heartContainer.addView(imageView)
+            }
         }
+        updateHeartIcons(remainingLives)
 
         enigmasViewModel = ViewModelProvider(this).get(EnigmasViewModel::class.java)
         val textViewDifficulty= view.findViewById<TextView>(R.id.difficulty)
@@ -177,7 +199,9 @@ class EnigmaFragment : Fragment() {
                     if (!text.isNullOrEmpty()) {
                         if (formattedAnswer != answer) {
 
+
                             remainingLives--
+                            updateHeartIcons(remainingLives)
                             lifesCounter.text = "$remainingLives vidas restantes"
 
                             if (remainingLives <= 0) {

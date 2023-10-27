@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.whatsthegame.R
 import kotlinx.coroutines.launch
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.*
 import android.os.CountDownTimer
@@ -37,7 +38,10 @@ import com.whatsthegame.Api.ViewModel.*
 import com.whatsthegame.models.GuessDiaryGame
 import com.whatsthegame.tutorial.TutorialWhatsThegame
 import java.io.File
-
+import java.util.Collections.max
+import java.util.Collections.min
+import kotlin.math.max
+import kotlin.math.min
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -61,6 +65,7 @@ class whatsTheGameFragment : Fragment() {
         super.onCreate(savedInstanceState)
         sendPointsViewModel = ViewModelProvider(this).get(SendPointsViewModel::class.java)
         guessDiaryGameViewModel = ViewModelProvider(this).get(GuessDiaryGameViewModel::class.java)
+
 
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
@@ -199,7 +204,6 @@ class whatsTheGameFragment : Fragment() {
 
 
 
-
         val lifesCounter = rootView.findViewById<TextView>(R.id.textViewLifes)
         var remainingLives = 5
 
@@ -207,12 +211,55 @@ class whatsTheGameFragment : Fragment() {
         val currentTimeMillis = System.currentTimeMillis()
 
 
-       // if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
-           // remainingLives = sharedPreferences.getInt("remainingLives", 5)
+        if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
+            remainingLives = sharedPreferences.getInt("remainingLives", 5)
 
-           // lifesCounter.text = "$remainingLives vidas restantes"
-       // }
+            lifesCounter.text = "$remainingLives vidas restantes"
+        }
 
+
+        val heartContainer = rootView.findViewById<LinearLayout>(R.id.hearts)
+        val iconSize = resources.getDimensionPixelSize(R.dimen.icon_size)
+
+        val heartFullIcons = listOf(
+            R.drawable.heart,
+            R.drawable.heart,
+            R.drawable.heart,
+            R.drawable.heart,
+            R.drawable.heart
+        )
+
+        val heartEmptyIcons = listOf(
+            R.drawable.heartbreak,
+            R.drawable.heartbreak,
+            R.drawable.heartbreak,
+            R.drawable.heartbreak,
+            R.drawable.heartbreak
+        )
+
+        fun updateHeartIcons(remainingLives: Int) {
+            heartContainer.removeAllViews()
+
+            val numFullHearts = min(remainingLives, heartFullIcons.size)
+
+            for (i in 0 until numFullHearts) {
+                val imageView = ImageView(requireContext())
+                imageView.setImageResource(heartFullIcons[i])
+                imageView.layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+                heartContainer.addView(imageView)
+            }
+
+            val numEmptyHearts = max(0, heartEmptyIcons.size - numFullHearts)
+
+
+            for (i in 0 until numEmptyHearts) {
+                val imageView = ImageView(requireContext())
+                imageView.setImageResource(heartEmptyIcons[i])
+                imageView.layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+                heartContainer.addView(imageView)
+            }
+        }
+        updateHeartIcons(remainingLives)
         val token = sharedPreferences.getString("tokenJwt", null)
         val sendButton = rootView.findViewById<Button>(R.id.sendButton)
         sendButton.setOnClickListener {
@@ -220,62 +267,60 @@ class whatsTheGameFragment : Fragment() {
             val choosedGame = sharedPreferences.getString("choosedGame", "")
             val choosedGameJson = GuessDiaryGame(choosedGame)
 
-
             if (remainingLives > 0) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    if (!choosedGame.isNullOrEmpty()) {
-                        if (choosedGame != gameName) {
+                    val searchView = rootView.findViewById<SearchView>(R.id.searchView)
+                    val query = searchView.query.toString().trim() // Obtenha o texto da SearchView e remova espaços em branco
 
-                            remainingLives--
-                            lifesCounter.text = "$remainingLives vidas restantes"
+                    if (query.isNotEmpty()) { // Verifique se a consulta não está vazia
+                        if (!choosedGame.isNullOrEmpty()) {
+                            if (choosedGame != gameName) {
+                                remainingLives--
+                                updateHeartIcons(remainingLives)
+                                lifesCounter.text = "$remainingLives vidas restantes"
 
-                            if (remainingLives <= 0) {
-
-                                if (watchedRewardAd) {
-                                    findNavController().navigate(R.id.action_whatsTheGame_to_gameOverFragment)
-                                } else {
-
-                                    val alertDialogBuilder = AlertDialog.Builder(
-                                        ContextThemeWrapper(
-                                            requireContext(),
-                                            R.style.AlertDialogStyle
-                                        )
-                                    )
-
-                                    alertDialogBuilder.setTitle("Sem vidas restantes")
-                                    alertDialogBuilder.setMessage("Você gostaria de assistir um anúncio para mais uma última chance?")
-
-                                    alertDialogBuilder.setPositiveButton("Sim") { dialog, which ->
-
-                                        rewardedAd?.let { ad ->
-                                            ad.show(
-                                                requireActivity(),
-                                                OnUserEarnedRewardListener { rewardItem ->
-                                                    watchedRewardAd = true
-                                                    remainingLives = 1
-                                                    lifesCounter.text =
-                                                        "$remainingLives vidas restantes"
-                                                })
-                                        } ?: run {
-                                            println("The rewarded ad wasn't ready yet.")
-                                        }
-                                    }
-
-
-                                alertDialogBuilder.setNegativeButton("Não") { dialog, which ->
-                                    if (mInterstitialAd != null) {
-                                        mInterstitialAd?.show(requireActivity())
+                                if (remainingLives <= 0) {
+                                    if (watchedRewardAd) {
+                                        findNavController().navigate(R.id.action_whatsTheGame_to_gameOverFragment)
                                     } else {
-                                        println("O anúncio intersticial ainda não estava pronto.")
+                                        val alertDialogBuilder = AlertDialog.Builder(
+                                            ContextThemeWrapper(
+                                                requireContext(),
+                                                R.style.AlertDialogStyle
+                                            )
+                                        )
+
+                                        alertDialogBuilder.setTitle("Sem vidas restantes")
+                                        alertDialogBuilder.setMessage("Você gostaria de assistir um anúncio para mais uma última chance?")
+
+                                        alertDialogBuilder.setPositiveButton("Sim") { dialog, which ->
+                                            rewardedAd?.let { ad ->
+                                                ad.show(
+                                                    requireActivity(),
+                                                    OnUserEarnedRewardListener { rewardItem ->
+                                                        watchedRewardAd = true
+                                                        remainingLives = 1
+                                                        lifesCounter.text = "$remainingLives vidas restantes"
+                                                    }
+                                                )
+                                            } ?: run {
+                                                println("The rewarded ad wasn't ready yet.")
+                                            }
+                                        }
+
+                                        alertDialogBuilder.setNegativeButton("Não") { dialog, which ->
+                                            if (mInterstitialAd != null) {
+                                                mInterstitialAd?.show(requireActivity())
+                                            } else {
+                                                println("O anúncio intersticial ainda não estava pronto.")
+                                            }
+                                            findNavController().navigate(R.id.action_whatsTheGame_to_gameOverFragment)
+                                        }
+
+                                        alertDialogBuilder.create().show()
                                     }
-                                    findNavController().navigate(R.id.action_whatsTheGame_to_gameOverFragment)
-                                }
-
-                                alertDialogBuilder.create().show()
-                             }
-                            } else {
-
-                                val imageViewGame = view!!.findViewById<ImageView>(R.id.imageViewGame)
+                                } else {
+                                    val imageViewGame = view!!.findViewById<ImageView>(R.id.imageViewGame)
                                     when (remainingLives) {
                                         4 -> displayMosaic(requireContext(), imageViewGame, blockSize = 50)
                                         3 -> displayMosaic(requireContext(), imageViewGame, blockSize = 30)
@@ -286,110 +331,104 @@ class whatsTheGameFragment : Fragment() {
                                         }
                                     }
 
-
-                                val searchView = rootView.findViewById<SearchView>(R.id.searchView)
-                                searchView.setQuery("", false)
-
-                                val inflater = layoutInflater
-                                val layout = inflater.inflate(R.layout.submit_layout, null)
-                                val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
-                                toastText.text = "Jogo errado!"
-                                val toast = Toast(requireContext())
-                                toast.duration = Toast.LENGTH_SHORT
-                                toast.view = layout
-                                toast.show()
-                            }
-                        } else if (token != null) {
-
-                            val sharedPreferences = requireContext().getSharedPreferences(
-                                "Preferences",
-                                Context.MODE_PRIVATE
-                            )
-                            //enviar direto pontos pro server
-
-                            val authToken = sharedPreferences.getString("tokenJwt", "")
-                            val decodedJWT: DecodedJWT = JWT.decode(authToken)
-                            val userId = decodedJWT.subject
-                            val playerAnswerString = decodedJWT.getClaim("userAnswer")
-                            val playerAnswer = playerAnswerString.asBoolean()
-                           if (playerAnswer) {
-
-                                val inflater = layoutInflater
-                                val layout = inflater.inflate(R.layout.empty_submit_layout, null)
-                                val toastText =
-                                    layout.findViewById<TextView>(R.id.empty_submit_text)
-                                toastText.text =
-                                    "Você já acertou o jogo hoje, novos pontos não serão computados!"
-                                val toast = Toast(requireContext())
-                                toast.duration = Toast.LENGTH_LONG
-                                toast.view = layout
-                                toast.show()
-                               if (mInterstitialAd != null) {
-                                   mInterstitialAd?.show(requireActivity())
-                               } else {
-                                   println("O anúncio intersticial ainda não estava pronto.")
-                               }
-                                findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
-                            } else {
-
-                                points = calculateTipsPoints(gameTipUsed)
-                                points = calculateMinutesPoints(timePassedInMin)
-                                points = calculateLivesPoints(remainingLives)
-
-                            try {
-
-                                if (authToken != null) {
-                                    sendPointsViewModel.sendPoints(userId.toLong(), points)
-                                    guessDiaryGameViewModel.guessDiaryGame(choosedGameJson, userId.toLong())
-
-                                    println("Token: $authToken")
-
+                                    val inflater = layoutInflater
+                                    val layout = inflater.inflate(R.layout.submit_layout, null)
+                                    val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                                    toastText.text = "Jogo errado!"
+                                    val toast = Toast(requireContext())
+                                    toast.duration = Toast.LENGTH_SHORT
+                                    toast.view = layout
+                                    toast.show()
                                 }
+                            } else if (token != null) {
+                                val sharedPreferences = requireContext().getSharedPreferences(
+                                    "Preferences",
+                                    Context.MODE_PRIVATE
+                                )
+                                //enviar direto pontos pro server
 
+                                val authToken = sharedPreferences.getString("tokenJwt", "")
+                                val decodedJWT: DecodedJWT = JWT.decode(authToken)
+                                val userId = decodedJWT.subject
+                                val playerAnswerString = decodedJWT.getClaim("userAnswer")
+                                val playerAnswer = playerAnswerString.asBoolean()
+                                if (playerAnswer) {
+                                    val inflater = layoutInflater
+                                    val layout = inflater.inflate(R.layout.empty_submit_layout, null)
+                                    val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                                    toastText.text = "Você já acertou o jogo hoje, novos pontos não serão computados!"
+                                    val toast = Toast(requireContext())
+                                    toast.duration = Toast.LENGTH_LONG
+                                    toast.view = layout
+                                    toast.show()
+                                    if (mInterstitialAd != null) {
+                                        mInterstitialAd?.show(requireActivity())
+                                    } else {
+                                        println("O anúncio intersticial ainda não estava pronto.")
+                                    }
+                                    findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
+                                } else {
+                                    points = calculateTipsPoints(gameTipUsed)
+                                    points += calculateMinutesPoints(timePassedInMin)
+                                    points += calculateLivesPoints(remainingLives)
+
+                                    try {
+                                        if (authToken != null) {
+                                            sendPointsViewModel.sendPoints(userId.toLong(), points)
+                                            guessDiaryGameViewModel.guessDiaryGame(choosedGameJson, userId.toLong())
+                                            println("Token: $authToken")
+                                        }
+
+                                        if (mInterstitialAd != null) {
+                                            mInterstitialAd?.show(requireActivity())
+                                        } else {
+                                            println("O anúncio intersticial ainda não estava pronto.")
+                                        }
+
+                                        findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                    }
+                                }
+                            } else {
                                 if (mInterstitialAd != null) {
                                     mInterstitialAd?.show(requireActivity())
                                 } else {
                                     println("O anúncio intersticial ainda não estava pronto.")
                                 }
 
-                                findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
+                                findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
+                                points = calculateTipsPoints(gameTipUsed)
+                                points += calculateMinutesPoints(timePassedInMin)
+                                points += calculateLivesPoints(remainingLives)
 
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                            }
-                        } else {
-
-                            if (mInterstitialAd != null) {
-                                mInterstitialAd?.show(requireActivity())
-                            } else {
-                                println("O anúncio intersticial ainda não estava pronto.")
+                                val editor: SharedPreferences.Editor = sharedPreferences.edit()
+                                editor.putInt("points", points)
+                                editor.apply()
                             }
 
-                            findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
-                            points = calculateTipsPoints(gameTipUsed)
-                            points = calculateMinutesPoints(timePassedInMin)
-                            points = calculateLivesPoints(remainingLives)
-
-                            val sharedPreferences: SharedPreferences = context!!.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-                            val editor: SharedPreferences.Editor = sharedPreferences.edit()
-                            editor.putInt("points", points)
+                            val editor = sharedPreferences.edit()
+                            editor.putString("choosedGame", choosedGame)
+                            editor.putInt("remainingLives", remainingLives)
+                            editor.putLong("lifesTimestamp", currentTimeMillis)
                             editor.apply()
-
+                        } else {
+                            println("Caiu aqui")
+                            val inflater = layoutInflater
+                            val layout = inflater.inflate(R.layout.empty_submit_layout, null)
+                            val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
+                            toastText.text = "Selecione um jogo antes de enviar!"
+                            val toast = Toast(requireContext())
+                            toast.duration = Toast.LENGTH_LONG
+                            toast.view = layout
+                            toast.show()
                         }
-
-                        val editor = sharedPreferences.edit()
-                        editor.putString("choosedGame", choosedGame)
-                        editor.putInt("remainingLives", remainingLives)
-                        editor.putLong("lifesTimestamp", currentTimeMillis)
-                        editor.apply()
-
                     } else {
-                        println("Caiu aqui")
+                        // Mensagem de erro quando a SearchView está vazia
                         val inflater = layoutInflater
                         val layout = inflater.inflate(R.layout.empty_submit_layout, null)
                         val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
-                        toastText.text = "Selecione um jogo antes de enviar!"
+                        toastText.text = "Digite o nome do jogo antes de enviar!"
                         val toast = Toast(requireContext())
                         toast.duration = Toast.LENGTH_LONG
                         toast.view = layout
@@ -397,7 +436,7 @@ class whatsTheGameFragment : Fragment() {
                     }
                 }
             } else {
-
+                // Mensagem de erro quando não há vidas restantes
                 val inflater = layoutInflater
                 val layout = inflater.inflate(R.layout.empty_submit_layout, null)
                 val toastText = layout.findViewById<TextView>(R.id.empty_submit_text)
@@ -411,24 +450,7 @@ class whatsTheGameFragment : Fragment() {
 
 
 
-        val alternativeIconsA = listOf(
-                R.drawable.heartthin,
-                R.drawable.heartthin,
-                R.drawable.heartthin,
-                R.drawable.heartthin,
-                R.drawable.heartthin
-        )
 
-        val iconContainerA = rootView.findViewById<LinearLayout>(R.id.hearts)
-        val iconSize = resources.getDimensionPixelSize(R.dimen.icon_size)
-
-        for (iconResId in alternativeIconsA) {
-            val imageView = ImageView(requireContext())
-            imageView.setImageResource(iconResId)
-            imageView.layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
-            imageView.setColorFilter(ContextCompat.getColor(requireContext(), R.color.destaques))
-            iconContainerA.addView(imageView)
-        }
 
 
         return rootView
@@ -540,7 +562,7 @@ class whatsTheGameFragment : Fragment() {
         })
     }
 
-
+    var remainingLives = 5
     private fun getImageFromBucket() {
         val storage = FirebaseStorage.getInstance()
         val storageRef = storage.reference
@@ -564,7 +586,26 @@ class whatsTheGameFragment : Fragment() {
 
             imageViewGame!!.setImageBitmap(resizedBitmap)
 
-            applyMosaic(requireContext(), imageViewGame, blockSize = 70)
+            val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+
+            val lifesTimestamp = sharedPreferences.getLong("lifesTimestamp", 0)
+            val currentTimeMillis = System.currentTimeMillis()
+
+
+            if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
+                remainingLives = sharedPreferences.getInt("remainingLives", 5)
+            }
+
+            when (remainingLives) {
+                5 -> applyMosaic(requireContext(), imageViewGame, blockSize = 70)
+                4 -> applyMosaic(requireContext(), imageViewGame, blockSize = 50)
+                3 -> applyMosaic(requireContext(), imageViewGame, blockSize = 30)
+                2 -> applyMosaic(requireContext(), imageViewGame, blockSize = 20)
+                1 -> applyMosaic(requireContext(), imageViewGame, blockSize = 10)
+                else -> {
+                    println("Número de vidas desconhecido: $remainingLives")
+                }
+            }
 
         }.addOnFailureListener {
             println("Erro ao fazer o download da imagem do jogo")
