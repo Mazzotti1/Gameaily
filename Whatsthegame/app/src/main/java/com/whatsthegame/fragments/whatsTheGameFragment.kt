@@ -61,11 +61,13 @@ class whatsTheGameFragment : Fragment() {
     private lateinit var sendPointsViewModel: SendPointsViewModel
     private lateinit var guessDiaryGameViewModel: GuessDiaryGameViewModel
     private lateinit var userVipViewModel: UserVipViewModel
+    private lateinit var userLivesViewModel: UserLivesViewModel
+    private lateinit var reduceLivesViewModel: ReduceLivesViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sendPointsViewModel = ViewModelProvider(this).get(SendPointsViewModel::class.java)
         guessDiaryGameViewModel = ViewModelProvider(this).get(GuessDiaryGameViewModel::class.java)
-
+        reduceLivesViewModel = ViewModelProvider(this).get(ReduceLivesViewModel::class.java)
 
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
@@ -86,7 +88,7 @@ class whatsTheGameFragment : Fragment() {
     private var mInterstitialAd: InterstitialAd? = null
     private var rewardedAd: RewardedAd? = null
     private var watchedRewardAd = false
-
+    private var remainingLives = 5
 
     @SuppressLint("ClickableViewAccessibility", "MissingInflatedId", "SuspiciousIndentation")
     override fun onCreateView(
@@ -127,7 +129,6 @@ class whatsTheGameFragment : Fragment() {
 
             userVipViewModel.getVip(userId.toLong())
         }
-
 
 
         loadAdRewarded()
@@ -205,16 +206,72 @@ class whatsTheGameFragment : Fragment() {
 
 
         val lifesCounter = rootView.findViewById<TextView>(R.id.textViewLifes)
-        var remainingLives = 5
-
-        val lifesTimestamp = sharedPreferences.getLong("lifesTimestamp", 0)
-        val currentTimeMillis = System.currentTimeMillis()
 
 
-        if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
-            remainingLives = sharedPreferences.getInt("remainingLives", 5)
+        if (authToken.isNullOrEmpty()) {
+            val lifesTimestamp = sharedPreferences.getLong("lifesTimestamp", 0)
+            val currentTimeMillis = System.currentTimeMillis()
 
-            lifesCounter.text = "$remainingLives vidas restantes"
+            if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
+                remainingLives = sharedPreferences.getInt("remainingLives", 5)
+
+                lifesCounter.text = "$remainingLives vidas restantes"
+            }
+        }else{
+            val decodedJWT: DecodedJWT = JWT.decode(authToken)
+            val userId = decodedJWT.subject
+            userLivesViewModel = ViewModelProvider(this).get(UserLivesViewModel::class.java)
+            userLivesViewModel.lives.observe(viewLifecycleOwner) { lives ->
+
+                remainingLives = lives!!
+                lifesCounter.text = "$remainingLives vidas restantes"
+
+                val heartContainer = rootView.findViewById<LinearLayout>(R.id.hearts)
+                val iconSize = resources.getDimensionPixelSize(R.dimen.icon_size)
+
+                val heartFullIcons = listOf(
+                    R.drawable.heart,
+                    R.drawable.heart,
+                    R.drawable.heart,
+                    R.drawable.heart,
+                    R.drawable.heart
+                )
+
+                val heartEmptyIcons = listOf(
+                    R.drawable.heartbreak,
+                    R.drawable.heartbreak,
+                    R.drawable.heartbreak,
+                    R.drawable.heartbreak,
+                    R.drawable.heartbreak
+                )
+
+                fun updateHeartIcons(remainingLives: Int) {
+                    heartContainer.removeAllViews()
+
+                    val numFullHearts = min(remainingLives, heartFullIcons.size)
+
+                    for (i in 0 until numFullHearts) {
+                        val imageView = ImageView(requireContext())
+                        imageView.setImageResource(heartFullIcons[i])
+                        imageView.layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+                        heartContainer.addView(imageView)
+                    }
+
+                    val numEmptyHearts = max(0, heartEmptyIcons.size - numFullHearts)
+
+
+                    for (i in 0 until numEmptyHearts) {
+                        val imageView = ImageView(requireContext())
+                        imageView.setImageResource(heartEmptyIcons[i])
+                        imageView.layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+                        heartContainer.addView(imageView)
+                    }
+                }
+
+                updateHeartIcons(remainingLives)
+            }
+
+            userLivesViewModel.getUserLives(userId.toLong())
         }
 
 
@@ -279,6 +336,11 @@ class whatsTheGameFragment : Fragment() {
                                 updateHeartIcons(remainingLives)
                                 lifesCounter.text = "$remainingLives vidas restantes"
 
+                                    if (!authToken.isNullOrEmpty()) {
+                                        val decodedJWT: DecodedJWT = JWT.decode(authToken)
+                                        val userId = decodedJWT.subject
+                                        reduceLivesViewModel.reduceRemaningLives(userId.toLong())
+                                    }
                                 if (remainingLives <= 0) {
                                     if (watchedRewardAd) {
                                         findNavController().navigate(R.id.action_whatsTheGame_to_gameOverFragment)
@@ -406,7 +468,7 @@ class whatsTheGameFragment : Fragment() {
                                 editor.putInt("points", points)
                                 editor.apply()
                             }
-
+                            val currentTimeMillis = System.currentTimeMillis()
                             val editor = sharedPreferences.edit()
                             editor.putString("choosedGame", choosedGame)
                             editor.putInt("remainingLives", remainingLives)
@@ -562,7 +624,6 @@ class whatsTheGameFragment : Fragment() {
         })
     }
 
-    var remainingLives = 5
     private fun getImageFromBucket() {
         val storage = FirebaseStorage.getInstance()
         val storageRef = storage.reference
@@ -586,15 +647,6 @@ class whatsTheGameFragment : Fragment() {
 
             imageViewGame!!.setImageBitmap(resizedBitmap)
 
-            val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
-
-            val lifesTimestamp = sharedPreferences.getLong("lifesTimestamp", 0)
-            val currentTimeMillis = System.currentTimeMillis()
-
-
-            if (lifesTimestamp > 0 && (currentTimeMillis - lifesTimestamp) < (24 * 60 * 60 * 1000)) {
-                remainingLives = sharedPreferences.getInt("remainingLives", 5)
-            }
 
             when (remainingLives) {
                 5 -> applyMosaic(requireContext(), imageViewGame, blockSize = 70)

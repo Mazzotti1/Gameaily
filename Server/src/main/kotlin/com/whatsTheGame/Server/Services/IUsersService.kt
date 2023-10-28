@@ -26,4 +26,8 @@ interface IUsersService {
     fun getVipStatus(userId: Long): Boolean?
 
     fun setRollsByUserId(userId: Long)
+
+    fun reduceRemaningLives(userId: Long)
+
+    fun getRemainingLivesStatus(userId: Long): Int?
 }

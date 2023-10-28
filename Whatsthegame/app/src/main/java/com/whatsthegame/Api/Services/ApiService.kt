@@ -51,4 +51,10 @@ interface ApiService {
 
     @PATCH("/users/rolls/{userId}")
     suspend fun setRollsUpdate(@Path("userId") userId: Long): ResponseBody
+
+    @PATCH("/users/remainingLives/{userId}")
+    suspend fun reduceRemaningLives(@Path("userId") userId: Long): ResponseBody
+
+    @GET("/users/remainingLives/{userId}")
+    suspend fun getRemainingLivesStatus(@Path("userId") userId: Long): Int
 }

@@ -40,6 +40,8 @@ class Users {
 
     var vip: Boolean = false
 
+    var remainingLives: Int = 5
+
     var userAnswer : Boolean = false
     fun token(token: String?) {
         this.token = token.toString()

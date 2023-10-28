@@ -24,7 +24,6 @@ class UserServiceImpl @Autowired constructor(
         return BCryptPasswordEncoder()
     }
 
-
     override fun getAll(name: String?): List<Users?>? {
         return userRepository!!.findAll()
     }
@@ -50,6 +49,18 @@ class UserServiceImpl @Autowired constructor(
     override fun getVipStatus(userId: Long): Boolean? {
         val user = userRepository.findById(userId).orElse(null)
         return user?.vip
+    }
+
+    override fun reduceRemaningLives(userId: Long) {
+        val userOptional = userRepository.findById(userId)
+        val user = userOptional.get()
+        user.remainingLives -= 1
+        userRepository.save(user)
+    }
+
+    override fun getRemainingLivesStatus(userId: Long): Int? {
+        val user = userRepository.findById(userId).orElse(null)
+        return user.remainingLives
     }
 
     @Throws(RegistroIncorretoException::class)
@@ -178,6 +189,7 @@ class UserServiceImpl @Autowired constructor(
         for (user in allUsers) {
             user.userAnswer = false
             user.rolls += 1
+            user.remainingLives = 5
         }
         userRepository.saveAll(allUsers)
     }

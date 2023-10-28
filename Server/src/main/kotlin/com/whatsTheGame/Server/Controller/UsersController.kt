@@ -42,6 +42,16 @@ class UsersController {
         return service!!.setRollsByUserId(userId)
     }
 
+    @GetMapping("/remainingLives/{userId}")
+    fun getRemainingLivesByUserId(@PathVariable userId: Long): Int? {
+        return service!!.getRemainingLivesStatus(userId)
+    }
+
+    @PatchMapping("/remainingLives/{userId}")
+    fun reduceRemainingLivesByUserId(@PathVariable userId: Long) {
+        return service!!.reduceRemaningLives(userId)
+    }
+
     @GetMapping("/vip/{userId}")
     fun getVipStatus(@PathVariable userId: Long): Boolean? {
         return service!!.getVipStatus(userId)
