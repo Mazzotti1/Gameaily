@@ -87,7 +87,7 @@ Para garantir a melhor experiência de usuário possível, o aplicativo foi dese
 </table>
 <table>
     <td>
-      
+      <a href="https://github.com/Mazzotti1/WhatsTheGame/blob/main/LICENSE">Licence</a>
     </td>
 </table>
 
