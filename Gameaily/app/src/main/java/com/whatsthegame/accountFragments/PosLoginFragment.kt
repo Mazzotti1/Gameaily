@@ -86,7 +86,7 @@ class PosLoginFragment : Fragment() {
 
                     sendPointsViewModel.sendPoints(userId.toLong(), points)
                     guessDiaryGameViewModel.guessDiaryGame(choosedGameJson, userId.toLong())
-
+                    println("Pos pontuação: $points")
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

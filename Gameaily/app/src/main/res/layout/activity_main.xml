@@ -8,19 +8,34 @@
     tools:context=".activitys.MainActivity">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/titleGame"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/mochiypoppone_regular"
-        android:text="What’s the game?"
+        android:text="Gameaily"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="45sp"
+        android:textSize="55sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.177" />
+        app:layout_constraintVertical_bias="0.197" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/mochiypoppone_regular"
+        android:text="Descubra o jogo diário!"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="35sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleGame"
+        app:layout_constraintVertical_bias="0.297" />
 
     <Button
         android:id="@+id/homeButtonStart"
@@ -133,6 +148,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:adSize="BANNER"
-        app:adUnitId="ca-app-pub-3940256099942544/6300978111"/>
+        app:adUnitId="ca-app-pub-4026039457973102/2839816177"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -150,7 +150,7 @@ class WhatsTheGameActivity : AppCompatActivity() {
         val isFirstTime = sharedPreferences.getBoolean("isFirstTime", true)
         if (isFirstTime) {
         val steps = listOf(
-            TutorialStep("Bem-vindo ao Whats The game!", R.drawable.step1wtg),
+            TutorialStep("Bem-vindo ao Gameaily!", R.drawable.step1wtg),
             TutorialStep("Aqui você vai ter diarimente uma capa de um jogo aleatório, e você pode tentar advinhar para ganhar alguns pontos!", R.drawable.step2wtg),
             TutorialStep("Mas calma! Se você quer ser o melhor tem que se atentar a algumas coisas!", R.drawable.step3wtg),
             TutorialStep("As pontuações são calculadas baseados nas suas ações, se usou dicas ou não, quanto tempo demorou para descobrir, quantas vidas você perdeu no processo, e outras coisas...", R.drawable.step4wtg),

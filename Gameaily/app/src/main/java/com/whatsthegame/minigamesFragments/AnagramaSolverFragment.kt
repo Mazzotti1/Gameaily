@@ -1,7 +1,9 @@
 package com.whatsthegame.minigamesFragments
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -20,10 +22,10 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.whatsthegame.Api.ViewModel.EnigmasViewModel
-import com.whatsthegame.Api.ViewModel.GuessEnigmaViewModel
-import com.whatsthegame.Api.ViewModel.UserVipViewModel
+import com.whatsthegame.Api.ViewModel.*
 import com.whatsthegame.R
+import com.whatsthegame.models.GuessAnagram
+import com.whatsthegame.models.GuessDiaryGame
 import com.whatsthegame.models.GuessEnigma
 import kotlinx.coroutines.launch
 import kotlin.math.max
@@ -36,19 +38,18 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [EnigmaFragment.newInstance] factory method to
+ * Use the [AnagramaSolverFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class EnigmaFragment : Fragment() {
+class AnagramaSolverFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    private lateinit var guessEnigmasViewModel: GuessEnigmaViewModel
+    private lateinit var guessAnagramViewModel: GuessAnagramViewModel
     private lateinit var userVipViewModel: UserVipViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        guessEnigmasViewModel = ViewModelProvider(this).get(GuessEnigmaViewModel::class.java)
+        guessAnagramViewModel = ViewModelProvider(this).get(GuessAnagramViewModel::class.java)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -56,18 +57,17 @@ class EnigmaFragment : Fragment() {
     }
 
     private var tips: String? = null
-    private var answer: GuessEnigma? = null
-    private lateinit var enigmasViewModel: EnigmasViewModel
+    private var answer: GuessAnagram? = null
+    private lateinit var anagramViewModel: AnagramsViewModel
     private var mInterstitialAd: InterstitialAd? = null
     private var rewardedAd: RewardedAd? = null
     private var watchedRewardAd = false
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_pistas, container, false)
+        val view = inflater.inflate(R.layout.fragment_anagrama_solver, container, false)
 
         val sharedPreferences = requireContext().getSharedPreferences("Preferences", Context.MODE_PRIVATE)
         val adController = sharedPreferences.getBoolean("adControl", false)
@@ -101,10 +101,7 @@ class EnigmaFragment : Fragment() {
         }
 
 
-
-
-        loadAdRewarded()
-
+       loadAdRewarded()
 
         val pointsCounter = view.findViewById<TextView>(R.id.points)
         var points = 0
@@ -151,15 +148,16 @@ class EnigmaFragment : Fragment() {
         }
         updateHeartIcons(remainingLives)
 
-        enigmasViewModel = ViewModelProvider(this).get(EnigmasViewModel::class.java)
+
+        anagramViewModel = ViewModelProvider(this).get(AnagramsViewModel::class.java)
         val textViewDifficulty= view.findViewById<TextView>(R.id.difficulty)
-        val textViewEnigma = view.findViewById<TextView>(R.id.enigma)
-        enigmasViewModel.enigma.observe(viewLifecycleOwner, Observer { enigma ->
-            if (enigma != null){
-                val wordname = enigma.enigmaName
-                answer = GuessEnigma(enigma.answer)
-                val gameDifficulty = enigma.difficulty
-                tips = enigma.tips
+        val textViewAnagram = view.findViewById<TextView>(R.id.anagram)
+        anagramViewModel.anagram.observe(viewLifecycleOwner, Observer { anagram ->
+            if (anagram != null){
+                val wordname = anagram.wordName
+                answer = GuessAnagram(anagram.answer)
+                val gameDifficulty = anagram.difficulty
+                tips = anagram.tips
                 val colorResId = when (gameDifficulty) {
                     "Fácil" -> R.color.win
                     "Médio" -> R.color.secundaria
@@ -167,7 +165,7 @@ class EnigmaFragment : Fragment() {
                     else -> android.R.color.white
                 }
                 activity?.runOnUiThread {
-                    textViewEnigma.text = "$wordname"
+                    textViewAnagram.text = "$wordname"
                     textViewDifficulty.text = "$gameDifficulty"
 
                     val color = ContextCompat.getColor(requireContext(), colorResId)
@@ -176,7 +174,7 @@ class EnigmaFragment : Fragment() {
             }
         })
         viewLifecycleOwner.lifecycleScope.launch {
-            enigmasViewModel.fetchEnigmaGame()
+            anagramViewModel.fetchAnagramGame()
         }
 
         val tipButton = view.findViewById<ImageButton>(R.id.tipButton)
@@ -189,16 +187,16 @@ class EnigmaFragment : Fragment() {
         val editText = view.findViewById<EditText>(R.id.editTextAnswer)
         val submitButton = view.findViewById<Button>(R.id.submitButton)
 
+
         submitButton.setOnClickListener {
             val text = editText.text.toString()
             val choosedAnswer = capitalizeWords(text)
-            val formattedAnswer = GuessEnigma(choosedAnswer)
+            val formattedAnswer = GuessAnagram(choosedAnswer)
 
             if (remainingLives > 0) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     if (!text.isNullOrEmpty()) {
                         if (formattedAnswer != answer) {
-
 
                             remainingLives--
                             updateHeartIcons(remainingLives)
@@ -214,7 +212,7 @@ class EnigmaFragment : Fragment() {
                                     } else {
                                         println("O anúncio intersticial ainda não estava pronto.")
                                     }
-                                    findNavController().navigate(R.id.action_pistasFragment2_to_gameOverMinigamesFragment2)
+                                    findNavController().navigate(R.id.action_anagramaSolverFragment2_to_gameOverMinigamesFragment2)
                                 } else {
 
                                     val alertDialogBuilder = AlertDialog.Builder(
@@ -250,11 +248,10 @@ class EnigmaFragment : Fragment() {
                                         } else {
                                             println("O anúncio intersticial ainda não estava pronto.")
                                         }
-                                        findNavController().navigate(R.id.action_pistasFragment2_to_gameOverMinigamesFragment2)
+                                        findNavController().navigate(R.id.action_anagramaSolverFragment2_to_gameOverMinigamesFragment2)
                                     }
                                     alertDialogBuilder.create().show()
                                 }
-
 
                             } else {
 
@@ -273,13 +270,12 @@ class EnigmaFragment : Fragment() {
                                 editText.text.clear()
                             }
                         } else {
+                            guessAnagramViewModel.guessAnagram(formattedAnswer)
 
-                            guessEnigmasViewModel.guessEnigma(formattedAnswer)
                             points++
                             pointsCounter.text = "$points Pontos"
                             editText.text.clear()
                             tipTextView.text = ""
-
                             submitButtonClickCount++
                             println("Clicks do botão: $submitButtonClickCount")
                             if (submitButtonClickCount >= 3) {
@@ -292,12 +288,12 @@ class EnigmaFragment : Fragment() {
                                 }
                             }
 
-                            enigmasViewModel.enigma.observe(viewLifecycleOwner, Observer { enigma ->
-                                if (enigma != null){
-                                    val wordname = enigma.enigmaName
-                                    answer = GuessEnigma(enigma.answer)
-                                    val gameDifficulty = enigma.difficulty
-                                    tips = enigma.tips
+                            anagramViewModel.anagram.observe(viewLifecycleOwner, Observer { anagram ->
+                                if (anagram != null){
+                                    val wordname = anagram.wordName
+                                    answer = GuessAnagram(anagram.answer)
+                                    val gameDifficulty = anagram.difficulty
+                                    tips = anagram.tips
                                     val colorResId = when (gameDifficulty) {
                                         "Fácil" -> R.color.win
                                         "Médio" -> R.color.secundaria
@@ -305,7 +301,7 @@ class EnigmaFragment : Fragment() {
                                         else -> android.R.color.white
                                     }
                                     activity?.runOnUiThread {
-                                        textViewEnigma.text = "$wordname"
+                                        textViewAnagram.text = "$wordname"
                                         textViewDifficulty.text = "$gameDifficulty"
 
                                         val color = ContextCompat.getColor(requireContext(), colorResId)
@@ -314,7 +310,7 @@ class EnigmaFragment : Fragment() {
                                 }
                             })
                             viewLifecycleOwner.lifecycleScope.launch {
-                                enigmasViewModel.fetchEnigmaGame()
+                                anagramViewModel.fetchAnagramGame()
                             }
                         }
 
@@ -342,9 +338,14 @@ class EnigmaFragment : Fragment() {
             }
         }
 
+        view.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                editText.clearFocus()
+            }
+            false
+        }
 
         return view
-
     }
 
     fun capitalizeWords(input: String): String {
@@ -352,11 +353,10 @@ class EnigmaFragment : Fragment() {
         val capitalizedWords = words.map { it.capitalize() }
         return capitalizedWords.joinToString(" ")
     }
-
     private fun loadAd(){
         var adRequest = AdRequest.Builder().build()
 
-        InterstitialAd.load(requireContext(),"ca-app-pub-3940256099942544/1033173712", adRequest, object : InterstitialAdLoadCallback() {
+        InterstitialAd.load(requireContext(),"ca-app-pub-4026039457973102/4744705032", adRequest, object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 println(adError?.toString())
                 mInterstitialAd = null
@@ -371,7 +371,7 @@ class EnigmaFragment : Fragment() {
 
     private fun loadAdRewarded(){
         var adRequest = AdRequest.Builder().build()
-        RewardedAd.load(requireContext(),"ca-app-pub-3940256099942544/5224354917", adRequest, object : RewardedAdLoadCallback() {
+        RewardedAd.load(requireContext(),"ca-app-pub-4026039457973102/8670727358", adRequest, object : RewardedAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 println(adError?.toString())
                 rewardedAd = null
@@ -383,6 +383,7 @@ class EnigmaFragment : Fragment() {
             }
         })
     }
+
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -390,12 +391,12 @@ class EnigmaFragment : Fragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment PistasFragment.
+         * @return A new instance of fragment AnagramaSolverFragment.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            EnigmaFragment().apply {
+            AnagramaSolverFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

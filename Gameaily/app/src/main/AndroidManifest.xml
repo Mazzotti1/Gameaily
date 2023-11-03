@@ -70,7 +70,7 @@
 
         <activity
             android:name=".activitys.WhatsTheGameActivity"
-            android:label="What&apos;s the game?"
+            android:label="Gameaily"
             android:parentActivityName=".activitys.MainActivity"
             android:theme="@style/AppTheme.WhatsTheGameActivity"
             android:windowSoftInputMode="adjustPan" />

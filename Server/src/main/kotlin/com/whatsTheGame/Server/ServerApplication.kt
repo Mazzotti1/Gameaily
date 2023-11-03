@@ -12,4 +12,3 @@ class ServerApplication
 		runApplication<ServerApplication>(*args)
 
 	}
-

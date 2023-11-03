@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_medium"
-        android:text="Sobre What's the game?"
+        android:text="Sobre Gameaily"
         android:textColor="@color/secundaria"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -43,7 +43,7 @@
         android:layout_width="296dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_medium"
-        android:text="Whats the game? é um projeto de entreterimento baseado em jogos diários, que o usuário pode competir com outros usuários para conseguir a maior pontuação! E também o usuário pode usar para passar o tempo em minigames ilimitados!"
+        android:text="Gameaily é um projeto de entreterimento baseado em jogos diários, que o usuário pode competir com outros usuários para conseguir a maior pontuação! E também o usuário pode usar para passar o tempo em minigames ilimitados!"
         android:textAlignment="textStart"
         android:textColor="@color/white"
         android:textSize="15sp"
@@ -74,7 +74,7 @@
         android:layout_width="291dp"
         android:layout_height="83dp"
         android:fontFamily="@font/poppins_medium"
-        android:text="What's the game? versão 1.0.0"
+        android:text="Gameaily versão 1.0.0"
         android:textAlignment="textStart"
         android:textColor="@color/white"
         android:textSize="15sp"
@@ -91,6 +91,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:adSize="BANNER"
-        app:adUnitId="ca-app-pub-3940256099942544/6300978111" />
+        app:adUnitId="ca-app-pub-4026039457973102/2839816177" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -430,9 +430,9 @@ class whatsTheGameFragment : Fragment() {
                                     }
                                     findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerLoggedFragment)
                                 } else {
-                                    points = calculateTipsPoints(gameTipUsed)
-                                    points += calculateMinutesPoints(timePassedInMin)
-                                    points += calculateLivesPoints(remainingLives)
+                                    points -= calculateTipsPoints(gameTipUsed)
+                                    points -= calculateMinutesPoints(timePassedInMin)
+                                    points -= calculateLivesPoints(remainingLives)
 
                                     try {
                                         if (authToken != null) {
@@ -460,10 +460,10 @@ class whatsTheGameFragment : Fragment() {
                                 }
 
                                 findNavController().navigate(R.id.action_whatsTheGame_to_rightAnswerFragment)
-                                points = calculateTipsPoints(gameTipUsed)
-                                points += calculateMinutesPoints(timePassedInMin)
-                                points += calculateLivesPoints(remainingLives)
-
+                                points -= calculateTipsPoints(gameTipUsed)
+                                points -= calculateMinutesPoints(timePassedInMin)
+                                points -= calculateLivesPoints(remainingLives)
+                                println("Pontuação: $points")
                                 val editor: SharedPreferences.Editor = sharedPreferences.edit()
                                 editor.putInt("points", points)
                                 editor.apply()
@@ -511,44 +511,37 @@ class whatsTheGameFragment : Fragment() {
         }
 
 
-
-
-
-
         return rootView
     }
 
-    private var points = 70
-    private fun calculateTipsPoints (userUsedHint: Boolean) : Int{
+    private var points = 160
+    private fun calculateTipsPoints(userUsedHint: Boolean): Int {
         if (userUsedHint) {
-            points -= 10
+            return 30
         }
-        return points
+        return 0
     }
-    private fun calculateMinutesPoints (timeInMinutes: Long) : Int{
+
+    private fun calculateMinutesPoints(timeInMinutes: Long): Int {
         if (timeInMinutes > 30) {
-            points -= 20
+            return 50
         }
-        return points
+        return 0
     }
-    private fun calculateLivesPoints (remainingLives: Int) : Int{
+    private fun calculateLivesPoints(remainingLives: Int): Int {
         when (remainingLives) {
-            1 -> points -= 30
-            2 -> points -= 25
-            3 -> points -= 15
-            4 -> points -= 10
-            5 -> points -= 0
+            1 -> return 70
+            2 -> return 65
+            3 -> return 45
+            4 -> return 30
+            else -> return 0
         }
-        return points
     }
 
     private lateinit var diaryGameViewModel: DiaryGameViewModel
     private lateinit var allGamesViewModel: AllGamesViewModel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-
 
         diaryGameViewModel = ViewModelProvider(this).get(DiaryGameViewModel::class.java)
 
@@ -596,7 +589,7 @@ class whatsTheGameFragment : Fragment() {
     private fun loadAdInterstitial(){
         var adRequest = AdRequest.Builder().build()
 
-        InterstitialAd.load(requireContext(),"ca-app-pub-3940256099942544/1033173712", adRequest, object : InterstitialAdLoadCallback() {
+        InterstitialAd.load(requireContext(),"ca-app-pub-4026039457973102/4744705032", adRequest, object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 println(adError?.toString())
                 mInterstitialAd = null
@@ -611,7 +604,7 @@ class whatsTheGameFragment : Fragment() {
 
     private fun loadAdRewarded(){
         var adRequest = AdRequest.Builder().build()
-        RewardedAd.load(requireContext(),"ca-app-pub-3940256099942544/5224354917", adRequest, object : RewardedAdLoadCallback() {
+        RewardedAd.load(requireContext(),"ca-app-pub-4026039457973102/8670727358", adRequest, object : RewardedAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 println(adError?.toString())
                 rewardedAd = null

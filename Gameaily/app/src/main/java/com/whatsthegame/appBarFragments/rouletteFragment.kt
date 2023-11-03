@@ -100,9 +100,14 @@ class rouletteFragment : Fragment() {
             setUserRollsViewModel = ViewModelProvider(this).get(SetUserRollsViewModel::class.java)
 
             userRollsViewModel.rolls.observe(viewLifecycleOwner) { rolls ->
-                rollsCounter.text = "$rolls Giros restantes"
-                defaultRolls = rolls ?: 0
+                if (rolls != null) {
+                    defaultRolls = rolls
+                } else {
+                    defaultRolls = 0
+                }
+                rollsCounter.text = "$defaultRolls Giros restantes"
             }
+
 
             userRollsViewModel.getRolls(userId.toLong())
         }
