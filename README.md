@@ -16,7 +16,8 @@ O aplicativo móvel foi desenvolvido para ser um jogo de entreterimento diário 
 O projeto conta com um sistema de monetização por anúncios, e também um sistema de inscrição IN-APP para usuarios que queiram apoiar o projeto e em troca se abster de anúncios.
 
 
-![mainMockupPronto](https://github.com/Mazzotti1/WhatsTheGame/assets/70278577/c865f571-e5e8-45ca-8521-81b1ec708064)
+![mainMockupPronto](https://github.com/Mazzotti1/Gameaily/assets/70278577/ed17e51c-a1c9-4c0c-8b3c-6d8216729c87)
+
 
 
 A API foi desenvolvida com segurança e encriptação de dados de ponta a ponta, com as mais diversas funções. Os usuários podem além de tentar descobrir qual é o jogo diário,
@@ -47,7 +48,8 @@ Quando o usuário está logado ele também libera a opção de poder registrar s
 
 - **Google Auth:** O usuário tem a possibilidade de se registrar com uma conta google e sempre se logar com a mesma apenas clicando em "Continuar com Google", essa implementação ajuda muito aqueles usuários que preferem a praticidade ao se registrar e logar, e pelo fato do flutter também ser desenvolvido pelo Google, a utilização do Firebase é extremamente fácil .
 
-![wtgMockupPronto](https://github.com/Mazzotti1/WhatsTheGame/assets/70278577/45955e0e-7e5c-487a-a37b-e3789d0ba705)
+
+![wtgMockupPronto](https://github.com/Mazzotti1/Gameaily/assets/70278577/bd60877d-7a7a-4a62-89e8-bc9e9339997f)
 
 
 ## Principais tecnologias utilizadas:
