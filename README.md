@@ -1,6 +1,6 @@
 ## Sobre
 
-**What's The Game?** é projeto é composto por um aplicativo móvel desenvolvido em Koltin com o com seu backend desenvolvido em Kotlin e com um banco de dados Postgres.
+**Gameaily** é projeto é composto por um aplicativo móvel desenvolvido em Koltin com o com seu backend desenvolvido em Kotlin e com um banco de dados Postgres.
 
 ![recursografico](https://github.com/Mazzotti1/WhatsTheGame/assets/70278577/8f064077-b666-45ca-90c7-20345dca635c)
 
